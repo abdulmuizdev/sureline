@@ -3,6 +3,9 @@ import 'package:flutter_app_icon_changer/flutter_app_icon_changer.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sureline/common/domain/use_cases/convert_widget_to_png_use_case.dart';
+import 'package:sureline/common/domain/use_cases/own_quotes/get_own_quotes_use_case.dart';
+import 'package:sureline/common/domain/use_cases/own_quotes/record/remove_own_quote_use_case.dart';
+import 'package:sureline/common/domain/use_cases/own_quotes/record/save_own_quote_use_case.dart';
 import 'package:sureline/common/domain/use_cases/quote/get_liked_quotes_count_use_case.dart';
 import 'package:sureline/common/domain/use_cases/get_voice_use_case.dart';
 import 'package:sureline/common/domain/use_cases/is_onboarding_completed_use_case.dart';
@@ -85,6 +88,7 @@ import 'package:sureline/features/onboarding/icon_selection/presentation/bloc/ic
 import 'package:sureline/features/onboarding/interested_catag/presentation/bloc/category_bloc.dart';
 import 'package:sureline/features/onboarding/name/presentation/bloc/onboarding_name_bloc.dart';
 import 'package:sureline/features/onboarding/theme_selection/presentation/bloc/theme_bloc.dart';
+import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_bloc.dart';
 import 'package:sureline/features/preferenecs/presentation/bloc/preferences_bloc.dart';
 import 'package:sureline/features/remote_config/data/data_source/remote_config_data_source.dart';
 import 'package:sureline/features/remote_config/data/repository/remote_config_repository.dart';
@@ -179,6 +183,11 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => SaveLikedQuoteUseCase(locator()));
   locator.registerFactory(() => RemoveLikedQuoteUseCase(locator()));
   locator.registerFactory(() => GetLikedQuotesUseCase(locator()));
+
+  locator.registerFactory(() => GetOwnQuotesUseCase(locator()));
+  locator.registerFactory(() => SaveOwnQuoteUseCase(locator()));
+  locator.registerFactory(() => RemoveOwnQuoteUseCase(locator()));
+
   locator.registerFactory(() => GetLikedQuotesCountUseCase(locator()));
   locator.registerFactory(() => GetRandomQuotesUseCase(locator()));
   locator.registerFactory(
@@ -210,6 +219,8 @@ Future<void> setupLocator() async {
       locator(),
     ),
   );
+
+  locator.registerFactory(() => OwnQuotesBloc(locator(), locator(), locator()));
 
   locator.registerFactory<VoiceDataSource>(() => VoiceDataSourceImpl());
   locator.registerFactory<VoiceRepository>(

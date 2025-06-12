@@ -157,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen>
             },
             quote: entity.quote,
             exportKey: _exportKey,
-            quoteKey: entity.quoteKey,
+            quoteKey: entity.quoteKey!,
             isLiveBackground: App.themeEntity.backgroundEntity.isLiveBackground,
           ),
         );
@@ -321,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   vertical: 100,
                                 ),
                                 child: HomeListItem(
-                                  quoteKey: _quotes[index].quoteKey,
+                                  quoteKey: _quotes[index].quoteKey!,
                                   isWelcome:
                                       (_isSwipeCompleted) ? false : index == 0,
                                   showSwipeUp:
@@ -527,7 +527,7 @@ class _HomeScreenState extends State<HomeScreen>
             (context) => ShareControlsBottomSheet(
               isWaterMarkShowing: _showWaterMark,
               onHideWaterMarkPressed: _hideWaterMark,
-              quoteKey: _quotes[index].quoteKey,
+              quoteKey: _quotes[index].quoteKey!,
               exportKey: _exportKey,
               quote: _quotes[index].quote,
               isLiveBackground:

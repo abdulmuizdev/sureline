@@ -6,7 +6,7 @@ class QuoteEntity {
   final String quote;
   final bool isLiked;
   final bool isOwnQuote;
-  final GlobalKey quoteKey;
+  final GlobalKey? quoteKey;
   final DateTime? likedAt;
 
   const QuoteEntity({

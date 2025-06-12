@@ -6,6 +6,7 @@ class SurelineButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool? disableVerticalPadding;
   final bool? disableHorizontalPadding;
+  final bool? isOutlined;
 
   const SurelineButton({
     super.key,
@@ -13,6 +14,7 @@ class SurelineButton extends StatelessWidget {
     required this.onPressed,
     this.disableVerticalPadding,
     this.disableHorizontalPadding,
+    this.isOutlined,
   });
 
   @override
@@ -27,8 +29,15 @@ class SurelineButton extends StatelessWidget {
         child: Container(
           height: 48,
           decoration: BoxDecoration(
-            color: AppColors.primaryColor,
+            color: (isOutlined ?? false) ? null : AppColors.primaryColor,
             borderRadius: BorderRadius.circular(10),
+            border:
+                (isOutlined ?? false)
+                    ? Border.all(
+                      color: AppColors.primaryColor.withValues(alpha: 0.5),
+                      width: 1,
+                    )
+                    : null,
           ),
           child: Center(
             child: Text(
@@ -36,7 +45,10 @@ class SurelineButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color: AppColors.white,
+                color:
+                    (isOutlined ?? false)
+                        ? AppColors.primaryColor
+                        : AppColors.white,
               ),
             ),
           ),

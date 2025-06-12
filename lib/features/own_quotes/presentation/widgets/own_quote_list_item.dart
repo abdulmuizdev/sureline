@@ -104,7 +104,7 @@ class _OwnQuoteListItemState extends State<OwnQuoteListItem> {
                 ),
               ],
             ),
-            SizedBox(height: 24),
+            // SizedBox(height: 14),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

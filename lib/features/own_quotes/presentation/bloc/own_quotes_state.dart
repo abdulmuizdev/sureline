@@ -10,3 +10,8 @@ class GotOwnQuotes extends OwnQuotesState {
   final List<QuoteEntity>? ownQuotes;
   const GotOwnQuotes(this.ownQuotes);
 }
+
+class SavedOwnQuote extends OwnQuotesState {
+  final List<QuoteEntity> ownQuotes;
+  const SavedOwnQuote(this.ownQuotes);
+}

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:sureline/common/domain/use_cases/own_quotes/record/save_own_quote_use_case.dart';
 import 'package:sureline/common/presentation/dialog/streak/widget/sureline_back_button.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
@@ -16,6 +17,7 @@ import 'package:sureline/features/home/domain/entity/quote_entity.dart';
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_bloc.dart';
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_event.dart';
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_state.dart';
+import 'package:sureline/features/own_quotes/presentation/widgets/own_quote_list_item.dart';
 import 'package:sureline/features/search/presentation/widget/sureline_search_bar.dart';
 
 class OwnQuotesBottomSheet extends StatefulWidget {
@@ -177,7 +179,7 @@ class _FirstPageState extends State<FirstPage> {
                     const Spacer(),
                     SurelineButton(
                       text: 'Add quote',
-                      onPressed: () {
+                      onPressed: () async {
                         final state =
                             context
                                 .findAncestorStateOfType<
@@ -186,11 +188,16 @@ class _FirstPageState extends State<FirstPage> {
                         state?.setState(() {
                           state._appBarTitle = 'Back';
                         });
-                        Navigator.of(context).push(
+                        final udpatedQuotes = await Navigator.of(
+                          context,
+                        ).push<List<QuoteEntity>?>(
                           CupertinoPageRoute(
                             builder: (context) => const SecondPage(),
                           ),
                         );
+                        setState(() {
+                          _ownQuotes = udpatedQuotes ?? [];
+                        });
                       },
                     ),
                   ],
@@ -207,13 +214,7 @@ class _FirstPageState extends State<FirstPage> {
                     }
                   },
                   child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(30),
-                        topLeft: Radius.circular(30),
-                      ),
-                      color: AppColors.white,
-                    ),
+                    decoration: BoxDecoration(color: AppColors.white),
                     child: Padding(
                       padding: const EdgeInsets.only(
                         top: 18,
@@ -236,6 +237,7 @@ class _FirstPageState extends State<FirstPage> {
                           SurelineSearchBar(controller: SearchController()),
                           SizedBox(height: 27),
                           SurelineButton(
+                            isOutlined: true,
                             text: 'Show all in feed',
                             onPressed: () {},
                             disableVerticalPadding: true,
@@ -245,12 +247,12 @@ class _FirstPageState extends State<FirstPage> {
                             child: ListView.builder(
                               itemCount: _ownQuotes.length,
                               itemBuilder: (context, index) {
-                                return FavouriteListItem(
+                                return OwnQuoteListItem(
                                   entity: _ownQuotes[index],
-                                  onDeletePressed: () {},
-                                  // () => context.read<OwnQuotesBloc>().add(
-                                  //   OnDeletePressed(_ownQuotes[index]),
-                                  // )
+                                  onDeletePressed:
+                                      () => context.read<OwnQuotesBloc>().add(
+                                        OnDeletePressed(_ownQuotes[index]),
+                                      ),
                                   onOverlayToggled: (value) {
                                     if (value) {
                                       setState(() {
@@ -267,6 +269,29 @@ class _FirstPageState extends State<FirstPage> {
                                 );
                               },
                             ),
+                          ),
+                          SurelineButton(
+                            text: 'Add quote',
+                            onPressed: () async {
+                              final state =
+                                  context
+                                      .findAncestorStateOfType<
+                                        _OwnQuotesBottomSheetState
+                                      >();
+                              state?.setState(() {
+                                state._appBarTitle = 'Back';
+                              });
+                              final udpatedQuotes = await Navigator.of(
+                                context,
+                              ).push<List<QuoteEntity>?>(
+                                CupertinoPageRoute(
+                                  builder: (context) => const SecondPage(),
+                                ),
+                              );
+                              setState(() {
+                                _ownQuotes = udpatedQuotes ?? [];
+                              });
+                            },
                           ),
                         ],
                       ),
@@ -293,41 +318,71 @@ class _SecondPageState extends State<SecondPage> {
   final _quoteController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
-      child: Column(
-        // mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Add new',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
-              color: AppColors.primaryColor,
-            ),
-          ),
-          SizedBox(height: 20),
-          Text(
-            'Add your own quote. It will only be visible to you',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.normal,
-              color: AppColors.primaryColor,
-            ),
-          ),
-          SizedBox(height: 20),
-          SurelineTextField(
-            controller: _quoteController,
-            showCharLimit: false,
-            hint: 'Type your quote',
-            disableCenterAlignment: true,
-            isNameInput: true,
-          ),
-          Spacer(),
-          SurelineButton(text: 'Save', onPressed: () {}),
-        ],
+    return MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => locator<OwnQuotesBloc>())],
+      child: BlocListener<OwnQuotesBloc, OwnQuotesState>(
+        listener: (context, state) {
+          if (state is SavedOwnQuote) {
+            Navigator.of(context).pop(state.ownQuotes);
+          }
+        },
+        child: BlocBuilder<OwnQuotesBloc, OwnQuotesState>(
+          builder: (context, state) {
+            return Container(
+              padding: const EdgeInsets.all(18),
+              decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
+              child: Column(
+                // mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Add new',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Add your own quote. It will only be visible to you',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  SurelineTextField(
+                    controller: _quoteController,
+                    showCharLimit: false,
+                    hint: 'Type your quote',
+                    disableCenterAlignment: true,
+                    isNameInput: false,
+                  ),
+                  Spacer(),
+                  SurelineButton(
+                    text: 'Save',
+                    onPressed: () {
+                      context.read<OwnQuotesBloc>().add(
+                        SaveOwnQuote(
+                          QuoteEntity(
+                            quote: _quoteController.text,
+                            author: '',
+                            isLiked: false,
+                            quoteKey: null,
+                            likedAt: null,
+                            isOwnQuote: true,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
