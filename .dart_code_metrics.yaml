@@ -1,0 +1,20 @@
+metrics:
+  cyclomatic-complexity: 5
+  number-of-arguments: 3
+  lines-of-code: 20
+  maximum-nesting-level: 3
+  number-of-methods: 5
+
+rules:
+  - prefer-trailing-comma
+  - always-remove-unused-imports
+  - avoid-returning-widgets
+  - no-boolean-literal-compare
+  - avoid-non-null-assertion
+  - prefer-conditional-expressions
+  - member-ordering
+  - newline-before-return
+  - no-equal-then-else
+  - avoid-unnecessary-setstate
+  - avoid-throw-in-catch-block
+  - prefer-moving-to-variable

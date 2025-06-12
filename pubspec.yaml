@@ -1,0 +1,79 @@
+name: sureline
+description: "Positive energy for founders"
+publish_to: 'none' # Remove this line if you're planning to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  dotted_border: 2.1.0
+#  flagsmith: ^6.0.1
+  flagsmith: ^5.0.1
+  dio: ^5.7.0
+  dartz: ^0.10.1
+  equatable: ^2.0.7
+  connectivity_plus: ^6.1.4
+  get_it: ^8.0.3
+  flutter_portal: ^1.1.4
+  intl: ^0.20.2
+  vibration:
+  throttling: ^2.0.1
+  flutter_app_icon_changer: ^0.1.1
+  flutter_bloc: ^9.1.0
+  app_minimizer: ^1.0.0+3
+  video_player: ^2.9.5
+  in_app_review: ^2.0.10
+  url_launcher: ^6.3.1
+  flutter_inappwebview: ^6.1.5
+  package_info_plus: ^8.3.0
+  flutter_tts: ^4.2.2
+  syncfusion_flutter_sliders: ^29.1.40
+  font_awesome_flutter: ^10.8.0
+  image_picker: ^1.1.2
+  path_provider: ^2.1.5
+  image_gallery_saver: ^2.0.3
+  share_plus: ^11.0.0
+  gallery_saver: ^2.3.2
+  permission_handler: ^12.0.0+1
+  shared_preferences: ^2.5.3
+  flutter_staggered_grid_view: ^0.7.0
+  cached_network_image: ^3.0.0
+  http:
+  ios_color_picker_with_title: ^1.0.2
+  google_fonts: ^4.0.4
+  path:
+  flutter_local_notifications: ^18.0.1
+  timezone:
+  flutter_native_timezone: ^2.0.0
+  mockito: ^5.4.6
+  home_widget: ^0.7.0+1
+  shared_preference_app_group: ^1.1.1
+  flutter_app_group_directory: ^1.1.0
+  story_view: ^0.16.5
+  uuid: ^4.5.1
+  screenshot_callback: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+#  very_good_analysis: ^7.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/videos/
+    - assets/data/
+#  fonts:
+#    - family: poppins
+#      fonts:
+#        - asset: assets/font/poppins/Poppins-Bold.ttf
+#        - asset: assets/font/poppins/Poppins-Regular.ttf
+#        - asset: assets/font/poppins/Poppins-Medium.ttf
+#        - asset: assets/font/poppins/Poppins-ExtraBold.ttf
