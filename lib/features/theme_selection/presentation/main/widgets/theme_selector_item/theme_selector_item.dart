@@ -127,9 +127,6 @@ class _ThemeSelectorItemState extends State<ThemeSelectorItem> {
                         padding: const EdgeInsets.all(9),
                         child: EditButton(
                           onPressed: () {
-                            debugPrint(
-                              'edit button is this ${widget.entity.backgroundEntity.isLiveBackground}',
-                            );
                             showModalBottomSheet(
                               isScrollControlled: true,
                               useSafeArea: false,

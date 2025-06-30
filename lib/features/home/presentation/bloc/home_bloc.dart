@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/common/domain/entities/streak_entity.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_quotes_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/clear_streak_data_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/get_all_streak_data_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/get_last_check_in_use_case.dart';
@@ -11,14 +10,11 @@ import 'package:sureline/common/domain/use_cases/streak/get_last_seven_days_stre
 import 'package:sureline/common/domain/use_cases/streak/is_streak_broken_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/log_streak_entry_use_case.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/home/domain/use_cases/like/decrement_like_count_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/get_like_count_use_case.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_liked_quotes_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/increment_like_count_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/add_favourite_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/get_favourites_count_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/remove_favourite_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/feed/is_feed_setup_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/like/guide/is_like_guide_shown_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/record/remove_liked_quote_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/record/save_liked_quote_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/share/is_share_guide_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/swipe/is_swipe_completed_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/feed/set_feed_setup_to_shown_use_case.dart';
@@ -31,9 +27,12 @@ import 'package:sureline/features/home/presentation/bloc/home_state.dart';
 import 'package:sureline/common/domain/use_cases/streak/can_log_streak_entry_use_case.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/edit_notification_preset_use_case.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/get_notification_presets_use_case.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_quotes_from_recommendation_algorithm.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/mark_quote_as_shown_use_case.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final GetQuotesUseCase _getQuotesUseCase;
+  final GetQuotesFromRecommendationAlgorithm
+  _getQuotesFromRecommendationAlgorithm;
   final SetOnboardingToCompletedUseCase _setOnboardingToCompletedUseCase;
 
   final IsSwipeCompletedUseCase _isSwipeCompletedUseCase;
@@ -47,10 +46,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final SetLikeGuideToShownUseCase _setLikeGuideToShownUseCase;
   final SetShareGuideToShownUseCase _setShareGuideToShownUseCase;
 
-  final IncrementLikeCountUseCase _incrementLikeCountUseCase;
-  final DecrementLikeCountUseCase _decrementLikeCountUseCase;
-  final GetLikeCountUseCase _getLikeCountUseCase;
-
   final IsStreakBrokenUseCase _isStreakBrokenUseCase;
   final GetLastCheckInUseCase _getLastCheckInUseCase;
   final CanLogStreakEntryUseCase _canLogStreakEntryUseCase;
@@ -62,18 +57,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetNotificationPresetsUseCase _getNotificationPresetsUseCase;
   final EditNotificationPresetUseCase _editNotificationPresetUseCase;
 
-  final SaveLikedQuoteUseCase _saveLikedQuoteUseCase;
-  final GetLikedQuotesUseCase _getLikedQuotesUseCase;
-  final RemoveLikedQuoteUseCase _removeLikedQuoteUseCase;
+  // final SaveLikedQuoteUseCase _saveLikedQuoteUseCase;
+  final AddFavouriteUseCase _addFavouriteUseCase;
+  final GetFavouritesCountUseCase _getFavouritesCountUseCase;
+  final RemoveFavouriteUseCase _removeFavouriteUseCase;
+  final MarkQuoteAsShownUseCase _markQuoteAsShownUseCase;
 
   HomeBloc(
-    this._getQuotesUseCase,
+    this._getQuotesFromRecommendationAlgorithm,
     this._setOnboardingToCompletedUseCase,
     this._setSwipeToCompletedUseCase,
-    this._incrementLikeCountUseCase,
-    this._decrementLikeCountUseCase,
     this._isSwipeCompletedUseCase,
-    this._getLikeCountUseCase,
     this._isShareGuideShownUseCase,
     this._setShareGuideToShownUseCase,
     this._setLikeGuideToShownUseCase,
@@ -89,12 +83,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     this._getAllStreakDataUseCase,
     this._getNotificationPresetsUseCase,
     this._editNotificationPresetUseCase,
-    this._saveLikedQuoteUseCase,
-    this._getLikedQuotesUseCase,
-    this._removeLikedQuoteUseCase,
+    // this._saveLikedQuoteUseCase,
+    this._addFavouriteUseCase,
+    this._getFavouritesCountUseCase,
+    this._removeFavouriteUseCase,
+    this._markQuoteAsShownUseCase,
   ) : super(Initial()) {
     on<GetQuotes>((event, emit) async {
-      final result = await _getQuotesUseCase.execute();
+      final result = await _getQuotesFromRecommendationAlgorithm.call(
+        event.page,
+      );
       result.fold(
         (left) {
           emit(HomeError(left.message));
@@ -104,6 +102,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           emit(GotQuotes(temp));
         },
       );
+    });
+
+    on<MarkQuoteAsShown>((event, emit) async {
+      final result = await _markQuoteAsShownUseCase.call(event.id);
+      result.fold((left) {}, (right) {
+        emit(QuoteAsShown());
+      });
     });
 
     on<OnboardingComplete>((event, emit) async {
@@ -157,11 +162,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       HapticFeedback.lightImpact();
       Either<Failure, int> result;
       if (event.isLiked) {
-        await _saveLikedQuoteUseCase.execute(event.entity);
-        result = await _incrementLikeCountUseCase.execute();
+        await _addFavouriteUseCase.call(event.entity);
+        result = await _getFavouritesCountUseCase.call();
       } else {
-        await _removeLikedQuoteUseCase.execute(event.entity);
-        result = await _decrementLikeCountUseCase.execute();
+        // await _removeFavouriteUseCase.call(event.entity.id);
+        result = await _getFavouritesCountUseCase.call();
       }
       result.fold((left) {}, (right) {
         emit(GotLikeCount(right));
@@ -169,7 +174,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
 
     on<GetLikeCount>((event, emit) async {
-      final result = await _getLikeCountUseCase.execute();
+      final result = await _getFavouritesCountUseCase.call();
       result.fold((left) {}, (right) {
         emit(GotLikeCount(right));
       });
@@ -204,7 +209,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (broken) {
         await _handleBrokenStreak(emit);
       } else {
-        _handleOnGoingStreak(emit);
+        await _handleOnGoingStreak(emit);
       }
     });
   }

@@ -29,7 +29,6 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
     super.dispose();
   }
 
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -37,21 +36,17 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).push(
           PageRouteBuilder(
-              pageBuilder:
-                  (context, animation, secondaryAnimation) =>
-                  HomeScreen(),
-              transitionsBuilder: (
-                  context,
-                  animation,
-                  secondaryAnimation,
-                  child,
-                  ) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-              transitionDuration: Duration(milliseconds: 300)
+            pageBuilder:
+                (context, animation, secondaryAnimation) => HomeScreen(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: Duration(milliseconds: 300),
           ),
         );
       });

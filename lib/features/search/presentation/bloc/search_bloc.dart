@@ -4,10 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/common/domain/use_cases/quote/get_quotes_search_results_use_case.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/home/domain/use_cases/like/decrement_like_count_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/increment_like_count_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/record/remove_liked_quote_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/record/save_liked_quote_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/add_favourite_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/get_favourites_count_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/remove_favourite_use_case.dart';
 import 'package:sureline/features/search/presentation/bloc/search_event.dart';
 import 'package:sureline/features/search/presentation/bloc/search_state.dart';
 
@@ -16,10 +15,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   // final GetQuotesUseCase _getQuotesUseCase;
 
-  final SaveLikedQuoteUseCase _saveLikedQuoteUseCase;
-  final IncrementLikeCountUseCase _incrementLikeCountUseCase;
-  final DecrementLikeCountUseCase _decrementLikeCountUseCase;
-  final RemoveLikedQuoteUseCase _removeLikedQuoteUseCase;
+  // final SaveLikedQuoteUseCase _saveLikedQuoteUseCase;
+  final AddFavouriteUseCase _addFavouriteUseCase;
+  final RemoveFavouriteUseCase _removeFavouriteUseCase;
+  final GetFavouritesCountUseCase _getFavouritesCountUseCase;
 
   String searchQuery = '';
   int page = 1;
@@ -28,20 +27,19 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc(
     this._getQuotesSearchResultsUseCase,
     // this._getQuotesUseCase,
-    this._decrementLikeCountUseCase,
-    this._removeLikedQuoteUseCase,
-    this._incrementLikeCountUseCase,
-    this._saveLikedQuoteUseCase,
+    this._addFavouriteUseCase,
+    this._removeFavouriteUseCase,
+    this._getFavouritesCountUseCase,
   ) : super(Initial()) {
     on<OnLikePressed>((event, emit) async {
       HapticFeedback.lightImpact();
       Either<Failure, int> result;
       if (event.isLiked) {
-        await _saveLikedQuoteUseCase.execute(event.entity);
-        result = await _incrementLikeCountUseCase.execute();
+        await _addFavouriteUseCase.call(event.entity);
+        result = await _getFavouritesCountUseCase.call();
       } else {
-        await _removeLikedQuoteUseCase.execute(event.entity);
-        result = await _decrementLikeCountUseCase.execute();
+        // await _removeFavouriteUseCase.call(event.entity.id);
+        result = await _getFavouritesCountUseCase.call();
       }
       result.fold((left) {}, (right) {
         // emit(GotLikeCount(right));

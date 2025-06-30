@@ -187,6 +187,7 @@ class _CreateAndEditThemeBottomSheetState
                             context.read<CreateThemeBloc>().add(
                               OnDonePressed(
                                 entity: ThemeEntity(
+                                  lastAccessed: DateTime.now(),
                                   textDecorEntity: ThemeTextDecorEntity(
                                     fontSize: _finalTextStyle.fontSize!,
                                     fontWeight: _finalTextStyle.fontWeight!,
@@ -476,6 +477,7 @@ class _CreateAndEditThemeBottomSheetState
   bool _checkDifference() {
     {
       final newEntity = ThemeEntity(
+        lastAccessed: DateTime.now(),
         textDecorEntity: ThemeTextDecorEntity(
           fontSize: _finalTextStyle.fontSize!,
           fontWeight: _finalTextStyle.fontWeight!,

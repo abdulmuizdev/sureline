@@ -2,16 +2,16 @@ import 'package:dio/dio.dart';
 import 'package:flutter_app_icon_changer/flutter_app_icon_changer.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sureline/common/data/database/dao/references/collections_favourites_dao.dart';
+import 'package:sureline/common/data/database/dao/references/collections_own_quotes_table_dao.dart';
+import 'package:sureline/common/domain/use_cases/collections/add_favourite_to_collection_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/add_own_quote_to_collection_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/remove_favourite_from_collection_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/remove_own_quote_from_collection_use_case.dart';
 import 'package:sureline/common/domain/use_cases/convert_widget_to_png_use_case.dart';
-import 'package:sureline/common/domain/use_cases/own_quotes/get_own_quotes_use_case.dart';
-import 'package:sureline/common/domain/use_cases/own_quotes/record/remove_own_quote_use_case.dart';
-import 'package:sureline/common/domain/use_cases/own_quotes/record/save_own_quote_use_case.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_liked_quotes_count_use_case.dart';
 import 'package:sureline/common/domain/use_cases/get_voice_use_case.dart';
 import 'package:sureline/common/domain/use_cases/is_onboarding_completed_use_case.dart';
 import 'package:sureline/common/domain/use_cases/quote/get_quotes_search_results_use_case.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_quotes_use_case.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_random_quotes_use_case.dart';
 import 'package:sureline/common/domain/use_cases/schedule_up_to_sixty_notifications_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/clear_streak_data_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/get_all_streak_data_use_case.dart';
@@ -21,19 +21,40 @@ import 'package:sureline/common/domain/use_cases/streak/get_total_streak_score_u
 import 'package:sureline/common/domain/use_cases/streak/is_streak_broken_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/log_streak_entry_use_case.dart';
 import 'package:sureline/core/constants/sureline_icons.dart';
+import 'package:sureline/core/db/app_database.dart';
 import 'package:sureline/core/network/network_info.dart';
+import 'package:sureline/features/collections/data/data_sources/collections_data_source.dart';
+import 'package:sureline/features/collections/data/database/dao/collections_dao.dart';
+import 'package:sureline/features/collections/data/repository/collections_repository_impl.dart';
+import 'package:sureline/features/collections/domain/repository/collections_repository.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_collections_of_favourites_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_collections_of_own_quotes_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_collections_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_favourites_of_collection_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_own_quotes_of_collection_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/remove_collection_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/save_collection_use_case.dart';
+import 'package:sureline/features/collections/presentation/bloc/collections_bloc.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/data_source/create_and_edit_theme_data_source.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/repository/create_and_edit_theme_repository_impl.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/domain/repository/create_and_edit_theme_repository.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/domain/use_case/download_photo_use_case.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_bloc.dart';
+import 'package:sureline/features/favourites/data/data_source/favourites_data_source.dart';
+import 'package:sureline/features/favourites/data/database/dao/favourites_dao.dart';
+import 'package:sureline/features/favourites/data/repository/favourites_repository_impl.dart';
+import 'package:sureline/features/favourites/domain/repository/favourites_repository.dart';
+import 'package:sureline/features/favourites/domain/use_cases/add_favourite_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/get_favourites_count_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/get_favourites_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/remove_favourite_use_case.dart';
 import 'package:sureline/features/favourites/presentation/bloc/favourites_bloc.dart';
-import 'package:sureline/features/general_settings/content_preferences/data/data_source/content_prefs_data_source.dart';
-import 'package:sureline/features/general_settings/content_preferences/data/repository/content_pref_repository_impl.dart';
-import 'package:sureline/features/general_settings/content_preferences/domain/repository/content_pref_repository.dart';
-import 'package:sureline/features/general_settings/content_preferences/domain/use_case/get_content_prefs_use_case.dart';
-import 'package:sureline/features/general_settings/content_preferences/domain/use_case/update_content_prefs_use_case.dart';
-import 'package:sureline/features/general_settings/content_preferences/presentation/bloc/content_pref_bloc.dart';
+import 'package:sureline/features/general_settings/author_preferences/data/data_source/author_prefs_data_source.dart';
+import 'package:sureline/features/general_settings/author_preferences/data/repository/author_pref_repository_impl.dart';
+import 'package:sureline/features/general_settings/author_preferences/domain/repository/author_pref_repository.dart';
+import 'package:sureline/features/general_settings/author_preferences/domain/use_case/get_author_prefs_use_case.dart';
+import 'package:sureline/features/general_settings/author_preferences/domain/use_case/update_author_prefs_use_case.dart';
+import 'package:sureline/features/general_settings/author_preferences/presentation/bloc/author_pref_bloc.dart';
 import 'package:sureline/features/general_settings/gender_identity/data/data_source/gender_identity_data_source.dart';
 import 'package:sureline/features/general_settings/gender_identity/data/repository/gender_identity_repository_impl.dart';
 import 'package:sureline/features/general_settings/gender_identity/domain/repository/gender_identity_repository.dart';
@@ -57,14 +78,8 @@ import 'package:sureline/features/general_settings/voice/presentation/bloc/voice
 import 'package:sureline/features/home/data/data_source/quote_data_source.dart';
 import 'package:sureline/features/home/data/repository/quote_repository_impl.dart';
 import 'package:sureline/features/home/domain/repository/quote_repository.dart';
-import 'package:sureline/features/home/domain/use_cases/like/decrement_like_count_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/get_like_count_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/increment_like_count_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/feed/is_feed_setup_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/like/guide/is_like_guide_shown_use_case.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_liked_quotes_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/record/remove_liked_quote_use_case.dart';
-import 'package:sureline/features/home/domain/use_cases/like/record/save_liked_quote_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/share/is_share_guide_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/swipe/is_swipe_completed_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/save_all_quotes_to_app_group_use_case.dart';
@@ -74,6 +89,11 @@ import 'package:sureline/features/home/domain/use_cases/set_onboarding_to_comple
 import 'package:sureline/features/home/domain/use_cases/share/set_share_guide_to_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/swipe/set_swipe_to_completed_use_case.dart';
 import 'package:sureline/features/home/presentation/bloc/home_bloc.dart';
+import 'package:sureline/features/manage_subscription/data/data_source/manage_subscription_data_source.dart';
+import 'package:sureline/features/manage_subscription/data/repository/subscription_record_repository_impl.dart';
+import 'package:sureline/features/manage_subscription/domain/repository/subscription_record_repository.dart';
+import 'package:sureline/features/manage_subscription/domain/use_cases/get_subscription_records_use_case.dart';
+import 'package:sureline/features/manage_subscription/presentation/bloc/subscription_record_bloc.dart';
 import 'package:sureline/features/notifications_settings/data/data_source/notification_settings_data_source.dart';
 import 'package:sureline/features/notifications_settings/data/repository/notification_setting_repository_impl.dart';
 import 'package:sureline/features/notifications_settings/domain/repository/notification_setting_repository.dart';
@@ -84,12 +104,26 @@ import 'package:sureline/features/notifications_settings/domain/use_cases/enable
 import 'package:sureline/features/notifications_settings/domain/use_cases/get_notification_presets_use_case.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/initialize_notifications_presets_use_case.dart';
 import 'package:sureline/features/notifications_settings/presentation/bloc/notification_setting_bloc.dart';
-import 'package:sureline/features/onboarding/icon_selection/presentation/bloc/icon_bloc.dart';
+import 'package:sureline/common/presentation/bloc/icon_bloc.dart';
 import 'package:sureline/features/onboarding/interested_catag/presentation/bloc/category_bloc.dart';
 import 'package:sureline/features/onboarding/name/presentation/bloc/onboarding_name_bloc.dart';
 import 'package:sureline/features/onboarding/theme_selection/presentation/bloc/theme_bloc.dart';
+import 'package:sureline/features/own_quotes/data/data_source/own_quotes_data_source.dart';
+import 'package:sureline/features/own_quotes/data/database/dao/own_quotes_dao.dart';
+import 'package:sureline/features/own_quotes/data/repository/own_quotes_repository.impl.dart';
+import 'package:sureline/features/own_quotes/domain/repository/own_quotes_repository.dart';
+import 'package:sureline/features/own_quotes/domain/use_cases/add_own_quote_use_case.dart';
+import 'package:sureline/features/own_quotes/domain/use_cases/get_all_own_quotes_use_case.dart';
+import 'package:sureline/features/own_quotes/domain/use_cases/remove_own_quote_use_case.dart';
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_bloc.dart';
 import 'package:sureline/features/preferenecs/presentation/bloc/preferences_bloc.dart';
+import 'package:sureline/features/recommendation_algorithm/data/data_source/recommendation_algorithm_data_source.dart';
+import 'package:sureline/features/recommendation_algorithm/data/database/dao/quotes_dao.dart';
+import 'package:sureline/features/recommendation_algorithm/data/repository/recommendation_algorithm_repository_impl.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/repository/recommendation_algorithm_repository.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_quotes_from_recommendation_algorithm.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/initialize_recommendation_algorithm.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/mark_quote_as_shown_use_case.dart';
 import 'package:sureline/features/remote_config/data/data_source/remote_config_data_source.dart';
 import 'package:sureline/features/remote_config/data/repository/remote_config_repository.dart';
 import 'package:sureline/features/remote_config/domain/repositories/remote_config_repository.dart';
@@ -127,10 +161,17 @@ import 'package:sureline/features/unsplash_screen/domain/use_case/get_photos_sea
 import 'package:sureline/features/unsplash_screen/domain/use_case/get_photos_use_case.dart';
 import 'package:sureline/features/unsplash_screen/presentation/bloc/photo_bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:sureline/features/general_settings/muted_content/data/data_source/muted_content_data_source.dart';
+import 'package:sureline/features/general_settings/muted_content/data/repository/muted_content_repository_impl.dart';
+import 'package:sureline/features/general_settings/muted_content/domain/repository/muted_content_repository.dart';
+import 'package:sureline/features/general_settings/muted_content/domain/use_case/get_muted_content_use_case.dart';
+import 'package:sureline/features/general_settings/muted_content/domain/use_case/update_muted_content_use_case.dart';
+import 'package:sureline/features/general_settings/muted_content/presentation/bloc/muted_content_bloc.dart';
 
 final locator = GetIt.instance;
 
 Future<void> setupLocator() async {
+  locator.registerSingleton<AppDatabase>(AppDatabase());
   locator.registerFactory(() => Dio());
   locator.registerFactory<NetworkInfo>(() => NetworkInfoImpl());
 
@@ -174,26 +215,34 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => SetFeedSetupToShownUseCase(locator()));
   locator.registerFactory(() => SetLikeGuideToShownUseCase(locator()));
   locator.registerFactory(() => SetShareGuideToShownUseCase(locator()));
-  locator.registerFactory(() => GetQuotesUseCase(locator()));
+  // locator.registerFactory(() => GetQuotesUseCase(locator()));
   locator.registerFactory(() => GetQuotesSearchResultsUseCase(locator()));
   locator.registerFactory(() => SaveAllQuotesToAppGroupUseCase(locator()));
-  locator.registerFactory(() => GetLikeCountUseCase(locator()));
-  locator.registerFactory(() => IncrementLikeCountUseCase(locator()));
-  locator.registerFactory(() => DecrementLikeCountUseCase(locator()));
-  locator.registerFactory(() => SaveLikedQuoteUseCase(locator()));
-  locator.registerFactory(() => RemoveLikedQuoteUseCase(locator()));
-  locator.registerFactory(() => GetLikedQuotesUseCase(locator()));
+  locator.registerFactory(() => AddFavouriteUseCase(locator()));
+  locator.registerFactory(() => RemoveFavouriteUseCase(locator()));
+  locator.registerFactory(() => GetFavouritesCountUseCase(locator()));
+  locator.registerFactory(
+    () => RemoveFavouriteFromCollectionUseCase(locator()),
+  );
+  locator.registerFactory(() => AddFavouriteToCollectionUseCase(locator()));
 
-  locator.registerFactory(() => GetOwnQuotesUseCase(locator()));
-  locator.registerFactory(() => SaveOwnQuoteUseCase(locator()));
+  locator.registerFactory(() => OwnQuotesDao(locator()));
+  locator.registerFactory(() => CollectionsOwnQuotesTableDao(locator()));
+
+  locator.registerFactory<OwnQuotesDataSource>(
+    () => OwnQuotesDataSourceImpl(locator(), locator()),
+  );
+  locator.registerFactory<OwnQuotesRepository>(
+    () => OwnQuotesRepositoryImpl(locator()),
+  );
+
+  locator.registerFactory(() => GetAllOwnQuotesUseCase(locator()));
+  locator.registerFactory(() => AddOwnQuoteUseCase(locator()));
   locator.registerFactory(() => RemoveOwnQuoteUseCase(locator()));
 
-  locator.registerFactory(() => GetLikedQuotesCountUseCase(locator()));
-  locator.registerFactory(() => GetRandomQuotesUseCase(locator()));
+  // locator.registerFactory(() => GetRandomQuotesUseCase(locator()));
   locator.registerFactory(
     () => HomeBloc(
-      locator(),
-      locator(),
       locator(),
       locator(),
       locator(),
@@ -220,7 +269,53 @@ Future<void> setupLocator() async {
     ),
   );
 
+  locator.registerFactory(() => QuotesDao(locator()));
+  locator.registerFactory<RecommendationAlgorithmDataSource>(
+    () => RecommendationAlgorithmDataSourceImpl(locator()),
+  );
+  locator.registerFactory<RecommendationAlgorithmRepository>(
+    () => RecommendationAlgorithmRepositoryImpl(locator()),
+  );
+
+  locator.registerFactory(
+    () => GetQuotesFromRecommendationAlgorithm(locator()),
+  );
+  locator.registerFactory(() => InitializeRecommendationAlgorithm(locator()));
+  locator.registerFactory(() => MarkQuoteAsShownUseCase(locator()));
   locator.registerFactory(() => OwnQuotesBloc(locator(), locator(), locator()));
+
+  locator.registerFactory<CollectionsDataSource>(
+    () => CollectionsDataSourceImpl(locator(), locator(), locator(), locator()),
+  );
+  locator.registerFactory<CollectionsDao>(() => CollectionsDao(locator()));
+  locator.registerFactory<CollectionsRepository>(
+    () => CollectionsRepositoryImpl(locator()),
+  );
+  locator.registerFactory(() => GetCollectionsUseCase(locator()));
+  locator.registerFactory(() => SaveCollectionUseCase(locator()));
+  locator.registerFactory(() => RemoveCollectionUseCase(locator()));
+
+  locator.registerFactory(() => GetFavouritesOfCollectionUseCase(locator()));
+  locator.registerFactory(() => GetCollectionsOfFavouritesUseCase(locator()));
+  locator.registerFactory(() => AddOwnQuoteToCollectionUseCase(locator()));
+  locator.registerFactory(() => RemoveOwnQuoteFromCollectionUseCase(locator()));
+  locator.registerFactory(() => GetOwnQuotesOfCollectionUseCase(locator()));
+  locator.registerFactory(() => GetCollectionsOfOwnQuotesUseCase(locator()));
+  locator.registerFactory(
+    () => CollectionsBloc(
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+    ),
+  );
 
   locator.registerFactory<VoiceDataSource>(() => VoiceDataSourceImpl());
   locator.registerFactory<VoiceRepository>(
@@ -340,15 +435,42 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => ConvertWidgetToPngUseCase(locator()));
   locator.registerFactory(() => GetTotalStreakScoreUseCase(locator()));
 
-  locator.registerFactory<ContentPrefsDataSource>(
-    () => ContentPrefsDataSourceImpl(locator()),
+  locator.registerFactory<AuthorPrefsDataSource>(
+    () => AuthorPrefsDataSourceImpl(locator()),
   );
-  locator.registerFactory<ContentPrefRepository>(
-    () => ContentPrefRepositoryImpl(locator()),
+  locator.registerFactory<AuthorPrefRepository>(
+    () => AuthorPrefRepositoryImpl(locator()),
   );
-  locator.registerFactory(() => GetContentPrefsUseCase(locator()));
-  locator.registerFactory(() => UpdateContentPrefsUseCase(locator()));
-  locator.registerFactory(() => ContentPrefBloc(locator(), locator()));
+  locator.registerFactory(() => GetAuthorPrefsUseCase(locator()));
+  locator.registerFactory(() => UpdateAuthorPrefsUseCase(locator()));
+  locator.registerFactory(() => AuthorPrefBloc(locator(), locator()));
+
+  locator.registerFactory<MutedContentDataSource>(
+    () => MutedContentDataSourceImpl(locator()),
+  );
+  locator.registerFactory<MutedContentRepository>(
+    () => MutedContentRepositoryImpl(locator()),
+  );
+  locator.registerFactory(() => GetMutedContentUseCase(locator()));
+  locator.registerFactory(() => UpdateMutedContentUseCase(locator()));
+  locator.registerFactory(() => MutedContentBloc(locator(), locator()));
+
+  locator.registerFactory<ManageSubscriptionDataSource>(
+    () => ManageSubscriptionDataSourceImpl(),
+  );
+  locator.registerFactory<SubscriptionRecordRepository>(
+    () => SubscriptionRecordRepositoryImpl(dataSource: locator()),
+  );
+  locator.registerFactory(
+    () => GetSubscriptionRecordsUseCase(repository: locator()),
+  );
+  locator.registerFactory(
+    () => SubscriptionRecordBloc(
+      getSubscriptionRecordsUseCase: GetSubscriptionRecordsUseCase(
+        repository: locator(),
+      ),
+    ),
+  );
 
   locator.registerFactory<GenderIdentityDataSource>(
     () => GenderIdentityDataSourceImpl(locator()),
@@ -370,11 +492,26 @@ Future<void> setupLocator() async {
 
   locator.registerFactory(() => StreakBloc(locator()));
 
-  locator.registerFactory(() => FavouritesBloc(locator(), locator()));
+  locator.registerFactory<FavouritesDataSource>(
+    () => FavouritesDataSourceImpl(
+      favouritesDao: locator(),
+      collectionsFavouritesDao: locator(),
+    ),
+  );
+  locator.registerFactory<FavouritesRepository>(
+    () => FavouritesRepositoryImpl(locator()),
+  );
+  locator.registerFactory(() => GetFavouritesUseCase(locator()));
+
+  locator.registerFactory(() => FavouritesDao(locator()));
+  locator.registerFactory(() => CollectionsFavouritesDao(locator()));
+
+  locator.registerFactory(
+    () => FavouritesBloc(locator(), locator(), locator(), locator()),
+  );
 
   locator.registerFactory(
     () => SearchBloc(
-      locator(),
       locator(),
       locator(),
       locator(),

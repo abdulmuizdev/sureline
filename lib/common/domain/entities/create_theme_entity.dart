@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 class ThemeEntity extends Equatable {
   final String id;
+  final DateTime lastAccessed;
   final String? previewQuote;
   final ThemeBackgroundEntity backgroundEntity;
   final ThemeTextDecorEntity textDecorEntity;
@@ -12,6 +13,7 @@ class ThemeEntity extends Equatable {
 
   ThemeEntity({
     String? id,
+    required this.lastAccessed,
     required this.textDecorEntity,
     required this.backgroundEntity,
     required this.previewQuote,
@@ -23,6 +25,7 @@ class ThemeEntity extends Equatable {
 
   factory ThemeEntity.fromModel(ThemeModel model) {
     return ThemeEntity(
+      lastAccessed: model.lastAccessed,
       textDecorEntity: ThemeTextDecorEntity.fromModel(model.textDecorModel),
       backgroundEntity: ThemeBackgroundEntity.fromModel(model.backgroundModel),
       previewQuote: model.previewQuote,

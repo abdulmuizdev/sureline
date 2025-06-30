@@ -19,7 +19,8 @@ class SP {
   static const String streakData = 'streak_data';
   static const String streakDataArchive = 'streak_data_archive';
 
-  static const String contentPreferences = 'content_preferences';
+  static const String authorPreferences = 'author_preferences';
+  static const String mutedContent = 'muted_content';
   static const String genderIdentities = 'gender_identities';
 
   static const String name = 'name';
@@ -38,4 +39,5 @@ class SP {
 
   static const String likedQuotes = 'liked_quotes';
   static const String ownQuotes = 'own_quotes';
+  // static const String collections = 'collections';
 }

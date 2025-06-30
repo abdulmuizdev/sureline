@@ -4,13 +4,14 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sureline/common/presentation/widgets/sureline_overlay.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
 
 class OwnQuoteListItem extends StatefulWidget {
   final bool isOverlayVisible;
   final Function(bool) onOverlayToggled;
   final VoidCallback onDeletePressed;
-  final QuoteEntity entity;
+  final OwnQuoteEntity entity;
+  final VoidCallback onAddToCollectionPressed;
 
   const OwnQuoteListItem({
     super.key,
@@ -18,6 +19,7 @@ class OwnQuoteListItem extends StatefulWidget {
     required this.isOverlayVisible,
     required this.onOverlayToggled,
     required this.onDeletePressed,
+    required this.onAddToCollectionPressed,
   });
 
   @override
@@ -42,7 +44,7 @@ class _OwnQuoteListItemState extends State<OwnQuoteListItem> {
               children: [
                 Expanded(
                   child: Text(
-                    widget.entity.quote,
+                    widget.entity.quoteText,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -109,8 +111,8 @@ class _OwnQuoteListItemState extends State<OwnQuoteListItem> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  (widget.entity.likedAt != null)
-                      ? '${Utils.getWeekDayLabel(widget.entity.likedAt!.weekday, threeChars: true)}, ${widget.entity.likedAt!.day} ${Utils.getMonthLabel(widget.entity.likedAt!.month)} ${widget.entity.likedAt!.year}'
+                  (widget.entity.createdAt != null)
+                      ? '${Utils.getWeekDayLabel(DateTime.parse(widget.entity.createdAt!).weekday, threeChars: true)}, ${DateTime.parse(widget.entity.createdAt!).day} ${Utils.getMonthLabel(DateTime.parse(widget.entity.createdAt!).month)} ${DateTime.parse(widget.entity.createdAt!).year}'
                       : '',
                   // 'Thu, 01 May 2025',
                   style: TextStyle(
@@ -122,16 +124,20 @@ class _OwnQuoteListItemState extends State<OwnQuoteListItem> {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        widget.onAddToCollectionPressed();
+                      },
                       icon: Icon(
-                        Icons.bookmark_border_outlined,
+                        (widget.entity.collections.isEmpty)
+                            ? Icons.bookmark_border_outlined
+                            : Icons.bookmark_outlined,
                         color: AppColors.primaryColor,
                       ),
                     ),
                     IconButton(
                       onPressed: () {
                         SharePlus.instance.share(
-                          ShareParams(text: '"${widget.entity.quote}"'),
+                          ShareParams(text: '"${widget.entity.quoteText}"'),
                         );
                       },
                       icon: Icon(

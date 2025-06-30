@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_random_quotes_use_case.dart';
 import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/constants/sureline_notification_presets.dart';
 import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/features/notifications_settings/data/model/notification_model.dart';
 import 'package:sureline/features/notifications_settings/data/model/notification_preset_model.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_quotes_from_recommendation_algorithm.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -42,9 +42,13 @@ abstract class NotificationSettingsDataSource {
 class NotificationSettingsDataSourceImpl
     extends NotificationSettingsDataSource {
   final SharedPreferences prefs;
-  final GetRandomQuotesUseCase _getRandomQuotesUseCase;
+  final GetQuotesFromRecommendationAlgorithm
+  _getQuotesFromRecommendationAlgorithm;
 
-  NotificationSettingsDataSourceImpl(this.prefs, this._getRandomQuotesUseCase);
+  NotificationSettingsDataSourceImpl(
+    this.prefs,
+    this._getQuotesFromRecommendationAlgorithm,
+  );
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -102,7 +106,9 @@ class NotificationSettingsDataSourceImpl
               .toList()
               .map((day) => day.dateTime)
               .toList();
-      final quotesResult = await _getRandomQuotesUseCase.execute(limits[i]);
+      final quotesResult = await _getQuotesFromRecommendationAlgorithm.call(
+        limits[i],
+      );
       await quotesResult.fold((left) {}, (right) async {
         await scheduleNotifications(
           qtyPerDay: model.qtyPerDay,
@@ -110,7 +116,7 @@ class NotificationSettingsDataSourceImpl
           endTime: model.endTime,
           todayReference: model.lastScheduledAt,
           weekdays: weekDays,
-          quotes: right.map((entity) => entity.quote).toList(),
+          quotes: right.map((entity) => entity.quoteText).toList(),
           limit: limits[i],
           baseId: model.id,
         );
@@ -225,7 +231,9 @@ class NotificationSettingsDataSourceImpl
             .toList();
 
     int limit = await _getAvailableNotificationScheduleLimit();
-    final quotesResult = await _getRandomQuotesUseCase.execute(limit);
+    final quotesResult = await _getQuotesFromRecommendationAlgorithm.call(
+      limit,
+    );
     await quotesResult.fold((left) {}, (right) async {
       await scheduleNotifications(
         baseId: model.id,
@@ -233,7 +241,7 @@ class NotificationSettingsDataSourceImpl
         startTime: model.startTime,
         endTime: model.endTime,
         weekdays: weekDays,
-        quotes: right.map((entity) => entity.quote).toList(),
+        quotes: right.map((entity) => entity.quoteText).toList(),
         limit: limit,
         todayReference: model.lastScheduledAt,
         isPracticeReminder: model.isPracticeReminder,

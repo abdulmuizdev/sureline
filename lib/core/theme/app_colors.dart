@@ -11,4 +11,5 @@ class AppColors {
   static const Color iosRed = Color(0xFFFF3B2F);
   static const Color green = Color(0xFF7EB29B);
   static const Color peach = Color(0xFFF1D1C1);
+  static const Color lightRed = Color(0xFFF1948A);
 }

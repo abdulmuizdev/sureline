@@ -7,7 +7,7 @@ import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/history/presentation/widget/history_list_item.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 import 'package:sureline/features/search/presentation/bloc/search_bloc.dart';
 import 'package:sureline/features/search/presentation/bloc/search_event.dart';
 import 'package:sureline/features/search/presentation/bloc/search_state.dart';

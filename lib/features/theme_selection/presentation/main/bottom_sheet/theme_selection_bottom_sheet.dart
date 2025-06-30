@@ -137,6 +137,8 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                               (context) =>
                                                   CreateAndEditThemeBottomSheet(
                                                     entity: ThemeEntity(
+                                                      lastAccessed:
+                                                          DateTime.now(),
                                                       textDecorEntity:
                                                           App
                                                               .themeEntity

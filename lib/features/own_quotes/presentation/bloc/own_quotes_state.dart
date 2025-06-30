@@ -1,4 +1,4 @@
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
 
 abstract class OwnQuotesState {
   const OwnQuotesState();
@@ -7,11 +7,11 @@ abstract class OwnQuotesState {
 class Initial extends OwnQuotesState {}
 
 class GotOwnQuotes extends OwnQuotesState {
-  final List<QuoteEntity>? ownQuotes;
+  final List<OwnQuoteEntity>? ownQuotes;
   const GotOwnQuotes(this.ownQuotes);
 }
 
 class SavedOwnQuote extends OwnQuotesState {
-  final List<QuoteEntity> ownQuotes;
+  final List<OwnQuoteEntity> ownQuotes;
   const SavedOwnQuote(this.ownQuotes);
 }

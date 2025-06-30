@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preference_app_group/shared_preference_app_group.dart';
+import 'package:sureline/common/domain/entities/streak_display_entity.dart';
 import 'package:sureline/common/presentation/dialog/streak/page/streak_bottom_sheet.dart';
 import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/features/general_settings/streak/presentation/pages/streak_setting_bottom_sheet.dart';
@@ -18,7 +19,7 @@ import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 import 'package:sureline/features/home/presentation/bloc/home_bloc.dart';
 import 'package:sureline/features/home/presentation/bloc/home_event.dart';
 import 'package:sureline/features/home/presentation/bloc/home_state.dart';
@@ -49,9 +50,9 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late Animation<double> _controlsFadeAnimation;
   late AnimationController _controller;
-  late PageController _pageController;
-
-  List<QuoteEntity> _quotes = [];
+  final PageController _pageController = PageController();
+  final List<QuoteEntity> _quotes = [];
+  int _page = 0;
 
   bool _showExtraWidgets = true;
   GlobalKey _exportKey = GlobalKey();
@@ -132,16 +133,14 @@ class _HomeScreenState extends State<HomeScreen>
       end: 1,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
 
-    _pageController = PageController(viewportFraction: 1);
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       screenshotCallback.addListener(() {
         _openShareDialog();
       });
       await Future.delayed(Duration(seconds: 1));
-      final entity = _quotes[_pageController.position.pixels.round()];
 
       if ((widget.isThemeChanged ?? false) && context.mounted) {
+        final entity = _quotes[_pageController.position.pixels.round()];
         Utils.showCustomSnackBar(
           context,
           ThemeChangedSnackBar(
@@ -155,9 +154,9 @@ class _HomeScreenState extends State<HomeScreen>
                 _showExtraWidgets = false;
               });
             },
-            quote: entity.quote,
+            quote: entity.quoteText,
             exportKey: _exportKey,
-            quoteKey: entity.quoteKey!,
+            quoteKey: entity.quoteKey,
             isLiveBackground: App.themeEntity.backgroundEntity.isLiveBackground,
           ),
         );
@@ -181,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen>
           create:
               (_) =>
                   locator<HomeBloc>()
-                    ..add(GetQuotes())
+                    ..add(GetQuotes(_page))
                     ..add(OnboardingComplete())
                     ..add(IsSwipeComplete())
                     ..add(IsFeedSetupShown())
@@ -197,19 +196,15 @@ class _HomeScreenState extends State<HomeScreen>
           if (state is StreakIsBroken) {
             debugPrint('streak is broken');
           }
-          // if (state is GotLastSevenDaysStreakData) {
-          //   debugPrint('streak data is this');
-          //   for (StreakEntity entity in state.streakData) {
-          //     debugPrint(entity.timeStamp);
-          //   }
-          //   showModalBottomSheet(
-          //     useSafeArea: true,
-          //     isScrollControlled: true,
-          //     context: context,
-          //     builder:
-          //         (context) => StreakBottomSheet(entities: state.streakData),
-          //   );
-          // }
+          if (state is GotLastSevenDaysStreakData) {
+            showModalBottomSheet(
+              useSafeArea: true,
+              isScrollControlled: true,
+              context: context,
+              builder:
+                  (context) => StreakBottomSheet(entities: state.streakData),
+            );
+          }
           if (state is ShowStreakBottomSheet) {
             showModalBottomSheet(
               useSafeArea: true,
@@ -220,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen>
             );
           }
           if (state is GotQuotes) {
-            _quotes = state.result;
+            _quotes.addAll(state.result);
           }
           if (state is GotSwipeCompleteState) {
             _isSwipeCompleted = state.isCompleted;
@@ -272,102 +267,97 @@ class _HomeScreenState extends State<HomeScreen>
                         MediaQuery.removePadding(
                           context: context,
                           removeTop: true,
-                          child: PageView.builder(
+                          child: PageView(
+                            controller: _pageController,
                             scrollDirection: Axis.vertical,
-                            controller:
-                                _pageController..addListener(() {
-                                  if (_pageController.page != null &&
-                                      _pageController.page! >= 1 &&
-                                      _controlsFadeAnimation.value == 0) {
-                                    context.read<HomeBloc>().add(
-                                      OnSwipeComplete(),
-                                    );
+                            onPageChanged: (int pageIndex) {
+                              // Handle swipe completion
+                              if (pageIndex >= 1 &&
+                                  _controlsFadeAnimation.value == 0) {
+                                context.read<HomeBloc>().add(OnSwipeComplete());
+                                _controller.forward();
+                              }
 
-                                    _controller.forward();
-                                  }
-                                  if (_pageController.page != null &&
-                                      _pageController.page! == 2) {
-                                    debugPrint(
-                                      'like guide is this $_isLikeGuideShown',
+                              // Handle like guide at index 2
+                              if (pageIndex == 2) {
+                                debugPrint(
+                                  'like guide is this $_isLikeGuideShown',
+                                );
+                                if (_likeCount < Constants.minimumLikeGoal) {
+                                  if (!_isLikeGuideShown) {
+                                    showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      context: context,
+                                      builder:
+                                          (context) => LikeDetailBottomSheet(),
                                     );
-                                    if (_likeCount <
-                                        Constants.minimumLikeGoal) {
-                                      if (!_isLikeGuideShown) {
-                                        showModalBottomSheet(
-                                          isScrollControlled: true,
-                                          context: context,
-                                          builder:
-                                              (context) =>
-                                                  LikeDetailBottomSheet(),
-                                        );
-                                        setState(() {
-                                          _isLikeGuideShown = true;
-                                        });
-                                        context.read<HomeBloc>().add(
-                                          OnLikeGuideShown(),
-                                        );
-                                      } else {
-                                        setState(() {
-                                          _showLikeProgress = true;
-                                        });
-                                      }
-                                    }
-                                  }
-                                }),
-                            itemCount: _quotes.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 100,
-                                ),
-                                child: HomeListItem(
-                                  quoteKey: _quotes[index].quoteKey!,
-                                  isWelcome:
-                                      (_isSwipeCompleted) ? false : index == 0,
-                                  showSwipeUp:
-                                      (_isSwipeCompleted) ? false : index >= 1,
-                                  showSwipeGuide:
-                                      (_isSwipeCompleted) ? false : index == 1,
-                                  quote: _quotes[index].quote,
-                                  isLiked: _quotes[index].isLiked,
-                                  showExtras: _showExtraWidgets,
-                                  showWaterMark: _showWaterMark,
-                                  // showExtras: true,
-                                  onTap: () {
-                                    Future.delayed(
-                                      Duration(milliseconds: 500),
-                                      () {
-                                        HapticFeedback.lightImpact();
-                                        if (context.mounted) {
-                                          _pageController.animateToPage(
-                                            index + 1,
-                                            duration: Duration(
-                                              milliseconds: 250,
-                                            ),
-                                            curve: Curves.linear,
-                                          );
-                                        }
-                                      },
-                                    );
-                                  },
-                                  onLikePressed: (isLiked) {
-                                    context.read<HomeBloc>().add(
-                                      OnLikePressed(isLiked, _quotes[index]),
-                                    );
-                                    final current = _quotes[index];
                                     setState(() {
-                                      _quotes[index] = (current).copyWith(
-                                        isLiked: !current.isLiked,
-                                      );
+                                      _isLikeGuideShown = true;
                                     });
-                                  },
-                                  onSharePressed: () {
-                                    HapticFeedback.lightImpact();
-                                    _showShareBottomSheet(index);
-                                  },
-                                ),
-                              );
+                                    context.read<HomeBloc>().add(
+                                      OnLikeGuideShown(),
+                                    );
+                                  } else {
+                                    setState(() {
+                                      _showLikeProgress = true;
+                                    });
+                                  }
+                                }
+                              }
+
+                              // Load more quotes when near the end
+                              if (pageIndex >= _quotes.length - 3) {
+                                _page++;
+                                print('getting more quotes $_page');
+                                context.read<HomeBloc>().add(GetQuotes(_page));
+                              }
                             },
+                            children: List.generate(
+                              _quotes.length,
+                              (index) => HomeListItem(
+                                quoteKey: _quotes[index].quoteKey,
+                                isWelcome:
+                                    (_isSwipeCompleted) ? false : index == 0,
+                                showSwipeUp:
+                                    (_isSwipeCompleted) ? false : index >= 1,
+                                showSwipeGuide:
+                                    (_isSwipeCompleted) ? false : index == 1,
+                                quote: _quotes[index].quoteText,
+                                isLiked: _quotes[index].isLiked,
+                                showExtras: _showExtraWidgets,
+                                showWaterMark: _showWaterMark,
+                                onTap: () {
+                                  Future.delayed(
+                                    Duration(milliseconds: 500),
+                                    () {
+                                      HapticFeedback.lightImpact();
+                                      if (context.mounted) {
+                                        _pageController.animateToPage(
+                                          index + 1,
+                                          duration: Duration(milliseconds: 250),
+                                          curve: Curves.linear,
+                                        );
+                                      }
+                                    },
+                                  );
+                                },
+                                onLikePressed: (isLiked) {
+                                  context.read<HomeBloc>().add(
+                                    OnLikePressed(isLiked, _quotes[index]),
+                                  );
+                                  final current = _quotes[index];
+                                  setState(() {
+                                    _quotes[index] = (current).copyWith(
+                                      isLiked: !current.isLiked,
+                                    );
+                                  });
+                                },
+                                onSharePressed: () {
+                                  HapticFeedback.lightImpact();
+                                  _showShareBottomSheet(index);
+                                },
+                              ),
+                            ),
                           ),
                         ),
                         Align(
@@ -422,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                                         .page ??
                                                                     1)
                                                                 .round()]
-                                                            .quote,
+                                                            .quoteText,
                                                   ),
                                             );
                                           },
@@ -527,9 +517,9 @@ class _HomeScreenState extends State<HomeScreen>
             (context) => ShareControlsBottomSheet(
               isWaterMarkShowing: _showWaterMark,
               onHideWaterMarkPressed: _hideWaterMark,
-              quoteKey: _quotes[index].quoteKey!,
+              quoteKey: _quotes[index].quoteKey,
               exportKey: _exportKey,
-              quote: _quotes[index].quote,
+              quote: _quotes[index].quoteText,
               isLiveBackground:
                   App.themeEntity.backgroundEntity.isLiveBackground,
               onPop: () {

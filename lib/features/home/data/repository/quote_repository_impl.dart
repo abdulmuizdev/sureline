@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:sureline/core/error/failures.dart';
+import 'package:sureline/features/collections/data/model/collection_model.dart';
+import 'package:sureline/features/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/home/data/data_source/quote_data_source.dart';
-import 'package:sureline/features/home/data/model/quote_model.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/recommendation_algorithm/data/model/quote_model.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 import 'package:sureline/features/home/domain/repository/quote_repository.dart';
 
 class QuoteRepositoryImpl extends QuoteRepository {
@@ -86,23 +88,8 @@ class QuoteRepositoryImpl extends QuoteRepository {
   }
 
   @override
-  Either<Failure, List<QuoteEntity>?> getLikedQuote() {
-    return quoteDataSource.getLikedQuote();
-  }
-
-  @override
   Either<Failure, List<QuoteEntity>?> getOwnQuote() {
     return quoteDataSource.getOwnQuote();
-  }
-
-  @override
-  Future<Either<Failure, void>> saveLikedQuote(QuoteEntity entity) {
-    return quoteDataSource.saveLikedQuote(QuoteModel.fromEntity(entity));
-  }
-
-  @override
-  Future<Either<Failure, void>> removeLikedQuote(QuoteEntity newEntity) {
-    return quoteDataSource.removeLikedQuote(QuoteModel.fromEntity(newEntity));
   }
 
   @override

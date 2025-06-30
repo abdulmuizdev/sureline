@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:story_view/story_view.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+
 import 'package:sureline/features/practice/widgets/practice_item.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 
 class PracticeBottomSheet extends StatefulWidget {
   final List<QuoteEntity> quotes;
@@ -40,7 +41,7 @@ class _PracticeBottomSheetState extends State<PracticeBottomSheet> {
             storyItems: [
               ...List.generate(widget.quotes.length, (index) {
                 return StoryItem(
-                  PracticeItem(quote: widget.quotes[index].quote),
+                  PracticeItem(quote: widget.quotes[index].quoteText),
                   duration: widget.perQuoteDuration,
                 );
               }),

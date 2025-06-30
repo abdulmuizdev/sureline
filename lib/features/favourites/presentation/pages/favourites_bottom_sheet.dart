@@ -1,5 +1,3 @@
-import 'package:app_minimizer/app_minimizer.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_portal/flutter_portal.dart';
@@ -7,13 +5,12 @@ import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
+import 'package:sureline/features/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
+import 'package:sureline/features/favourites/domain/entity/favourite_entity.dart';
 import 'package:sureline/features/favourites/presentation/bloc/favourites_bloc.dart';
 import 'package:sureline/features/favourites/presentation/bloc/favourites_event.dart';
 import 'package:sureline/features/favourites/presentation/bloc/favourites_state.dart';
-import 'package:sureline/features/favourites/presentation/widget/favourite_list_item.dart';
-import 'package:sureline/features/history/presentation/widget/history_list_item.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
-import 'package:sureline/features/search/presentation/widget/search_list_item.dart';
+import 'package:sureline/common/presentation/widgets/favourite_list_item.dart';
 import 'package:sureline/features/search/presentation/widget/sureline_search_bar.dart';
 
 class FavouritesBottomSheet extends StatefulWidget {
@@ -24,7 +21,7 @@ class FavouritesBottomSheet extends StatefulWidget {
 }
 
 class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
-  List<QuoteEntity> _quotes = [];
+  List<FavouriteEntity> _quotes = [];
   int _deleteOverlayVisibleIndex = -1;
 
   @override
@@ -38,7 +35,7 @@ class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
       child: BlocListener<FavouritesBloc, FavouritesState>(
         listener: (context, state) {
           if (state is GotFavouriteQuotes) {
-            _quotes = state.likedQuotes ?? [];
+            _quotes = [...(state.quotes ?? [])];
             _deleteOverlayVisibleIndex = -1;
           }
         },
@@ -62,7 +59,11 @@ class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
                     color: AppColors.white,
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 18, left: 18, right: 18),
+                    padding: const EdgeInsets.only(
+                      top: 18,
+                      left: 18,
+                      right: 18,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -71,8 +72,7 @@ class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
                             Navigator.of(context).pop();
                           },
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -109,7 +109,7 @@ class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        SurelineSearchBar(controller: SearchController(),),
+                        SurelineSearchBar(controller: SearchController()),
                         SizedBox(height: 27),
                         SurelineButton(
                           text: 'Show all in feed',
@@ -122,12 +122,38 @@ class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
                             itemCount: _quotes.length,
                             itemBuilder: (context, index) {
                               return FavouriteListItem(
-                                entity: _quotes[index],
-                                onDeletePressed:
-                                    () =>
-                                        context.read<FavouritesBloc>().add(
-                                          OnDeletePressed(_quotes[index]),
+                                favouriteEntity: _quotes[index],
+                                ownQuoteEntity: null,
+                                onAddToCollectionPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder:
+                                        (ctx) => CollectionSelectionBottomSheet(
+                                          favouriteId: _quotes[index].id,
+                                          onFavouritesUpdated: (
+                                            _,
+                                            collectionsOfFavourite,
+                                          ) {
+                                            print(
+                                              'collectionsOfFavourite: ${collectionsOfFavourite.length}',
+                                            );
+                                            setState(() {
+                                              _quotes[index] = _quotes[index]
+                                                  .copyWith(
+                                                    collections:
+                                                        collectionsOfFavourite,
+                                                  );
+                                            });
+                                          },
                                         ),
+                                    isScrollControlled: true,
+                                    useSafeArea: true,
+                                  );
+                                },
+                                onDeletePressed:
+                                    () => context.read<FavouritesBloc>().add(
+                                      OnDeletePressed(_quotes[index]),
+                                    ),
                                 onOverlayToggled: (value) {
                                   if (value) {
                                     setState(() {

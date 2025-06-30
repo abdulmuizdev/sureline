@@ -11,8 +11,9 @@ class App {
   static double volume = Constants.defaultVolume;
   static Map<String, String>? voice;
   static RemoteConfigEntity remoteConfigEntity = Constants.remoteConfigModel;
-
+  static ValueKey homeScreenQuoteKey = ValueKey('quote_0');
   static ThemeEntity themeEntity = ThemeEntity(
+    lastAccessed: DateTime.now(),
     textDecorEntity: ThemeTextDecorEntity(
       fontSize: Constants.defaultFontSize,
       fontWeight: Constants.defaultFontWeight,

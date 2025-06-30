@@ -3,29 +3,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sureline/common/domain/use_cases/convert_widget_to_png_use_case.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_liked_quotes_count_use_case.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_random_quotes_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/get_last_seven_days_streak_data_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/get_total_streak_score_use_case.dart';
 import 'package:sureline/core/constants/sp.dart';
+import 'package:sureline/features/favourites/domain/use_cases/get_favourites_count_use_case.dart';
 import 'package:sureline/features/preferenecs/presentation/bloc/preferences_event.dart';
 import 'package:sureline/features/preferenecs/presentation/bloc/preferences_state.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_quotes_from_recommendation_algorithm.dart';
 import 'package:sureline/features/streak/presentation/share_streak_render_widget.dart';
 
 class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
   final ConvertWidgetToPngUseCase _convertWidgetToPngUseCase;
   final GetLastSevenDaysStreakDataUseCase _getLastSevenDaysStreakDataUseCase;
   final GetTotalStreakScoreUseCase _getTotalStreakScoreUseCase;
-  final GetLikedQuotesCountUseCase _getLikedQuotesCountUseCase;
-  final GetRandomQuotesUseCase _getRandomQuotesUseCase;
+  final GetFavouritesCountUseCase _getFavouritesCountUseCase;
+  final GetQuotesFromRecommendationAlgorithm _getQuotesFromRecommendationAlgorithm;
   final SharedPreferences prefs;
 
   PreferencesBloc(
     this._getLastSevenDaysStreakDataUseCase,
     this._getTotalStreakScoreUseCase,
     this._convertWidgetToPngUseCase,
-    this._getLikedQuotesCountUseCase,
-    this._getRandomQuotesUseCase,
+    this._getFavouritesCountUseCase,
+    this._getQuotesFromRecommendationAlgorithm,
     this.prefs,
   ) : super(Initial()) {
     on<GetLastSevenDaysStreakData>((event, emit) {
@@ -62,21 +62,21 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
     on<GetRandomQuotes>((event, emit) async {
       final quotesLength = _getRandomQuotesLength(event.option);
       final perQuoteDuration = _getPerQuoteDuration(event.option);
-      final result = await _getRandomQuotesUseCase.execute(quotesLength);
-      result.fold((left){}, (right){
+      final result = await _getQuotesFromRecommendationAlgorithm.call(quotesLength);
+      result.fold((left) {}, (right) {
         emit(GotRandomQuotes(right, perQuoteDuration));
       });
     });
 
-    on<GetFavouritesCount>((event, emit){
-      final result = _getLikedQuotesCountUseCase.execute();
-      result.fold((left){}, (right){
+    on<GetFavouritesCount>((event, emit) async {
+      final result = await _getFavouritesCountUseCase.call();
+      result.fold((left) {}, (right) {
         emit(GotFavouritesCount(right));
       });
     });
   }
-  int _getRandomQuotesLength(int option){
-    switch (option){
+  int _getRandomQuotesLength(int option) {
+    switch (option) {
       case 0:
         return 6;
       case 1:
@@ -88,8 +88,8 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
     }
   }
 
-  Duration _getPerQuoteDuration(int option){
-    switch (option){
+  Duration _getPerQuoteDuration(int option) {
+    switch (option) {
       case 0:
         int minutes = 1;
         int quotes = 6;

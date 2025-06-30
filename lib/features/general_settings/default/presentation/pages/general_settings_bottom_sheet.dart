@@ -1,22 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:permission_handler/permission_handler.dart' as AppSettings;
 import 'package:share_plus/share_plus.dart';
+import 'package:sureline/features/general_settings/help/presentation/help_bottom_sheet.dart';
 import 'package:sureline/features/general_settings/streak/presentation/pages/streak_setting_bottom_sheet.dart';
 import 'package:sureline/common/presentation/dialog/streak/widget/sureline_back_button.dart';
 import 'package:sureline/common/presentation/widgets/settings_list_item.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/general_settings/content_preferences/presentation/pages/content_pref_bottom_sheet.dart';
+import 'package:sureline/features/general_settings/author_preferences/presentation/pages/author_pref_bottom_sheet.dart';
 import 'package:sureline/common/presentation/widgets/heading.dart';
 import 'package:sureline/features/general_settings/default/presentation/widget/info_copy.dart';
 import 'package:sureline/features/general_settings/gender_identity/presentation/pages/gender_identity_bottom_sheet.dart';
+import 'package:sureline/features/general_settings/muted_content/presentation/bottom_sheets/muted_content_bottom_sheet.dart';
 import 'package:sureline/features/general_settings/more_apps/presentation/pages/more_apps_bottom_sheet.dart';
 import 'package:sureline/features/general_settings/name/presentation/name_bottom_sheet.dart';
 import 'package:sureline/features/general_settings/sign_in/presentation/pages/sign_in_bottom_sheet.dart';
 import 'package:sureline/features/general_settings/sound/presentation/bottom_sheet/sound_bottom_sheet.dart';
 import 'package:sureline/features/general_settings/voice/presentation/pages/voice_bottom_sheet.dart';
+import 'package:sureline/features/manage_subscription/presentation/bottom_sheet/manage_subscription_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:sureline/features/general_settings/vote_on_next_feature/presentation/vote_on_next_feature_bottom_sheet.dart';
 
 class GeneralSettingsBottomSheet extends StatelessWidget {
   const GeneralSettingsBottomSheet({super.key});
@@ -49,17 +54,25 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SizedBox(height: 22),
-                        Heading(text: 'PREMIUM'),
                         SizedBox(height: 15),
+                        Heading(text: 'PREMIUM'),
+                        SizedBox(height: 10),
                         SettingsListItem(
                           useDarkHover: true,
                           title: 'Manage subscription',
-                          icon: Icons.add,
+                          icon: CupertinoIcons.creditcard,
                           isFirst: true,
                           isLast: true,
+                          onPressed: () {
+                            showModalBottomSheet(
+                              useSafeArea: true,
+                              isScrollControlled: true,
+                              context: context,
+                              builder:
+                                  (context) => ManageSubscriptionBottomSheet(),
+                            );
+                          },
                         ),
-
                         SizedBox(height: 22),
                         Heading(text: 'MAKE IT YOURS'),
                         SizedBox(height: 15),
@@ -79,14 +92,14 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                         ),
                         SettingsListItem(
                           useDarkHover: true,
-                          title: 'Content preferences',
+                          title: 'Author preferences',
                           icon: Icons.menu_rounded,
                           onPressed: () {
                             showModalBottomSheet(
                               useSafeArea: true,
                               isScrollControlled: true,
                               context: context,
-                              builder: (context) => ContentPrefBottomSheet(),
+                              builder: (context) => AuthorPrefBottomSheet(),
                             );
                           },
                         ),
@@ -94,24 +107,36 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                           useDarkHover: true,
                           title: 'Muted content',
                           icon: CupertinoIcons.volume_off,
-                        ),
-                        SettingsListItem(
-                          useDarkHover: true,
-                          title: 'Gender identity',
-                          icon: Icons.male_rounded,
                           onPressed: () {
+                            print('muted contrent clicked');
                             showModalBottomSheet(
                               useSafeArea: true,
                               isScrollControlled: true,
                               context: context,
-                              builder: (context) => GenderIdentityBottomSheet(),
+                              builder: (context) => MutedContentBottomSheet(),
                             );
                           },
                         ),
+                        // SettingsListItem(
+                        //   useDarkHover: true,
+                        //   title: 'Gender identity',
+                        //   icon: Icons.male_rounded,
+                        //   onPressed: () {
+                        //     showModalBottomSheet(
+                        //       useSafeArea: true,
+                        //       isScrollControlled: true,
+                        //       context: context,
+                        //       builder: (context) => GenderIdentityBottomSheet(),
+                        //     );
+                        //   },
+                        // ),
                         SettingsListItem(
                           useDarkHover: true,
                           title: 'Language',
                           icon: Icons.language_rounded,
+                          onPressed: () async {
+                            await AppSettings.openAppSettings();
+                          },
                         ),
                         SettingsListItem(
                           useDarkHover: true,
@@ -223,6 +248,14 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                           icon: CupertinoIcons.star,
                           isLast: true,
                           hideArrow: true,
+                          onPressed:
+                              () => showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                useSafeArea: true,
+                                builder:
+                                    (context) => VoteOnNextFeatureBottomSheet(),
+                              ),
                         ),
 
                         SizedBox(height: 22),
@@ -235,6 +268,14 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                           isFirst: true,
                           isLast: true,
                           hideArrow: true,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HelpBottomSheet(),
+                              ),
+                            );
+                          },
                         ),
 
                         SizedBox(height: 22),

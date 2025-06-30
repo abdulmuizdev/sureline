@@ -1,13 +1,15 @@
 import 'package:flutter/cupertino.dart';
+import 'package:sureline/features/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/home/data/model/quote_model.dart';
 
 class QuoteEntity {
   final String author;
   final String quote;
-  final bool isLiked;
-  final bool isOwnQuote;
   final GlobalKey? quoteKey;
   final DateTime? likedAt;
+  final bool isLiked;
+  final bool isOwnQuote;
+  final List<CollectionEntity> collections;
 
   const QuoteEntity({
     required this.quote,
@@ -16,6 +18,7 @@ class QuoteEntity {
     required this.quoteKey,
     required this.likedAt,
     required this.isOwnQuote,
+    required this.collections,
   });
 
   QuoteEntity copyWith({
@@ -24,6 +27,7 @@ class QuoteEntity {
     bool? isLiked,
     bool? isOwnQuote,
     DateTime? likedAt,
+    List<CollectionEntity>? collections,
   }) {
     return QuoteEntity(
       quote: quote ?? this.quote,
@@ -32,6 +36,7 @@ class QuoteEntity {
       isOwnQuote: isOwnQuote ?? this.isOwnQuote,
       likedAt: likedAt ?? this.likedAt,
       quoteKey: quoteKey,
+      collections: collections ?? this.collections,
     );
   }
 
@@ -43,6 +48,8 @@ class QuoteEntity {
       isOwnQuote: model.isOwnQuote,
       likedAt: model.likedAt,
       quoteKey: model.quoteKey,
+      collections:
+          model.collections.map((e) => CollectionEntity.fromModel(e)).toList(),
     );
   }
 }

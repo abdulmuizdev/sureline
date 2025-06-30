@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
+import 'package:sureline/core/utils/utils.dart';
 
 class ThemeModel extends ThemeEntity {
   final ThemeTextDecorModel textDecorModel;
@@ -12,6 +13,7 @@ class ThemeModel extends ThemeEntity {
     required super.previewQuote,
     super.isActive,
     super.id,
+    required super.lastAccessed,
   }) : super(
          textDecorEntity: textDecorModel,
          backgroundEntity: backgroundModel,
@@ -21,6 +23,7 @@ class ThemeModel extends ThemeEntity {
     return ThemeModel(
       textDecorModel: ThemeTextDecorModel.fromJson(json['textDecorEntity']),
       backgroundModel: ThemeBackgroundModel.fromJson(json['backgroundEntity']),
+      lastAccessed: DateTime.parse(json['lastAccessed']),
       previewQuote: json['previewQuote'],
       isActive: json['isActive'] ?? false,
       id: json['id'],
@@ -29,6 +32,7 @@ class ThemeModel extends ThemeEntity {
 
   factory ThemeModel.fromEntity(ThemeEntity entity) {
     return ThemeModel(
+      lastAccessed: entity.lastAccessed,
       textDecorModel: ThemeTextDecorModel.fromEntity(entity.textDecorEntity),
       backgroundModel: ThemeBackgroundModel.fromEntity(entity.backgroundEntity),
       previewQuote: entity.previewQuote,
@@ -42,8 +46,10 @@ class ThemeModel extends ThemeEntity {
     ThemeBackgroundModel? backgroundModel,
     String? previewQuote,
     bool? isActive,
+    DateTime? lastAccessed,
   }) {
     return ThemeModel(
+      lastAccessed: lastAccessed ?? this.lastAccessed,
       textDecorModel: textDecorModel ?? this.textDecorModel,
       backgroundModel: backgroundModel ?? this.backgroundModel,
       previewQuote: previewQuote ?? this.previewQuote,
@@ -60,6 +66,7 @@ class ThemeModel extends ThemeEntity {
           (ThemeBackgroundModel.fromEntity(backgroundEntity)).toJson(),
       'previewQuote': previewQuote,
       'isActive': isActive,
+      'lastAccessed': lastAccessed.toIso8601String(),
       'id': id,
     };
   }

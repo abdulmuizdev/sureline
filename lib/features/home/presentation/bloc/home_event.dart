@@ -1,11 +1,12 @@
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 
 abstract class HomeEvent {
   const HomeEvent();
 }
 
 class GetQuotes extends HomeEvent {
-  const GetQuotes();
+  final int page;
+  const GetQuotes(this.page);
 }
 
 class OnboardingComplete extends HomeEvent {
@@ -60,4 +61,9 @@ class UpdateStreak extends HomeEvent {
 
 class GetLastSevenDaysStreakData extends HomeEvent {
   const GetLastSevenDaysStreakData();
+}
+
+class MarkQuoteAsShown extends HomeEvent {
+  final int id;
+  const MarkQuoteAsShown(this.id);
 }

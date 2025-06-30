@@ -10,6 +10,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   ios_color_picker_with_title
   permission_handler_windows
   share_plus
+  sqlite3_flutter_libs
   url_launcher_windows
 )
 

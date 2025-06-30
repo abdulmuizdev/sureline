@@ -1,5 +1,5 @@
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
 import 'package:sureline/common/domain/entities/streak_display_entity.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 
 abstract class HomeState {
   const HomeState();
@@ -37,10 +37,12 @@ class GotFeedSetupState extends HomeState {
   final bool isShown;
   GotFeedSetupState(this.isShown);
 }
+
 class GotLikeGuideState extends HomeState {
   final bool isShown;
   GotLikeGuideState(this.isShown);
 }
+
 class GotShareGuideState extends HomeState {
   final bool isShown;
   GotShareGuideState(this.isShown);
@@ -50,10 +52,16 @@ class ShowStreakBottomSheet extends HomeState {
   final List<StreakDisplayEntity> streakData;
   ShowStreakBottomSheet(this.streakData);
 }
+
 class GotLastSevenDaysStreakData extends HomeState {
   final List<StreakDisplayEntity> streakData;
   GotLastSevenDaysStreakData(this.streakData);
 }
+
 class StreakIsBroken extends HomeState {
   const StreakIsBroken();
+}
+
+class QuoteAsShown extends HomeState {
+  QuoteAsShown();
 }

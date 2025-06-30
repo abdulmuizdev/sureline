@@ -5,7 +5,9 @@ import 'package:sureline/common/data/model/review_model.dart';
 import 'package:sureline/features/remote_config/data/model/remote_config_model.dart';
 
 class Constants {
-  static const String widgetAppGroup = 'group.com.abdulmuiz.sureline.quoteWidget';
+  static const int quotesPageSize = 20;
+  static const String widgetAppGroup =
+      'group.com.abdulmuiz.sureline.quoteWidget';
   static const String streakReminderNotificationTitle =
       '❄️ Streak will freeze soon!';
   static const String streakReminderNotificationBody =

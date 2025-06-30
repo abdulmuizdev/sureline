@@ -1,4 +1,4 @@
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
 
 abstract class OwnQuotesEvent {
   const OwnQuotesEvent();
@@ -7,11 +7,11 @@ abstract class OwnQuotesEvent {
 class GetOwnQuotes extends OwnQuotesEvent {}
 
 class OnDeletePressed extends OwnQuotesEvent {
-  final QuoteEntity entity;
+  final OwnQuoteEntity entity;
   const OnDeletePressed(this.entity);
 }
 
 class SaveOwnQuote extends OwnQuotesEvent {
-  final QuoteEntity entity;
+  final OwnQuoteEntity entity;
   const SaveOwnQuote(this.entity);
 }

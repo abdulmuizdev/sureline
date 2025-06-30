@@ -9,7 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/home/data/model/quote_model.dart';
+import 'package:sureline/features/collections/data/model/collection_model.dart';
+import 'package:sureline/features/recommendation_algorithm/data/model/quote_model.dart';
 
 abstract class QuoteDataSource {
   Future<Either<Failure, void>> saveAllQuotesToAppGroup();
@@ -42,15 +43,8 @@ abstract class QuoteDataSource {
 
   Future<Either<Failure, void>> setFeedSetupShown();
 
-  Future<Either<Failure, void>> saveLikedQuote(QuoteModel model);
-
   Future<Either<Failure, void>> saveOwnQuote(QuoteModel model);
-
-  Future<Either<Failure, void>> removeLikedQuote(QuoteModel newModel);
-
   Future<Either<Failure, void>> removeOwnQuote(QuoteModel newModel);
-
-  Either<Failure, List<QuoteModel>?> getLikedQuote();
 
   Either<Failure, List<QuoteModel>?> getOwnQuote();
 
@@ -85,7 +79,7 @@ class QuoteDataSourceImpl extends QuoteDataSource {
         searchedQuotes =
             allQuotes
                 .where(
-                  (model) => model.quote.trim().toLowerCase().contains(
+                  (model) => model.quoteText.trim().toLowerCase().contains(
                     query.trim().toLowerCase(),
                   ),
                 )
@@ -109,8 +103,9 @@ class QuoteDataSourceImpl extends QuoteDataSource {
 
     for (int i = 0; i < quotes.length; i++) {
       for (int j = 0; j < likedQuotes.length; j++) {
-        if (quotes[i].quote == likedQuotes[j].quote) {
-          finalQuotes[i] = quotes[i].copyWith(isLiked: true);
+        if (quotes[i].quoteText == likedQuotes[j].quoteText) {
+          // finalQuotes[i] = quotes[i].copyWith(isLiked: true);
+          finalQuotes[i] = quotes[i].copyWith();
         }
       }
     }
@@ -361,7 +356,7 @@ class QuoteDataSourceImpl extends QuoteDataSource {
       await SharedPreferenceAppGroup.setAppGroup(Constants.widgetAppGroup);
       await SharedPreferenceAppGroup.setStringList(
         SP.quotesDataAppGroup,
-        allQuotes.map((quote) => quote.quote).toList(),
+        allQuotes.map((quote) => quote.quoteText).toList(),
       );
 
       return Right(unit);
@@ -372,38 +367,10 @@ class QuoteDataSourceImpl extends QuoteDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> saveLikedQuote(QuoteModel model) async {
-    try {
-      debugPrint('check 1');
-      final newModel = model.copyWith(likedAt: DateTime.now());
-      final raw = prefs.getString(SP.likedQuotes);
-      List<QuoteModel> likedQuotes = [];
-      if (raw != null) {
-        List<dynamic> list = jsonDecode(raw);
-        likedQuotes = list.map((json) => QuoteModel.fromJson(json)).toList();
-        likedQuotes.add(newModel);
-      } else {
-        likedQuotes = [newModel];
-      }
-      final isSuccessful = await prefs.setString(
-        SP.likedQuotes,
-        jsonEncode(likedQuotes.map((quote) => quote.toJson()).toList()),
-      );
-      if (isSuccessful) {
-        return Right(unit);
-      } else {
-        return Left(UnknownFailure());
-      }
-    } catch (e) {
-      debugPrint('${e}');
-      return Left(UnknownFailure());
-    }
-  }
-
-  @override
   Future<Either<Failure, void>> saveOwnQuote(QuoteModel model) async {
     try {
-      final newModel = model.copyWith(isOwnQuote: true);
+      // final newModel = model.copyWith(isOwnQuote: true);
+      final newModel = model.copyWith();
       final raw = prefs.getString(SP.ownQuotes);
       List<QuoteModel> ownQuotes = [];
       if (raw != null) {
@@ -429,38 +396,6 @@ class QuoteDataSourceImpl extends QuoteDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> removeLikedQuote(QuoteModel newModel) async {
-    try {
-      final raw = prefs.getString(SP.likedQuotes);
-      if (raw == null) {
-        return Right(null);
-      }
-      List<dynamic> list = jsonDecode(raw);
-      List<QuoteModel> likedQuotes =
-          list.map((json) => QuoteModel.fromJson(json)).toList();
-      int prevLength = likedQuotes.length;
-      likedQuotes.removeWhere((model) {
-        debugPrint(model.quote);
-        debugPrint(newModel.quote);
-        debugPrint('${model.quote == newModel.quote}');
-        return model.quote == newModel.quote;
-      });
-      if (likedQuotes.length != prevLength - 1) {
-        debugPrint('the quote must be liked to unlike it');
-        return Left(UnknownFailure());
-      }
-      await prefs.setString(
-        SP.likedQuotes,
-        jsonEncode(likedQuotes.map((model) => model.toJson()).toList()),
-      );
-      return Right(unit);
-    } catch (e) {
-      debugPrint('${e}');
-      return Left(UnknownFailure());
-    }
-  }
-
-  @override
   Future<Either<Failure, void>> removeOwnQuote(QuoteModel newModel) async {
     try {
       final raw = prefs.getString(SP.ownQuotes);
@@ -472,7 +407,7 @@ class QuoteDataSourceImpl extends QuoteDataSource {
           list.map((json) => QuoteModel.fromJson(json)).toList();
       int prevLength = ownQuotes.length;
       ownQuotes.removeWhere((model) {
-        return model.quote == newModel.quote;
+        return model.quoteText == newModel.quoteText;
       });
       if (ownQuotes.length != prevLength - 1) {
         debugPrint('the quote must be there to delete it');
@@ -483,20 +418,6 @@ class QuoteDataSourceImpl extends QuoteDataSource {
         jsonEncode(ownQuotes.map((model) => model.toJson()).toList()),
       );
       return Right(unit);
-    } catch (e) {
-      debugPrint('${e}');
-      return Left(UnknownFailure());
-    }
-  }
-
-  @override
-  Either<Failure, List<QuoteModel>?> getLikedQuote() {
-    try {
-      final likedQuotes = _getLikedQuotesList();
-      if (likedQuotes == null) {
-        return Right(null);
-      }
-      return Right(likedQuotes);
     } catch (e) {
       debugPrint('${e}');
       return Left(UnknownFailure());

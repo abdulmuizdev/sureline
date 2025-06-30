@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
   ios_color_picker_with_title
+  sqlite3_flutter_libs
   url_launcher_linux
 )
 

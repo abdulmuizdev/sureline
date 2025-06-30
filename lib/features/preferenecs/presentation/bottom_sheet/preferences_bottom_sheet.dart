@@ -10,11 +10,11 @@ import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
 import 'package:sureline/features/app_icon_selection/presentation/bottom_sheet/app_icon_setting_bottom_sheet.dart';
-import 'package:sureline/features/collections/presentation/pages/collections_bottom_sheet.dart';
+import 'package:sureline/features/collections/presentation/pages/default/collections_bottom_sheet.dart';
 import 'package:sureline/features/favourites/presentation/pages/favourites_bottom_sheet.dart';
 import 'package:sureline/features/general_settings/default/presentation/pages/general_settings_bottom_sheet.dart';
 import 'package:sureline/features/history/presentation/pages/history_bottom_sheet.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+
 import 'package:sureline/features/home_widget/presentation/bottom_sheet/home_widget_bottom_sheet.dart';
 import 'package:sureline/features/notifications_settings/presentation/bottom_sheet/notifications_settings_bottom_sheet.dart';
 import 'package:sureline/common/presentation/widgets/settings_list_item.dart';

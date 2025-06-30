@@ -5,6 +5,7 @@ import 'package:sureline/core/theme/app_colors.dart';
 class SurelineThemes {
   static final List<ThemeEntity> values = [
     ThemeEntity(
+      lastAccessed: DateTime.now(),
       textDecorEntity: App.themeEntity.textDecorEntity,
       backgroundEntity: ThemeBackgroundEntity(
         path: 'assets/images/background2.png',
@@ -16,6 +17,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
+      lastAccessed: DateTime.now(),
       textDecorEntity: App.themeEntity.textDecorEntity,
       backgroundEntity: ThemeBackgroundEntity(
         path: 'assets/images/background.png',
@@ -27,6 +29,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
+      lastAccessed: DateTime.now(),
       textDecorEntity: App.themeEntity.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
       ),
@@ -40,6 +43,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
+      lastAccessed: DateTime.now(),
       textDecorEntity: App.themeEntity.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
       ),
@@ -53,6 +57,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
+      lastAccessed: DateTime.now(),
       textDecorEntity: App.themeEntity.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
       ),
@@ -66,6 +71,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
+      lastAccessed: DateTime.now(),
       textDecorEntity: App.themeEntity.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
       ),

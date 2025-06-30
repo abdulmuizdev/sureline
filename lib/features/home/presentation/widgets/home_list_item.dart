@@ -38,22 +38,24 @@ class HomeListItem extends StatefulWidget {
 
 class _HomeListItemState extends State<HomeListItem>
     with TickerProviderStateMixin {
-  late final AnimationController _welcomeSwipeSlideController;
-  late final AnimationController _swipeSlideController;
-  late final AnimationController _swipeFadeController;
+  late AnimationController _welcomeSwipeSlideController;
+  late AnimationController _swipeSlideController;
+  late AnimationController _swipeFadeController;
+  late AnimationController _likeController;
 
-  late final Animation<Offset> _welcomeSwipeSlideAnimation;
-  late final Animation<Offset> _swipeSlideTransition;
-  late final Animation<double> _swipeFadeAnimation;
-
-  late final AnimationController _likeController;
-  late final Animation<double> _likeScaleAnimation;
-  late final Animation<double> _likeFadeAnimation;
+  late Animation<Offset> _welcomeSwipeSlideAnimation;
+  late Animation<Offset> _swipeSlideTransition;
+  late Animation<double> _swipeFadeAnimation;
+  late Animation<double> _likeScaleAnimation;
+  late Animation<double> _likeFadeAnimation;
 
   bool _showLike = false;
-
-  GlobalKey textKey = GlobalKey();
   Size _quoteWidgetSize = Size.zero;
+  final GlobalKey textKey = GlobalKey();
+
+  // Add flag to control animation loop
+  bool _isAnimationRunning = false;
+
   double _waterMarkHeight = 25;
 
   @override
@@ -237,6 +239,7 @@ class _HomeListItemState extends State<HomeListItem>
                             ),
                           ),
                         ],
+                        Expanded(flex: 1, child: Container()),
                       ],
                     ),
                   ),
@@ -408,11 +411,9 @@ class _HomeListItemState extends State<HomeListItem>
   void _startSwipeGuideAnimationLoop() {
     if (widget.showSwipeUp ?? false) {
       Future.delayed(const Duration(seconds: 3), () {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            _swipeFadeController.forward();
-          }
-        });
+        if (mounted) {
+          _swipeFadeController.forward();
+        }
       });
     }
 
@@ -426,15 +427,27 @@ class _HomeListItemState extends State<HomeListItem>
   }
 
   void _startCustomSwipeAnimation() async {
-    while (context.mounted) {
-      await _swipeSlideController.forward();
-      await _swipeSlideController.reverse();
-      await Future.delayed(Duration(seconds: 1));
+    _isAnimationRunning = true;
+
+    while (_isAnimationRunning && mounted) {
+      try {
+        await _swipeSlideController.forward();
+        if (!_isAnimationRunning || !mounted) break;
+
+        await _swipeSlideController.reverse();
+        if (!_isAnimationRunning || !mounted) break;
+
+        await Future.delayed(Duration(seconds: 1));
+      } catch (e) {
+        // Controller might be disposed, break the loop
+        break;
+      }
     }
   }
 
   @override
   void dispose() {
+    _isAnimationRunning = false;
     _welcomeSwipeSlideController.dispose();
     _swipeSlideController.dispose();
     _swipeFadeController.dispose();

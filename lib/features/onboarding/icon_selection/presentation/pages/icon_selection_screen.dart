@@ -6,9 +6,9 @@ import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/features/onboarding/icon_selection/domain/entity/icon_entity.dart';
-import 'package:sureline/features/onboarding/icon_selection/presentation/bloc/icon_bloc.dart';
-import 'package:sureline/features/onboarding/icon_selection/presentation/bloc/icon_event.dart';
-import 'package:sureline/features/onboarding/icon_selection/presentation/bloc/icon_state.dart';
+import 'package:sureline/common/presentation/bloc/icon_bloc.dart';
+import 'package:sureline/common/presentation/bloc/icon_event.dart';
+import 'package:sureline/common/presentation/bloc/icon_state.dart';
 import 'package:sureline/features/onboarding/icon_selection/presentation/widgets/icon_grid_item.dart';
 import 'package:sureline/features/onboarding/theme_selection/presentation/pages/theme_selection_screen.dart';
 

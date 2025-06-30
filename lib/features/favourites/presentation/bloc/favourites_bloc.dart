@@ -1,32 +1,40 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_liked_quotes_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/add_favourite_to_collection_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/remove_favourite_from_collection_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/get_favourites_use_case.dart';
+import 'package:sureline/features/favourites/domain/use_cases/remove_favourite_use_case.dart';
 import 'package:sureline/features/favourites/presentation/bloc/favourites_event.dart';
 import 'package:sureline/features/favourites/presentation/bloc/favourites_state.dart';
-import 'package:sureline/features/home/domain/use_cases/like/record/remove_liked_quote_use_case.dart';
 
 class FavouritesBloc extends Bloc<FavouritesEvent, FavouritesState> {
-  final GetLikedQuotesUseCase _getLikedQuotesUseCase;
-  final RemoveLikedQuoteUseCase _removeLikedQuoteUseCase;
+  final GetFavouritesUseCase _getFavouritesUseCase;
+  final RemoveFavouriteUseCase _removeFavouriteUseCase;
 
-  FavouritesBloc(this._getLikedQuotesUseCase, this._removeLikedQuoteUseCase)
-    : super(Initial()) {
-    on<GetFavouriteQuotes>((event, emit) {
-      _getFavouriteQuotes(emit);
+  final AddFavouriteToCollectionUseCase _addFavouriteToCollectionUseCase;
+  final RemoveFavouriteFromCollectionUseCase
+  _removeFavouriteFromCollectionUseCase;
+
+  FavouritesBloc(
+    this._getFavouritesUseCase,
+    this._removeFavouriteUseCase,
+    this._addFavouriteToCollectionUseCase,
+    this._removeFavouriteFromCollectionUseCase,
+  ) : super(Initial()) {
+    on<GetFavouriteQuotes>((event, emit) async {
+      await _getFavouriteQuotes(emit);
     });
 
     on<OnDeletePressed>((event, emit) async {
-      final result = await _removeLikedQuoteUseCase.execute(event.entity);
-      result.fold((left){}, (right){
-        _getFavouriteQuotes(emit);
+      final result = await _removeFavouriteUseCase.call(event.entity.id);
+      await result.fold((left) {}, (right) async {
+        await _getFavouriteQuotes(emit);
       });
     });
-
   }
-  void _getFavouriteQuotes(Emitter<FavouritesState> emit)async {
-    final result = _getLikedQuotesUseCase.execute();
+  Future<void> _getFavouriteQuotes(Emitter<FavouritesState> emit) async {
+    final result = await _getFavouritesUseCase.call();
     result.fold((left) {}, (right) {
       emit(GotFavouriteQuotes(right));
     });
   }
-
 }

@@ -3,7 +3,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sureline/common/domain/use_cases/get_voice_use_case.dart';
 import 'package:sureline/common/domain/use_cases/is_onboarding_completed_use_case.dart';
-import 'package:sureline/common/domain/use_cases/quote/get_quotes_use_case.dart';
 import 'package:sureline/common/domain/use_cases/schedule_up_to_sixty_notifications_use_case.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/di/injection.dart';
@@ -12,14 +11,15 @@ import 'package:sureline/features/general_settings/sound/domain/use_cases/get_vo
 import 'package:sureline/features/general_settings/voice/data/model/voice_model.dart';
 import 'package:sureline/features/home/domain/use_cases/save_all_quotes_to_app_group_use_case.dart';
 import 'package:sureline/features/home/presentation/pages/home_screen.dart';
-import 'package:sureline/features/notifications_settings/domain/use_cases/get_notification_presets_use_case.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/initialize_notifications_presets_use_case.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/initialize_recommendation_algorithm.dart';
 import 'package:sureline/features/remote_config/domain/use_cases/prepare_remote_config_use_case.dart';
 import 'package:sureline/features/theme_selection/domain/use_case/set_theme_use_case.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
+  await locator<InitializeRecommendationAlgorithm>().call();
   debugPrint(
     'pending ${(await FlutterLocalNotificationsPlugin().pendingNotificationRequests()).length}',
   );
@@ -182,7 +182,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-//
 // import 'dart:typed_data';
 // import 'dart:ui' as ui;
 // import 'package:flutter/material.dart';

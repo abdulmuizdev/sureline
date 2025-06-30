@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/collections/data/model/collection_model.dart';
+import 'package:sureline/features/collections/domain/entity/collection_entity.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 
 abstract class QuoteRepository {
   Future<Either<Failure, void>> saveAllQuotesToAppGroup();
@@ -33,13 +35,9 @@ abstract class QuoteRepository {
 
   Future<Either<Failure, void>> setFeedSetupShown();
 
-  Future<Either<Failure, void>> saveLikedQuote(QuoteEntity entity);
   Future<Either<Failure, void>> saveOwnQuote(QuoteEntity entity);
 
-  Future<Either<Failure, void>> removeLikedQuote(QuoteEntity newEntity);
   Future<Either<Failure, void>> removeOwnQuote(QuoteEntity newEntity);
-
-  Either<Failure, List<QuoteEntity>?> getLikedQuote();
   Either<Failure, List<QuoteEntity>?> getOwnQuote();
 
   Either<Failure, int> getLikedQuotesCount();

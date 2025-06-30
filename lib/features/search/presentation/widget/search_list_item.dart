@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 
 class SearchListItem extends StatefulWidget {
   final QuoteEntity entity;
@@ -35,7 +35,7 @@ class _SearchListItemState extends State<SearchListItem> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.entity.quote,
+              widget.entity.quoteText,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.normal,
@@ -58,10 +58,12 @@ class _SearchListItemState extends State<SearchListItem> {
 
                     IconButton(
                       onPressed: () {
-                        widget.onLikePressed(!widget.entity.isLiked);
+                        // widget.onLikePressed(!widget.entity.isLiked);
+                        widget.onLikePressed(true);
                       },
                       icon: Icon(
-                        (widget.entity.isLiked)
+                        // (widget.entity.isLiked)
+                        (true)
                             ? CupertinoIcons.heart_fill
                             : CupertinoIcons.heart,
                         color: AppColors.primaryColor,
@@ -71,7 +73,7 @@ class _SearchListItemState extends State<SearchListItem> {
                     IconButton(
                       onPressed: () {
                         SharePlus.instance.share(
-                          ShareParams(text: '"${widget.entity.quote}"'),
+                          ShareParams(text: '"${widget.entity.quoteText}"'),
                         );
                       },
                       icon: Icon(

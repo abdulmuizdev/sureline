@@ -36,6 +36,9 @@ class ThemeDataSourceImpl extends ThemeDataSource {
       return Left(UnknownFailure());
     }
 
+    // Sort themes by DateTime in descending order (newest first)
+    spThemes.sort((a, b) => b.lastAccessed.compareTo(a.lastAccessed));
+
     return Right(spThemes);
   }
 
@@ -130,6 +133,7 @@ class ThemeDataSourceImpl extends ThemeDataSource {
       textDecorEntity: ThemeTextDecorEntity.fromModel(model.textDecorModel),
       backgroundEntity: ThemeBackgroundEntity.fromModel(model.backgroundModel),
       previewQuote: model.previewQuote,
+      lastAccessed: DateTime.now(),
     );
   }
 

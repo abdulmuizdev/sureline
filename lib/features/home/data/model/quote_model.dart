@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:sureline/features/collections/data/model/collection_model.dart';
+import 'package:sureline/features/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/home/domain/entity/quote_entity.dart';
 
 class QuoteModel extends QuoteEntity {
+  final List<CollectionModel> collections;
   QuoteModel({
     required super.quote,
     required super.author,
@@ -9,7 +12,8 @@ class QuoteModel extends QuoteEntity {
     required super.isOwnQuote,
     required super.quoteKey,
     required super.likedAt,
-  });
+    required this.collections,
+  }) : super(collections: collections);
 
   factory QuoteModel.fromJson(Map<String, dynamic> json) {
     return QuoteModel(
@@ -20,6 +24,14 @@ class QuoteModel extends QuoteEntity {
       likedAt:
           (json['likedAt'] != null) ? DateTime.tryParse(json['likedAt']) : null,
       quoteKey: GlobalKey(),
+      collections:
+          (json['collections'] != null)
+              ? (json['collections'] as List<dynamic>)
+                  .map(
+                    (e) => CollectionModel.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : [],
     );
   }
 
@@ -30,6 +42,7 @@ class QuoteModel extends QuoteEntity {
     bool? isLiked,
     bool? isOwnQuote,
     DateTime? likedAt,
+    List<CollectionEntity>? collections,
   }) {
     return QuoteModel(
       quote: quote ?? this.quote,
@@ -38,6 +51,9 @@ class QuoteModel extends QuoteEntity {
       isOwnQuote: isOwnQuote ?? this.isOwnQuote,
       likedAt: likedAt ?? this.likedAt,
       quoteKey: quoteKey,
+      collections:
+          collections?.map((e) => CollectionModel.fromEntity(e)).toList() ??
+          this.collections,
     );
   }
 
@@ -49,6 +65,8 @@ class QuoteModel extends QuoteEntity {
       isOwnQuote: entity.isOwnQuote,
       likedAt: entity.likedAt,
       quoteKey: entity.quoteKey,
+      collections:
+          entity.collections.map((e) => CollectionModel.fromEntity(e)).toList(),
     );
   }
 
@@ -59,6 +77,7 @@ class QuoteModel extends QuoteEntity {
       'isLiked': isLiked,
       'isOwnQuote': isOwnQuote,
       'likedAt': likedAt?.toIso8601String(),
+      'collections': collections.map((e) => e.toJson()).toList(),
     };
   }
 }

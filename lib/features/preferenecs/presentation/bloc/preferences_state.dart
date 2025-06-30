@@ -1,5 +1,5 @@
 import 'package:sureline/common/domain/entities/streak_display_entity.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 
 abstract class PreferencesState {
   const PreferencesState();
