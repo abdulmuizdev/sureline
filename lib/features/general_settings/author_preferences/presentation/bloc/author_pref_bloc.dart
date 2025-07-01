@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sureline/features/general_settings/author_preferences/domain/use_case/get_author_prefs_use_case.dart';
-import 'package:sureline/features/general_settings/author_preferences/domain/use_case/update_author_prefs_use_case.dart';
 import 'package:sureline/features/general_settings/author_preferences/presentation/bloc/author_pref_event.dart';
 import 'package:sureline/features/general_settings/author_preferences/presentation/bloc/author_pref_state.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/author_preferences/get_author_preferences_use_case.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/author_preferences/update_author_preference_use_case.dart';
 
 class AuthorPrefBloc extends Bloc<AuthorPrefEvent, AuthorPrefState> {
-  final GetAuthorPrefsUseCase _getAuthorPrefsUseCase;
-  final UpdateAuthorPrefsUseCase _updateAuthorPrefsUseCase;
+  final GetAuthorPreferencesUseCase _getAuthorPreferencesUseCase;
+  final UpdateAuthorPreferenceUseCase _updateAuthorPreferenceUseCase;
 
-  AuthorPrefBloc(this._getAuthorPrefsUseCase, this._updateAuthorPrefsUseCase)
-    : super(Initial()) {
-    on<GetAuthorPrefOptions>((event, emit) {
+  AuthorPrefBloc(
+    this._getAuthorPreferencesUseCase,
+    this._updateAuthorPreferenceUseCase,
+  ) : super(Initial()) {
+    on<GetAuthorPrefOptions>((event, emit) async {
       debugPrint('got it');
       emit(GettingAuthorPrefOptions());
-      final result = _getAuthorPrefsUseCase.execute();
+      final result = await _getAuthorPreferencesUseCase.call();
       result.fold((left) {}, (right) {
         debugPrint('right is this');
         emit(GotAuthorPrefOptions(right));
@@ -22,12 +24,11 @@ class AuthorPrefBloc extends Bloc<AuthorPrefEvent, AuthorPrefState> {
     });
 
     on<OnAuthorPrefPressed>((event, emit) async {
-      final result = await _updateAuthorPrefsUseCase.execute(event.authorPrefs);
-      result.fold((left) {}, (right) {
-        final authorPrefResult = _getAuthorPrefsUseCase.execute();
-        authorPrefResult.fold((left) {}, (right) {
-          emit(GotAuthorPrefOptions(right));
-        });
+      final result = await _updateAuthorPreferenceUseCase.call(
+        event.authorPref.copyWith(isPreferred: !event.authorPref.isPreferred),
+      );
+      result.fold((left) {}, (right) async {
+        add(GetAuthorPrefOptions());
       });
     });
   }

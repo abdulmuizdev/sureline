@@ -67,62 +67,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   final ScreenshotCallback screenshotCallback = ScreenshotCallback();
 
-  void _saveOnAppGroup() async {
-    try {
-      await SharedPreferenceAppGroup.setAppGroup(
-        'group.com.abdulmuiz.sureline.quoteWidget',
-      );
-      if (App.themeEntity.backgroundEntity.solidColor == null) {
-        await SharedPreferenceAppGroup.remove(SP.solidColorAppGroup);
-      } else {
-        await SharedPreferenceAppGroup.setInt(
-          SP.solidColorAppGroup,
-          App.themeEntity.backgroundEntity.solidColor?.value,
-        );
-      }
-      try {
-        // final appGroupDir = await FlutterAppGroupDirectory.getAppGroupDirectory('group.com.abdulmuiz.sureline.quoteWidget',);
-        // if (appGroupDir == null) return null;
-        //
-        // final XFile xFile = XFile(App.themeEntity.backgroundEntity.path!);
-        // final fileName = p.basename(xFile.path) + '.png';
-        // final destPath = p.join(appGroupDir.path, fileName);
-        // debugPrint(destPath);
-
-        // Save XFile to the destination path
-        // await xFile.saveTo(destPath);
-
-        await SharedPreferenceAppGroup.setString(
-          SP.imagePathAppGroup,
-          App.themeEntity.backgroundEntity.path,
-        );
-        await SharedPreferenceAppGroup.setInt(
-          SP.textColorAppGroup,
-          App.themeEntity.textDecorEntity.textColor.value,
-        );
-        await SharedPreferenceAppGroup.setInt(
-          SP.textSizeAppGroup,
-          App.themeEntity.textDecorEntity.fontSize.round(),
-        );
-      } catch (e) {
-        debugPrint("Error saving image to App Group: $e");
-      }
-
-      Utils.updateWidgets();
-      final str = (await SharedPreferenceAppGroup.getString(
-        SP.solidColorAppGroup,
-      ));
-      debugPrint(str);
-    } catch (e) {
-      debugPrint('${e}');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-
-    _saveOnAppGroup();
 
     _controller = AnimationController(
       vsync: this,

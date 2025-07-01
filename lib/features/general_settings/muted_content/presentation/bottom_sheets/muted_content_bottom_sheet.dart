@@ -19,10 +19,10 @@ class MutedContentBottomSheet extends StatefulWidget {
 }
 
 class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
-  List<MutedContentEntity> _options = [
-    MutedContentEntity(title: 'With author', isSelected: false),
-    MutedContentEntity(title: 'Without author', isSelected: false),
-  ];
+  MutedContentEntity _mutedContent = MutedContentEntity(
+    isWithAuthorMuted: false,
+    isWithoutAuthorMuted: false,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,8 @@ class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
       child: BlocListener<MutedContentBloc, MutedContentState>(
         listener: (context, state) {
           if (state is GotMutedContentOptions) {
-            _options = state.result;
+            print('got muted content options');
+            _mutedContent = state.result;
           }
         },
         child: BlocBuilder<MutedContentBloc, MutedContentState>(
@@ -94,21 +95,35 @@ class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
                                         mainAxisSpacing: 18,
                                         crossAxisSpacing: 18,
                                       ),
-                                  itemCount: _options.length,
+                                  itemCount: 2,
                                   itemBuilder: (context, index) {
                                     return MutedContentGridItem(
-                                      title: _options[index].title,
-                                      isSelected: _options[index].isSelected,
+                                      title:
+                                          index == 0
+                                              ? 'With Author'
+                                              : 'Without Author',
+                                      isSelected:
+                                          index == 0
+                                              ? _mutedContent.isWithAuthorMuted
+                                              : _mutedContent
+                                                  .isWithoutAuthorMuted,
                                       onPressed: () {
-                                        final current = _options[index];
-                                        List<MutedContentEntity> newEntities = [
-                                          ..._options,
-                                        ];
-                                        newEntities[index] = current.copyWith(
-                                          isSelected: !current.isSelected,
-                                        );
+                                        final newOptions = _mutedContent
+                                            .copyWith(
+                                              isWithAuthorMuted:
+                                                  index == 0
+                                                      ? !_mutedContent
+                                                          .isWithAuthorMuted
+                                                      : false,
+                                              isWithoutAuthorMuted:
+                                                  index == 1
+                                                      ? !_mutedContent
+                                                          .isWithoutAuthorMuted
+                                                      : false,
+                                            );
+
                                         context.read<MutedContentBloc>().add(
-                                          OnMutedContentPressed(newEntities),
+                                          OnMutedContentPressed([newOptions]),
                                         );
                                       },
                                     );

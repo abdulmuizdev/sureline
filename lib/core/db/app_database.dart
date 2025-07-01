@@ -4,8 +4,10 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sureline/core/db/tables/author_prefs_table.dart';
 import 'package:sureline/core/db/tables/collections_table.dart';
 import 'package:sureline/core/db/tables/favourites.dart';
+import 'package:sureline/core/db/tables/muted_content_table.dart';
 import 'package:sureline/core/db/tables/own_quotes_table.dart';
 import 'package:sureline/core/db/tables/quotes.dart';
 import 'package:sureline/core/db/tables/references/collections_favourites.dart';
@@ -25,13 +27,15 @@ part 'app_database.g.dart';
     CollectionsOwnQuotesTable,
     CollectionsHistoryQuotes,
     CollectionsSearchQuotes,
+    AuthorPrefsTable,
+    MutedContentTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 17;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

@@ -42,7 +42,8 @@ void main() async {
   debugPrint('check 4');
   await locator<SetThemeUseCase>().execute();
   debugPrint('check 5');
-  await locator<SaveAllQuotesToAppGroupUseCase>().execute();
+  
+  // await locator<SaveAllQuotesToAppGroupUseCase>().execute();
   debugPrint('check 6');
   _cacheFonts();
   (await locator<IsOnboardingCompletedUseCase>().execute()).fold((left) {}, (

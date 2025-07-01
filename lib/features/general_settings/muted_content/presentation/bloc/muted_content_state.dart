@@ -13,7 +13,7 @@ class GettingMutedContentOptions extends MutedContentState {
 }
 
 class GotMutedContentOptions extends MutedContentState {
-  final List<MutedContentEntity> result;
+  final MutedContentEntity result;
   const GotMutedContentOptions(this.result);
 }
 

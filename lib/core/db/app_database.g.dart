@@ -294,6 +294,30 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, Quote> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _isRestrictedMeta = const VerificationMeta(
+    'isRestricted',
+  );
+  @override
+  late final GeneratedColumn<bool> isRestricted = GeneratedColumn<bool>(
+    'is_restricted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_restricted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _orderMeta = const VerificationMeta('order');
+  @override
+  late final GeneratedColumn<int> order = GeneratedColumn<int>(
+    'order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -322,6 +346,8 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, Quote> {
     id,
     quoteText,
     author,
+    isRestricted,
+    order,
     createdAt,
     shownAt,
   ];
@@ -353,6 +379,23 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, Quote> {
         _authorMeta,
         author.isAcceptableOrUnknown(data['author']!, _authorMeta),
       );
+    }
+    if (data.containsKey('is_restricted')) {
+      context.handle(
+        _isRestrictedMeta,
+        isRestricted.isAcceptableOrUnknown(
+          data['is_restricted']!,
+          _isRestrictedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('order')) {
+      context.handle(
+        _orderMeta,
+        order.isAcceptableOrUnknown(data['order']!, _orderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_orderMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -389,6 +432,16 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, Quote> {
         DriftSqlType.string,
         data['${effectivePrefix}author'],
       ),
+      isRestricted:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_restricted'],
+          )!,
+      order:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}order'],
+          )!,
       createdAt:
           attachedDatabase.typeMapping.read(
             DriftSqlType.dateTime,
@@ -411,12 +464,16 @@ class Quote extends DataClass implements Insertable<Quote> {
   final int id;
   final String quoteText;
   final String? author;
+  final bool isRestricted;
+  final int order;
   final DateTime createdAt;
   final DateTime? shownAt;
   const Quote({
     required this.id,
     required this.quoteText,
     this.author,
+    required this.isRestricted,
+    required this.order,
     required this.createdAt,
     this.shownAt,
   });
@@ -428,6 +485,8 @@ class Quote extends DataClass implements Insertable<Quote> {
     if (!nullToAbsent || author != null) {
       map['author'] = Variable<String>(author);
     }
+    map['is_restricted'] = Variable<bool>(isRestricted);
+    map['order'] = Variable<int>(order);
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || shownAt != null) {
       map['shown_at'] = Variable<DateTime>(shownAt);
@@ -441,6 +500,8 @@ class Quote extends DataClass implements Insertable<Quote> {
       quoteText: Value(quoteText),
       author:
           author == null && nullToAbsent ? const Value.absent() : Value(author),
+      isRestricted: Value(isRestricted),
+      order: Value(order),
       createdAt: Value(createdAt),
       shownAt:
           shownAt == null && nullToAbsent
@@ -458,6 +519,8 @@ class Quote extends DataClass implements Insertable<Quote> {
       id: serializer.fromJson<int>(json['id']),
       quoteText: serializer.fromJson<String>(json['quoteText']),
       author: serializer.fromJson<String?>(json['author']),
+      isRestricted: serializer.fromJson<bool>(json['isRestricted']),
+      order: serializer.fromJson<int>(json['order']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       shownAt: serializer.fromJson<DateTime?>(json['shownAt']),
     );
@@ -469,6 +532,8 @@ class Quote extends DataClass implements Insertable<Quote> {
       'id': serializer.toJson<int>(id),
       'quoteText': serializer.toJson<String>(quoteText),
       'author': serializer.toJson<String?>(author),
+      'isRestricted': serializer.toJson<bool>(isRestricted),
+      'order': serializer.toJson<int>(order),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'shownAt': serializer.toJson<DateTime?>(shownAt),
     };
@@ -478,12 +543,16 @@ class Quote extends DataClass implements Insertable<Quote> {
     int? id,
     String? quoteText,
     Value<String?> author = const Value.absent(),
+    bool? isRestricted,
+    int? order,
     DateTime? createdAt,
     Value<DateTime?> shownAt = const Value.absent(),
   }) => Quote(
     id: id ?? this.id,
     quoteText: quoteText ?? this.quoteText,
     author: author.present ? author.value : this.author,
+    isRestricted: isRestricted ?? this.isRestricted,
+    order: order ?? this.order,
     createdAt: createdAt ?? this.createdAt,
     shownAt: shownAt.present ? shownAt.value : this.shownAt,
   );
@@ -492,6 +561,11 @@ class Quote extends DataClass implements Insertable<Quote> {
       id: data.id.present ? data.id.value : this.id,
       quoteText: data.quoteText.present ? data.quoteText.value : this.quoteText,
       author: data.author.present ? data.author.value : this.author,
+      isRestricted:
+          data.isRestricted.present
+              ? data.isRestricted.value
+              : this.isRestricted,
+      order: data.order.present ? data.order.value : this.order,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       shownAt: data.shownAt.present ? data.shownAt.value : this.shownAt,
     );
@@ -503,6 +577,8 @@ class Quote extends DataClass implements Insertable<Quote> {
           ..write('id: $id, ')
           ..write('quoteText: $quoteText, ')
           ..write('author: $author, ')
+          ..write('isRestricted: $isRestricted, ')
+          ..write('order: $order, ')
           ..write('createdAt: $createdAt, ')
           ..write('shownAt: $shownAt')
           ..write(')'))
@@ -510,7 +586,15 @@ class Quote extends DataClass implements Insertable<Quote> {
   }
 
   @override
-  int get hashCode => Object.hash(id, quoteText, author, createdAt, shownAt);
+  int get hashCode => Object.hash(
+    id,
+    quoteText,
+    author,
+    isRestricted,
+    order,
+    createdAt,
+    shownAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -518,6 +602,8 @@ class Quote extends DataClass implements Insertable<Quote> {
           other.id == this.id &&
           other.quoteText == this.quoteText &&
           other.author == this.author &&
+          other.isRestricted == this.isRestricted &&
+          other.order == this.order &&
           other.createdAt == this.createdAt &&
           other.shownAt == this.shownAt);
 }
@@ -526,12 +612,16 @@ class QuotesCompanion extends UpdateCompanion<Quote> {
   final Value<int> id;
   final Value<String> quoteText;
   final Value<String?> author;
+  final Value<bool> isRestricted;
+  final Value<int> order;
   final Value<DateTime> createdAt;
   final Value<DateTime?> shownAt;
   const QuotesCompanion({
     this.id = const Value.absent(),
     this.quoteText = const Value.absent(),
     this.author = const Value.absent(),
+    this.isRestricted = const Value.absent(),
+    this.order = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.shownAt = const Value.absent(),
   });
@@ -539,13 +629,18 @@ class QuotesCompanion extends UpdateCompanion<Quote> {
     this.id = const Value.absent(),
     required String quoteText,
     this.author = const Value.absent(),
+    this.isRestricted = const Value.absent(),
+    required int order,
     this.createdAt = const Value.absent(),
     this.shownAt = const Value.absent(),
-  }) : quoteText = Value(quoteText);
+  }) : quoteText = Value(quoteText),
+       order = Value(order);
   static Insertable<Quote> custom({
     Expression<int>? id,
     Expression<String>? quoteText,
     Expression<String>? author,
+    Expression<bool>? isRestricted,
+    Expression<int>? order,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? shownAt,
   }) {
@@ -553,6 +648,8 @@ class QuotesCompanion extends UpdateCompanion<Quote> {
       if (id != null) 'id': id,
       if (quoteText != null) 'quote_text': quoteText,
       if (author != null) 'author': author,
+      if (isRestricted != null) 'is_restricted': isRestricted,
+      if (order != null) 'order': order,
       if (createdAt != null) 'created_at': createdAt,
       if (shownAt != null) 'shown_at': shownAt,
     });
@@ -562,6 +659,8 @@ class QuotesCompanion extends UpdateCompanion<Quote> {
     Value<int>? id,
     Value<String>? quoteText,
     Value<String?>? author,
+    Value<bool>? isRestricted,
+    Value<int>? order,
     Value<DateTime>? createdAt,
     Value<DateTime?>? shownAt,
   }) {
@@ -569,6 +668,8 @@ class QuotesCompanion extends UpdateCompanion<Quote> {
       id: id ?? this.id,
       quoteText: quoteText ?? this.quoteText,
       author: author ?? this.author,
+      isRestricted: isRestricted ?? this.isRestricted,
+      order: order ?? this.order,
       createdAt: createdAt ?? this.createdAt,
       shownAt: shownAt ?? this.shownAt,
     );
@@ -586,6 +687,12 @@ class QuotesCompanion extends UpdateCompanion<Quote> {
     if (author.present) {
       map['author'] = Variable<String>(author.value);
     }
+    if (isRestricted.present) {
+      map['is_restricted'] = Variable<bool>(isRestricted.value);
+    }
+    if (order.present) {
+      map['order'] = Variable<int>(order.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -601,6 +708,8 @@ class QuotesCompanion extends UpdateCompanion<Quote> {
           ..write('id: $id, ')
           ..write('quoteText: $quoteText, ')
           ..write('author: $author, ')
+          ..write('isRestricted: $isRestricted, ')
+          ..write('order: $order, ')
           ..write('createdAt: $createdAt, ')
           ..write('shownAt: $shownAt')
           ..write(')'))
@@ -2424,6 +2533,552 @@ class CollectionsSearchQuotesCompanion
   }
 }
 
+class $AuthorPrefsTableTable extends AuthorPrefsTable
+    with TableInfo<$AuthorPrefsTableTable, AuthorPrefsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AuthorPrefsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _authorNameMeta = const VerificationMeta(
+    'authorName',
+  );
+  @override
+  late final GeneratedColumn<String> authorName = GeneratedColumn<String>(
+    'author_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isPreferredMeta = const VerificationMeta(
+    'isPreferred',
+  );
+  @override
+  late final GeneratedColumn<bool> isPreferred = GeneratedColumn<bool>(
+    'is_preferred',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_preferred" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, authorName, isPreferred];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'author_prefs_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AuthorPrefsTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('author_name')) {
+      context.handle(
+        _authorNameMeta,
+        authorName.isAcceptableOrUnknown(data['author_name']!, _authorNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_authorNameMeta);
+    }
+    if (data.containsKey('is_preferred')) {
+      context.handle(
+        _isPreferredMeta,
+        isPreferred.isAcceptableOrUnknown(
+          data['is_preferred']!,
+          _isPreferredMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AuthorPrefsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AuthorPrefsTableData(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      authorName:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}author_name'],
+          )!,
+      isPreferred:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_preferred'],
+          )!,
+    );
+  }
+
+  @override
+  $AuthorPrefsTableTable createAlias(String alias) {
+    return $AuthorPrefsTableTable(attachedDatabase, alias);
+  }
+}
+
+class AuthorPrefsTableData extends DataClass
+    implements Insertable<AuthorPrefsTableData> {
+  final int id;
+  final String authorName;
+  final bool isPreferred;
+  const AuthorPrefsTableData({
+    required this.id,
+    required this.authorName,
+    required this.isPreferred,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['author_name'] = Variable<String>(authorName);
+    map['is_preferred'] = Variable<bool>(isPreferred);
+    return map;
+  }
+
+  AuthorPrefsTableCompanion toCompanion(bool nullToAbsent) {
+    return AuthorPrefsTableCompanion(
+      id: Value(id),
+      authorName: Value(authorName),
+      isPreferred: Value(isPreferred),
+    );
+  }
+
+  factory AuthorPrefsTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AuthorPrefsTableData(
+      id: serializer.fromJson<int>(json['id']),
+      authorName: serializer.fromJson<String>(json['authorName']),
+      isPreferred: serializer.fromJson<bool>(json['isPreferred']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'authorName': serializer.toJson<String>(authorName),
+      'isPreferred': serializer.toJson<bool>(isPreferred),
+    };
+  }
+
+  AuthorPrefsTableData copyWith({
+    int? id,
+    String? authorName,
+    bool? isPreferred,
+  }) => AuthorPrefsTableData(
+    id: id ?? this.id,
+    authorName: authorName ?? this.authorName,
+    isPreferred: isPreferred ?? this.isPreferred,
+  );
+  AuthorPrefsTableData copyWithCompanion(AuthorPrefsTableCompanion data) {
+    return AuthorPrefsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      authorName:
+          data.authorName.present ? data.authorName.value : this.authorName,
+      isPreferred:
+          data.isPreferred.present ? data.isPreferred.value : this.isPreferred,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AuthorPrefsTableData(')
+          ..write('id: $id, ')
+          ..write('authorName: $authorName, ')
+          ..write('isPreferred: $isPreferred')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, authorName, isPreferred);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AuthorPrefsTableData &&
+          other.id == this.id &&
+          other.authorName == this.authorName &&
+          other.isPreferred == this.isPreferred);
+}
+
+class AuthorPrefsTableCompanion extends UpdateCompanion<AuthorPrefsTableData> {
+  final Value<int> id;
+  final Value<String> authorName;
+  final Value<bool> isPreferred;
+  const AuthorPrefsTableCompanion({
+    this.id = const Value.absent(),
+    this.authorName = const Value.absent(),
+    this.isPreferred = const Value.absent(),
+  });
+  AuthorPrefsTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String authorName,
+    this.isPreferred = const Value.absent(),
+  }) : authorName = Value(authorName);
+  static Insertable<AuthorPrefsTableData> custom({
+    Expression<int>? id,
+    Expression<String>? authorName,
+    Expression<bool>? isPreferred,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (authorName != null) 'author_name': authorName,
+      if (isPreferred != null) 'is_preferred': isPreferred,
+    });
+  }
+
+  AuthorPrefsTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? authorName,
+    Value<bool>? isPreferred,
+  }) {
+    return AuthorPrefsTableCompanion(
+      id: id ?? this.id,
+      authorName: authorName ?? this.authorName,
+      isPreferred: isPreferred ?? this.isPreferred,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (authorName.present) {
+      map['author_name'] = Variable<String>(authorName.value);
+    }
+    if (isPreferred.present) {
+      map['is_preferred'] = Variable<bool>(isPreferred.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AuthorPrefsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('authorName: $authorName, ')
+          ..write('isPreferred: $isPreferred')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MutedContentTableTable extends MutedContentTable
+    with TableInfo<$MutedContentTableTable, MutedContentTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MutedContentTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _isWithAuthorMutedMeta = const VerificationMeta(
+    'isWithAuthorMuted',
+  );
+  @override
+  late final GeneratedColumn<bool> isWithAuthorMuted = GeneratedColumn<bool>(
+    'is_with_author_muted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_with_author_muted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _isWithoutAuthorMutedMeta =
+      const VerificationMeta('isWithoutAuthorMuted');
+  @override
+  late final GeneratedColumn<bool> isWithoutAuthorMuted = GeneratedColumn<bool>(
+    'is_without_author_muted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_without_author_muted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    isWithAuthorMuted,
+    isWithoutAuthorMuted,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'muted_content_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MutedContentTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('is_with_author_muted')) {
+      context.handle(
+        _isWithAuthorMutedMeta,
+        isWithAuthorMuted.isAcceptableOrUnknown(
+          data['is_with_author_muted']!,
+          _isWithAuthorMutedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_without_author_muted')) {
+      context.handle(
+        _isWithoutAuthorMutedMeta,
+        isWithoutAuthorMuted.isAcceptableOrUnknown(
+          data['is_without_author_muted']!,
+          _isWithoutAuthorMutedMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MutedContentTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MutedContentTableData(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      isWithAuthorMuted:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_with_author_muted'],
+          )!,
+      isWithoutAuthorMuted:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_without_author_muted'],
+          )!,
+    );
+  }
+
+  @override
+  $MutedContentTableTable createAlias(String alias) {
+    return $MutedContentTableTable(attachedDatabase, alias);
+  }
+}
+
+class MutedContentTableData extends DataClass
+    implements Insertable<MutedContentTableData> {
+  final int id;
+  final bool isWithAuthorMuted;
+  final bool isWithoutAuthorMuted;
+  const MutedContentTableData({
+    required this.id,
+    required this.isWithAuthorMuted,
+    required this.isWithoutAuthorMuted,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['is_with_author_muted'] = Variable<bool>(isWithAuthorMuted);
+    map['is_without_author_muted'] = Variable<bool>(isWithoutAuthorMuted);
+    return map;
+  }
+
+  MutedContentTableCompanion toCompanion(bool nullToAbsent) {
+    return MutedContentTableCompanion(
+      id: Value(id),
+      isWithAuthorMuted: Value(isWithAuthorMuted),
+      isWithoutAuthorMuted: Value(isWithoutAuthorMuted),
+    );
+  }
+
+  factory MutedContentTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MutedContentTableData(
+      id: serializer.fromJson<int>(json['id']),
+      isWithAuthorMuted: serializer.fromJson<bool>(json['isWithAuthorMuted']),
+      isWithoutAuthorMuted: serializer.fromJson<bool>(
+        json['isWithoutAuthorMuted'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'isWithAuthorMuted': serializer.toJson<bool>(isWithAuthorMuted),
+      'isWithoutAuthorMuted': serializer.toJson<bool>(isWithoutAuthorMuted),
+    };
+  }
+
+  MutedContentTableData copyWith({
+    int? id,
+    bool? isWithAuthorMuted,
+    bool? isWithoutAuthorMuted,
+  }) => MutedContentTableData(
+    id: id ?? this.id,
+    isWithAuthorMuted: isWithAuthorMuted ?? this.isWithAuthorMuted,
+    isWithoutAuthorMuted: isWithoutAuthorMuted ?? this.isWithoutAuthorMuted,
+  );
+  MutedContentTableData copyWithCompanion(MutedContentTableCompanion data) {
+    return MutedContentTableData(
+      id: data.id.present ? data.id.value : this.id,
+      isWithAuthorMuted:
+          data.isWithAuthorMuted.present
+              ? data.isWithAuthorMuted.value
+              : this.isWithAuthorMuted,
+      isWithoutAuthorMuted:
+          data.isWithoutAuthorMuted.present
+              ? data.isWithoutAuthorMuted.value
+              : this.isWithoutAuthorMuted,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MutedContentTableData(')
+          ..write('id: $id, ')
+          ..write('isWithAuthorMuted: $isWithAuthorMuted, ')
+          ..write('isWithoutAuthorMuted: $isWithoutAuthorMuted')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, isWithAuthorMuted, isWithoutAuthorMuted);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MutedContentTableData &&
+          other.id == this.id &&
+          other.isWithAuthorMuted == this.isWithAuthorMuted &&
+          other.isWithoutAuthorMuted == this.isWithoutAuthorMuted);
+}
+
+class MutedContentTableCompanion
+    extends UpdateCompanion<MutedContentTableData> {
+  final Value<int> id;
+  final Value<bool> isWithAuthorMuted;
+  final Value<bool> isWithoutAuthorMuted;
+  const MutedContentTableCompanion({
+    this.id = const Value.absent(),
+    this.isWithAuthorMuted = const Value.absent(),
+    this.isWithoutAuthorMuted = const Value.absent(),
+  });
+  MutedContentTableCompanion.insert({
+    this.id = const Value.absent(),
+    this.isWithAuthorMuted = const Value.absent(),
+    this.isWithoutAuthorMuted = const Value.absent(),
+  });
+  static Insertable<MutedContentTableData> custom({
+    Expression<int>? id,
+    Expression<bool>? isWithAuthorMuted,
+    Expression<bool>? isWithoutAuthorMuted,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (isWithAuthorMuted != null) 'is_with_author_muted': isWithAuthorMuted,
+      if (isWithoutAuthorMuted != null)
+        'is_without_author_muted': isWithoutAuthorMuted,
+    });
+  }
+
+  MutedContentTableCompanion copyWith({
+    Value<int>? id,
+    Value<bool>? isWithAuthorMuted,
+    Value<bool>? isWithoutAuthorMuted,
+  }) {
+    return MutedContentTableCompanion(
+      id: id ?? this.id,
+      isWithAuthorMuted: isWithAuthorMuted ?? this.isWithAuthorMuted,
+      isWithoutAuthorMuted: isWithoutAuthorMuted ?? this.isWithoutAuthorMuted,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (isWithAuthorMuted.present) {
+      map['is_with_author_muted'] = Variable<bool>(isWithAuthorMuted.value);
+    }
+    if (isWithoutAuthorMuted.present) {
+      map['is_without_author_muted'] = Variable<bool>(
+        isWithoutAuthorMuted.value,
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MutedContentTableCompanion(')
+          ..write('id: $id, ')
+          ..write('isWithAuthorMuted: $isWithAuthorMuted, ')
+          ..write('isWithoutAuthorMuted: $isWithoutAuthorMuted')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2441,6 +3096,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $CollectionsHistoryQuotesTable(this);
   late final $CollectionsSearchQuotesTable collectionsSearchQuotes =
       $CollectionsSearchQuotesTable(this);
+  late final $AuthorPrefsTableTable authorPrefsTable = $AuthorPrefsTableTable(
+    this,
+  );
+  late final $MutedContentTableTable mutedContentTable =
+      $MutedContentTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2454,6 +3114,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     collectionsOwnQuotesTable,
     collectionsHistoryQuotes,
     collectionsSearchQuotes,
+    authorPrefsTable,
+    mutedContentTable,
   ];
 }
 
@@ -2642,6 +3304,8 @@ typedef $$QuotesTableCreateCompanionBuilder =
       Value<int> id,
       required String quoteText,
       Value<String?> author,
+      Value<bool> isRestricted,
+      required int order,
       Value<DateTime> createdAt,
       Value<DateTime?> shownAt,
     });
@@ -2650,6 +3314,8 @@ typedef $$QuotesTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> quoteText,
       Value<String?> author,
+      Value<bool> isRestricted,
+      Value<int> order,
       Value<DateTime> createdAt,
       Value<DateTime?> shownAt,
     });
@@ -2736,6 +3402,16 @@ class $$QuotesTableFilterComposer
 
   ColumnFilters<String> get author => $composableBuilder(
     column: $table.author,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isRestricted => $composableBuilder(
+    column: $table.isRestricted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get order => $composableBuilder(
+    column: $table.order,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2827,6 +3503,16 @@ class $$QuotesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isRestricted => $composableBuilder(
+    column: $table.isRestricted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get order => $composableBuilder(
+    column: $table.order,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -2855,6 +3541,14 @@ class $$QuotesTableAnnotationComposer
 
   GeneratedColumn<String> get author =>
       $composableBuilder(column: $table.author, builder: (column) => column);
+
+  GeneratedColumn<bool> get isRestricted => $composableBuilder(
+    column: $table.isRestricted,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get order =>
+      $composableBuilder(column: $table.order, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -2951,12 +3645,16 @@ class $$QuotesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> quoteText = const Value.absent(),
                 Value<String?> author = const Value.absent(),
+                Value<bool> isRestricted = const Value.absent(),
+                Value<int> order = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> shownAt = const Value.absent(),
               }) => QuotesCompanion(
                 id: id,
                 quoteText: quoteText,
                 author: author,
+                isRestricted: isRestricted,
+                order: order,
                 createdAt: createdAt,
                 shownAt: shownAt,
               ),
@@ -2965,12 +3663,16 @@ class $$QuotesTableTableManager
                 Value<int> id = const Value.absent(),
                 required String quoteText,
                 Value<String?> author = const Value.absent(),
+                Value<bool> isRestricted = const Value.absent(),
+                required int order,
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> shownAt = const Value.absent(),
               }) => QuotesCompanion.insert(
                 id: id,
                 quoteText: quoteText,
                 author: author,
+                isRestricted: isRestricted,
+                order: order,
                 createdAt: createdAt,
                 shownAt: shownAt,
               ),
@@ -4983,6 +5685,376 @@ typedef $$CollectionsSearchQuotesTableProcessedTableManager =
       CollectionsSearchQuote,
       PrefetchHooks Function({bool quoteId})
     >;
+typedef $$AuthorPrefsTableTableCreateCompanionBuilder =
+    AuthorPrefsTableCompanion Function({
+      Value<int> id,
+      required String authorName,
+      Value<bool> isPreferred,
+    });
+typedef $$AuthorPrefsTableTableUpdateCompanionBuilder =
+    AuthorPrefsTableCompanion Function({
+      Value<int> id,
+      Value<String> authorName,
+      Value<bool> isPreferred,
+    });
+
+class $$AuthorPrefsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $AuthorPrefsTableTable> {
+  $$AuthorPrefsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get authorName => $composableBuilder(
+    column: $table.authorName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isPreferred => $composableBuilder(
+    column: $table.isPreferred,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AuthorPrefsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $AuthorPrefsTableTable> {
+  $$AuthorPrefsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get authorName => $composableBuilder(
+    column: $table.authorName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isPreferred => $composableBuilder(
+    column: $table.isPreferred,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AuthorPrefsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AuthorPrefsTableTable> {
+  $$AuthorPrefsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get authorName => $composableBuilder(
+    column: $table.authorName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isPreferred => $composableBuilder(
+    column: $table.isPreferred,
+    builder: (column) => column,
+  );
+}
+
+class $$AuthorPrefsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AuthorPrefsTableTable,
+          AuthorPrefsTableData,
+          $$AuthorPrefsTableTableFilterComposer,
+          $$AuthorPrefsTableTableOrderingComposer,
+          $$AuthorPrefsTableTableAnnotationComposer,
+          $$AuthorPrefsTableTableCreateCompanionBuilder,
+          $$AuthorPrefsTableTableUpdateCompanionBuilder,
+          (
+            AuthorPrefsTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $AuthorPrefsTableTable,
+              AuthorPrefsTableData
+            >,
+          ),
+          AuthorPrefsTableData,
+          PrefetchHooks Function()
+        > {
+  $$AuthorPrefsTableTableTableManager(
+    _$AppDatabase db,
+    $AuthorPrefsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () =>
+                  $$AuthorPrefsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$AuthorPrefsTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$AuthorPrefsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> authorName = const Value.absent(),
+                Value<bool> isPreferred = const Value.absent(),
+              }) => AuthorPrefsTableCompanion(
+                id: id,
+                authorName: authorName,
+                isPreferred: isPreferred,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String authorName,
+                Value<bool> isPreferred = const Value.absent(),
+              }) => AuthorPrefsTableCompanion.insert(
+                id: id,
+                authorName: authorName,
+                isPreferred: isPreferred,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AuthorPrefsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AuthorPrefsTableTable,
+      AuthorPrefsTableData,
+      $$AuthorPrefsTableTableFilterComposer,
+      $$AuthorPrefsTableTableOrderingComposer,
+      $$AuthorPrefsTableTableAnnotationComposer,
+      $$AuthorPrefsTableTableCreateCompanionBuilder,
+      $$AuthorPrefsTableTableUpdateCompanionBuilder,
+      (
+        AuthorPrefsTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $AuthorPrefsTableTable,
+          AuthorPrefsTableData
+        >,
+      ),
+      AuthorPrefsTableData,
+      PrefetchHooks Function()
+    >;
+typedef $$MutedContentTableTableCreateCompanionBuilder =
+    MutedContentTableCompanion Function({
+      Value<int> id,
+      Value<bool> isWithAuthorMuted,
+      Value<bool> isWithoutAuthorMuted,
+    });
+typedef $$MutedContentTableTableUpdateCompanionBuilder =
+    MutedContentTableCompanion Function({
+      Value<int> id,
+      Value<bool> isWithAuthorMuted,
+      Value<bool> isWithoutAuthorMuted,
+    });
+
+class $$MutedContentTableTableFilterComposer
+    extends Composer<_$AppDatabase, $MutedContentTableTable> {
+  $$MutedContentTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isWithAuthorMuted => $composableBuilder(
+    column: $table.isWithAuthorMuted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isWithoutAuthorMuted => $composableBuilder(
+    column: $table.isWithoutAuthorMuted,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MutedContentTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $MutedContentTableTable> {
+  $$MutedContentTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isWithAuthorMuted => $composableBuilder(
+    column: $table.isWithAuthorMuted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isWithoutAuthorMuted => $composableBuilder(
+    column: $table.isWithoutAuthorMuted,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MutedContentTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MutedContentTableTable> {
+  $$MutedContentTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<bool> get isWithAuthorMuted => $composableBuilder(
+    column: $table.isWithAuthorMuted,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isWithoutAuthorMuted => $composableBuilder(
+    column: $table.isWithoutAuthorMuted,
+    builder: (column) => column,
+  );
+}
+
+class $$MutedContentTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MutedContentTableTable,
+          MutedContentTableData,
+          $$MutedContentTableTableFilterComposer,
+          $$MutedContentTableTableOrderingComposer,
+          $$MutedContentTableTableAnnotationComposer,
+          $$MutedContentTableTableCreateCompanionBuilder,
+          $$MutedContentTableTableUpdateCompanionBuilder,
+          (
+            MutedContentTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $MutedContentTableTable,
+              MutedContentTableData
+            >,
+          ),
+          MutedContentTableData,
+          PrefetchHooks Function()
+        > {
+  $$MutedContentTableTableTableManager(
+    _$AppDatabase db,
+    $MutedContentTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$MutedContentTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$MutedContentTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$MutedContentTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<bool> isWithAuthorMuted = const Value.absent(),
+                Value<bool> isWithoutAuthorMuted = const Value.absent(),
+              }) => MutedContentTableCompanion(
+                id: id,
+                isWithAuthorMuted: isWithAuthorMuted,
+                isWithoutAuthorMuted: isWithoutAuthorMuted,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<bool> isWithAuthorMuted = const Value.absent(),
+                Value<bool> isWithoutAuthorMuted = const Value.absent(),
+              }) => MutedContentTableCompanion.insert(
+                id: id,
+                isWithAuthorMuted: isWithAuthorMuted,
+                isWithoutAuthorMuted: isWithoutAuthorMuted,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MutedContentTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MutedContentTableTable,
+      MutedContentTableData,
+      $$MutedContentTableTableFilterComposer,
+      $$MutedContentTableTableOrderingComposer,
+      $$MutedContentTableTableAnnotationComposer,
+      $$MutedContentTableTableCreateCompanionBuilder,
+      $$MutedContentTableTableUpdateCompanionBuilder,
+      (
+        MutedContentTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $MutedContentTableTable,
+          MutedContentTableData
+        >,
+      ),
+      MutedContentTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5012,4 +6084,8 @@ class $AppDatabaseManager {
         _db,
         _db.collectionsSearchQuotes,
       );
+  $$AuthorPrefsTableTableTableManager get authorPrefsTable =>
+      $$AuthorPrefsTableTableTableManager(_db, _db.authorPrefsTable);
+  $$MutedContentTableTableTableManager get mutedContentTable =>
+      $$MutedContentTableTableTableManager(_db, _db.mutedContentTable);
 }

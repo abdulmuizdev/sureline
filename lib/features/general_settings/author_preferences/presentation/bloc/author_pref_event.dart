@@ -9,6 +9,6 @@ class GetAuthorPrefOptions extends AuthorPrefEvent {
 }
 
 class OnAuthorPrefPressed extends AuthorPrefEvent {
-  final List<AuthorPrefEntity> authorPrefs;
-  OnAuthorPrefPressed(this.authorPrefs);
+  final AuthorPrefEntity authorPref;
+  OnAuthorPrefPressed(this.authorPref);
 }

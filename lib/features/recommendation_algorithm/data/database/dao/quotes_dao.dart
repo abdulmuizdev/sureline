@@ -1,10 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:sureline/core/db/app_database.dart';
 import 'package:sureline/core/db/tables/quotes.dart';
+import 'package:sureline/core/db/tables/favourites.dart';
+import 'package:sureline/features/general_settings/author_preferences/data/model/author_pref_model.dart';
+import 'package:sureline/features/general_settings/author_preferences/domain/entity/author_pref_entity.dart';
+import 'package:sureline/features/general_settings/muted_content/data/model/muted_content_model.dart';
 
 part 'quotes_dao.g.dart';
 
-@DriftAccessor(tables: [Quotes])
+@DriftAccessor(tables: [Quotes, Favourites])
 class QuotesDao extends DatabaseAccessor<AppDatabase> with _$QuotesDaoMixin {
   QuotesDao(AppDatabase db) : super(db);
 
@@ -12,10 +16,18 @@ class QuotesDao extends DatabaseAccessor<AppDatabase> with _$QuotesDaoMixin {
     return select(quotes).get();
   }
 
+  Future<void> updateOrder(int quoteId, int newOrder) {
+    return (update(quotes)..where(
+      (tbl) => tbl.id.equals(quoteId),
+    )).write(QuotesCompanion(order: Value(newOrder)));
+  }
+
   Future<List<Quote>> getAllNewQuotes() {
     return (select(quotes)
-          ..where((tbl) => tbl.shownAt.isNull())
-          ..orderBy([(tbl) => OrderingTerm(expression: tbl.createdAt)]))
+          ..where(
+            (tbl) => tbl.shownAt.isNull() & tbl.isRestricted.equals(false),
+          )
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.order)]))
         .get();
   }
 
@@ -44,19 +56,49 @@ class QuotesDao extends DatabaseAccessor<AppDatabase> with _$QuotesDaoMixin {
     )).write(QuotesCompanion(shownAt: Value(shownAt)));
   }
 
+  Future<void> markQuoteAsNotShown(int quoteId) {
+    return (update(quotes)..where(
+      (tbl) => tbl.id.equals(quoteId),
+    )).write(QuotesCompanion(shownAt: Value(null)));
+  }
+
   Future<void> deleteAllQuotes() {
     return delete(quotes).go();
   }
 
   Future<bool> isQuoteFavourite(int quoteId) {
-    return (select(db.favourites)..where(
-      (tbl) => tbl.historyId.equals(quoteId),
+    return (select(favourites)..where(
+      (tbl) => tbl.quoteId.equals(quoteId),
     )).getSingleOrNull().then((favourite) => favourite != null);
   }
 
   Future<bool> isSearchFavourite(int searchId) {
-    return (select(db.favourites)..where(
+    return (select(favourites)..where(
       (tbl) => tbl.searchId.equals(searchId),
     )).getSingleOrNull().then((favourite) => favourite != null);
+  }
+
+  Future<void> restrictAllQuotesWithAuthor() {
+    return (update(quotes)..where(
+      (tbl) => tbl.author.isNotNull(),
+    )).write(QuotesCompanion(isRestricted: Value(true)));
+  }
+
+  Future<void> liftRestrictionOnAllQuotesWithAuthor() {
+    return (update(quotes)..where(
+      (tbl) => tbl.author.isNotNull(),
+    )).write(QuotesCompanion(isRestricted: Value(false)));
+  }
+
+  Future<void> restrictAllQuotesWithoutAuthor() {
+    return (update(quotes)..where(
+      (tbl) => tbl.author.isNull(),
+    )).write(QuotesCompanion(isRestricted: Value(true)));
+  }
+
+  Future<void> liftRestrictionOnAllQuotesWithoutAuthor() {
+    return (update(quotes)..where(
+      (tbl) => tbl.author.isNull(),
+    )).write(QuotesCompanion(isRestricted: Value(false)));
   }
 }

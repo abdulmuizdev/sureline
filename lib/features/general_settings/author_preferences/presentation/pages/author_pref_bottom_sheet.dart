@@ -74,17 +74,12 @@ class _AuthorPrefBottomSheetState extends State<AuthorPrefBottomSheet> {
                       itemCount: _options.length,
                       itemBuilder: (context, index) {
                         return AuthorPrefGridItem(
-                          title: _options[index].title,
-                          isSelected: _options[index].isSelected,
+                          title: _options[index].authorName,
+                          isSelected: _options[index].isPreferred,
                           isLocked: _options[index].isLocked,
                           onPressed: () {
-                            final current = _options[index];
-                            List<AuthorPrefEntity> newEntities = [..._options];
-                            newEntities[index] = current.copyWith(
-                              isSelected: !current.isSelected,
-                            );
                             context.read<AuthorPrefBloc>().add(
-                              OnAuthorPrefPressed(newEntities),
+                              OnAuthorPrefPressed(_options[index]),
                             );
                           },
                         );

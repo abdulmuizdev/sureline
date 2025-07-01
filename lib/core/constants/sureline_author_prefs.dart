@@ -2,8 +2,16 @@ import 'package:sureline/features/general_settings/author_preferences/data/model
 
 class SurelineAuthorPrefs {
   static final List<AuthorPrefModel> values = [
-    AuthorPrefModel(title: 'Napoleon Hill', isLocked: false, isSelected: true),
-    AuthorPrefModel(title: 'Jim Collins', isLocked: false, isSelected: true),
-    AuthorPrefModel(title: 'Peter Drucker', isLocked: true),
+    AuthorPrefModel(
+      authorName: 'Napoleon Hill',
+      isLocked: false,
+      isPreferred: true,
+    ),
+    AuthorPrefModel(
+      authorName: 'Jim Collins',
+      isLocked: false,
+      isPreferred: true,
+    ),
+    AuthorPrefModel(authorName: 'Peter Drucker', isLocked: true),
   ];
 }

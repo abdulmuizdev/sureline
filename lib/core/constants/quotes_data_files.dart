@@ -1,7 +1,8 @@
 class QuotesDataFiles {
   static const List<String> files = [
+    'assets/data/extras.json',
     'assets/data/jim_collins.json',
-    // 'assets/data/napoleon_hill.json',
-    // 'assets/data/peter_drucker.json',
+    'assets/data/napoleon_hill.json',
+    'assets/data/peter_drucker.json',
   ];
 }

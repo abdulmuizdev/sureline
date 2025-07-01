@@ -1,12 +1,18 @@
 class MutedContentEntity {
-  final String title;
-  final bool isSelected;
+  final bool isWithAuthorMuted;
+  final bool isWithoutAuthorMuted;
 
-  MutedContentEntity({required this.title, required this.isSelected});
-  MutedContentEntity copyWith({String? title, bool? isSelected}) {
+  MutedContentEntity({
+    required this.isWithAuthorMuted,
+    required this.isWithoutAuthorMuted,
+  });
+  MutedContentEntity copyWith({
+    bool? isWithAuthorMuted,
+    bool? isWithoutAuthorMuted,
+  }) {
     return MutedContentEntity(
-      title: title ?? this.title,
-      isSelected: isSelected ?? this.isSelected,
+      isWithAuthorMuted: isWithAuthorMuted ?? this.isWithAuthorMuted,
+      isWithoutAuthorMuted: isWithoutAuthorMuted ?? this.isWithoutAuthorMuted,
     );
   }
 }

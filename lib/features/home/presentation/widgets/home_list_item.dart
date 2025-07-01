@@ -56,6 +56,9 @@ class _HomeListItemState extends State<HomeListItem>
   // Add flag to control animation loop
   bool _isAnimationRunning = false;
 
+  // Store the status listener for proper disposal
+  void Function(AnimationStatus)? _likeStatusListener;
+
   double _waterMarkHeight = 25;
 
   @override
@@ -384,22 +387,25 @@ class _HomeListItemState extends State<HomeListItem>
     ]).animate(_likeController);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _quoteWidgetSize =
-            (textKey.currentContext != null)
-                ? (textKey.currentContext!.size != null
-                    ? textKey.currentContext!.size!
-                    : Size.zero)
-                : Size.zero;
-      });
-      _likeController.addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
+      if (mounted) {
+        setState(() {
+          _quoteWidgetSize =
+              (textKey.currentContext != null)
+                  ? (textKey.currentContext!.size != null
+                      ? textKey.currentContext!.size!
+                      : Size.zero)
+                  : Size.zero;
+        });
+      }
+      _likeStatusListener = (status) {
+        if (status == AnimationStatus.completed && mounted) {
           setState(() {
             _showLike = false;
           });
           _likeController.reset();
         }
-      });
+      };
+      _likeController.addStatusListener(_likeStatusListener!);
     });
 
     if (widget.showSwipeGuide ?? false) {
@@ -447,6 +453,13 @@ class _HomeListItemState extends State<HomeListItem>
   @override
   void dispose() {
     _isAnimationRunning = false;
+
+    // Remove status listener before disposing
+    if (_likeStatusListener != null) {
+      _likeController.removeStatusListener(_likeStatusListener!);
+      _likeStatusListener = null;
+    }
+
     _welcomeSwipeSlideController.dispose();
     _swipeSlideController.dispose();
     _swipeFadeController.dispose();

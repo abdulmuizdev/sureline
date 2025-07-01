@@ -59,11 +59,6 @@ import 'package:sureline/features/favourites/domain/use_cases/get_favourites_cou
 import 'package:sureline/features/favourites/domain/use_cases/get_favourites_use_case.dart';
 import 'package:sureline/features/favourites/domain/use_cases/remove_favourite_use_case.dart';
 import 'package:sureline/features/favourites/presentation/bloc/favourites_bloc.dart';
-import 'package:sureline/features/general_settings/author_preferences/data/data_source/author_prefs_data_source.dart';
-import 'package:sureline/features/general_settings/author_preferences/data/repository/author_pref_repository_impl.dart';
-import 'package:sureline/features/general_settings/author_preferences/domain/repository/author_pref_repository.dart';
-import 'package:sureline/features/general_settings/author_preferences/domain/use_case/get_author_prefs_use_case.dart';
-import 'package:sureline/features/general_settings/author_preferences/domain/use_case/update_author_prefs_use_case.dart';
 import 'package:sureline/features/general_settings/author_preferences/presentation/bloc/author_pref_bloc.dart';
 import 'package:sureline/features/general_settings/gender_identity/data/data_source/gender_identity_data_source.dart';
 import 'package:sureline/features/general_settings/gender_identity/data/repository/gender_identity_repository_impl.dart';
@@ -133,9 +128,15 @@ import 'package:sureline/features/own_quotes/domain/use_cases/remove_own_quote_u
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_bloc.dart';
 import 'package:sureline/features/preferenecs/presentation/bloc/preferences_bloc.dart';
 import 'package:sureline/features/recommendation_algorithm/data/data_source/recommendation_algorithm_data_source.dart';
+import 'package:sureline/features/recommendation_algorithm/data/database/dao/author_prefs_table_dao.dart';
+import 'package:sureline/features/recommendation_algorithm/data/database/dao/muted_content_table_dao.dart';
 import 'package:sureline/features/recommendation_algorithm/data/database/dao/quotes_dao.dart';
 import 'package:sureline/features/recommendation_algorithm/data/repository/recommendation_algorithm_repository_impl.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/repository/recommendation_algorithm_repository.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/author_preferences/get_author_preferences_use_case.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/author_preferences/update_author_preference_use_case.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/update_muted_content_use_case.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_muted_content_use_case.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_quotes_from_recommendation_algorithm.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_shown_quotes_use_case.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/use_cases/initialize_recommendation_algorithm.dart';
@@ -181,11 +182,6 @@ import 'package:sureline/features/unsplash_screen/domain/use_case/get_photos_sea
 import 'package:sureline/features/unsplash_screen/domain/use_case/get_photos_use_case.dart';
 import 'package:sureline/features/unsplash_screen/presentation/bloc/photo_bloc.dart';
 import 'package:http/http.dart' as http;
-import 'package:sureline/features/general_settings/muted_content/data/data_source/muted_content_data_source.dart';
-import 'package:sureline/features/general_settings/muted_content/data/repository/muted_content_repository_impl.dart';
-import 'package:sureline/features/general_settings/muted_content/domain/repository/muted_content_repository.dart';
-import 'package:sureline/features/general_settings/muted_content/domain/use_case/get_muted_content_use_case.dart';
-import 'package:sureline/features/general_settings/muted_content/domain/use_case/update_muted_content_use_case.dart';
 import 'package:sureline/features/general_settings/muted_content/presentation/bloc/muted_content_bloc.dart';
 
 final locator = GetIt.instance;
@@ -290,8 +286,11 @@ Future<void> setupLocator() async {
   );
 
   locator.registerFactory(() => QuotesDao(locator()));
+  locator.registerFactory(() => AuthorPrefsTableDao(locator()));
+  locator.registerFactory(() => MutedContentTableDao(locator()));
   locator.registerFactory<RecommendationAlgorithmDataSource>(
-    () => RecommendationAlgorithmDataSourceImpl(locator()),
+    () =>
+        RecommendationAlgorithmDataSourceImpl(locator(), locator(), locator()),
   );
   locator.registerFactory<RecommendationAlgorithmRepository>(
     () => RecommendationAlgorithmRepositoryImpl(locator()),
@@ -485,22 +484,10 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => ConvertWidgetToPngUseCase(locator()));
   locator.registerFactory(() => GetTotalStreakScoreUseCase(locator()));
 
-  locator.registerFactory<AuthorPrefsDataSource>(
-    () => AuthorPrefsDataSourceImpl(locator()),
-  );
-  locator.registerFactory<AuthorPrefRepository>(
-    () => AuthorPrefRepositoryImpl(locator()),
-  );
-  locator.registerFactory(() => GetAuthorPrefsUseCase(locator()));
-  locator.registerFactory(() => UpdateAuthorPrefsUseCase(locator()));
+  locator.registerFactory(() => GetAuthorPreferencesUseCase(locator()));
+  locator.registerFactory(() => UpdateAuthorPreferenceUseCase(locator()));
   locator.registerFactory(() => AuthorPrefBloc(locator(), locator()));
 
-  locator.registerFactory<MutedContentDataSource>(
-    () => MutedContentDataSourceImpl(locator()),
-  );
-  locator.registerFactory<MutedContentRepository>(
-    () => MutedContentRepositoryImpl(locator()),
-  );
   locator.registerFactory(() => GetMutedContentUseCase(locator()));
   locator.registerFactory(() => UpdateMutedContentUseCase(locator()));
   locator.registerFactory(() => MutedContentBloc(locator(), locator()));
