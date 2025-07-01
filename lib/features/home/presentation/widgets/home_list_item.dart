@@ -239,7 +239,6 @@ class _HomeListItemState extends State<HomeListItem>
                             ),
                           ),
                         ],
-                        Expanded(flex: 1, child: Container()),
                       ],
                     ),
                   ),

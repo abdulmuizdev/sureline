@@ -4,11 +4,13 @@ import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart
 
 class OwnQuoteModel extends OwnQuoteEntity {
   final List<CollectionModel> collections;
+
   OwnQuoteModel({
     required super.id,
     required super.quoteText,
     required super.createdAt,
     required this.collections,
+    required super.isFavourite,
   }) : super(collections: collections);
 
   factory OwnQuoteModel.fromEntity(OwnQuoteEntity entity) {
@@ -18,6 +20,7 @@ class OwnQuoteModel extends OwnQuoteEntity {
       createdAt: entity.createdAt,
       collections:
           entity.collections.map((e) => CollectionModel.fromEntity(e)).toList(),
+      isFavourite: entity.isFavourite,
     );
   }
 
@@ -32,15 +35,7 @@ class OwnQuoteModel extends OwnQuoteEntity {
                 (collection) => CollectionModel.fromEntity(collection).toJson(),
               )
               .toList(),
+      'isFavourite': isFavourite,
     };
-  }
-
-  factory OwnQuoteModel.fromOwnQuote(OwnQuotesTableData dbOwnQuote) {
-    return OwnQuoteModel(
-      id: dbOwnQuote.id,
-      quoteText: dbOwnQuote.quoteText,
-      createdAt: dbOwnQuote.createdAt.toIso8601String(),
-      collections: [],
-    );
   }
 }

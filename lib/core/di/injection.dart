@@ -4,10 +4,16 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sureline/common/data/database/dao/references/collections_favourites_dao.dart';
 import 'package:sureline/common/data/database/dao/references/collections_own_quotes_table_dao.dart';
+import 'package:sureline/common/data/database/dao/references/collections_history_dao.dart';
+import 'package:sureline/common/data/database/dao/references/collections_search_dao.dart';
 import 'package:sureline/common/domain/use_cases/collections/add_favourite_to_collection_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/add_history_to_collection_use_case.dart';
 import 'package:sureline/common/domain/use_cases/collections/add_own_quote_to_collection_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/add_search_to_collection_use_case.dart';
 import 'package:sureline/common/domain/use_cases/collections/remove_favourite_from_collection_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/remove_history_from_collection_use_case.dart';
 import 'package:sureline/common/domain/use_cases/collections/remove_own_quote_from_collection_use_case.dart';
+import 'package:sureline/common/domain/use_cases/collections/remove_search_from_collection_use_case.dart';
 import 'package:sureline/common/domain/use_cases/convert_widget_to_png_use_case.dart';
 import 'package:sureline/common/domain/use_cases/get_voice_use_case.dart';
 import 'package:sureline/common/domain/use_cases/is_onboarding_completed_use_case.dart';
@@ -28,10 +34,14 @@ import 'package:sureline/features/collections/data/database/dao/collections_dao.
 import 'package:sureline/features/collections/data/repository/collections_repository_impl.dart';
 import 'package:sureline/features/collections/domain/repository/collections_repository.dart';
 import 'package:sureline/features/collections/domain/use_cases/get_collections_of_favourites_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_collections_of_history_use_case.dart';
 import 'package:sureline/features/collections/domain/use_cases/get_collections_of_own_quotes_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_collections_of_search_use_case.dart';
 import 'package:sureline/features/collections/domain/use_cases/get_collections_use_case.dart';
 import 'package:sureline/features/collections/domain/use_cases/get_favourites_of_collection_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_history_of_collection_use_case.dart';
 import 'package:sureline/features/collections/domain/use_cases/get_own_quotes_of_collection_use_case.dart';
+import 'package:sureline/features/collections/domain/use_cases/get_search_of_collection_use_case.dart';
 import 'package:sureline/features/collections/domain/use_cases/remove_collection_use_case.dart';
 import 'package:sureline/features/collections/domain/use_cases/save_collection_use_case.dart';
 import 'package:sureline/features/collections/presentation/bloc/collections_bloc.dart';
@@ -75,6 +85,11 @@ import 'package:sureline/features/general_settings/voice/domain/repository/voice
 import 'package:sureline/features/general_settings/voice/domain/use_cases/change_voice_use_case.dart';
 import 'package:sureline/features/general_settings/voice/domain/use_cases/get_voices_use_case.dart';
 import 'package:sureline/features/general_settings/voice/presentation/bloc/voice_bloc.dart';
+import 'package:sureline/features/history/data/data_source/history_data_source.dart';
+import 'package:sureline/features/history/data/repository/history_repository_impl.dart';
+import 'package:sureline/features/history/domain/repository/history_repository.dart';
+import 'package:sureline/features/history/domain/use_cases/get_history_use_case.dart';
+import 'package:sureline/features/history/presentation/bloc/history_bloc.dart';
 import 'package:sureline/features/home/data/data_source/quote_data_source.dart';
 import 'package:sureline/features/home/data/repository/quote_repository_impl.dart';
 import 'package:sureline/features/home/domain/repository/quote_repository.dart';
@@ -122,12 +137,17 @@ import 'package:sureline/features/recommendation_algorithm/data/database/dao/quo
 import 'package:sureline/features/recommendation_algorithm/data/repository/recommendation_algorithm_repository_impl.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/repository/recommendation_algorithm_repository.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_quotes_from_recommendation_algorithm.dart';
+import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_shown_quotes_use_case.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/use_cases/initialize_recommendation_algorithm.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/use_cases/mark_quote_as_shown_use_case.dart';
 import 'package:sureline/features/remote_config/data/data_source/remote_config_data_source.dart';
 import 'package:sureline/features/remote_config/data/repository/remote_config_repository.dart';
 import 'package:sureline/features/remote_config/domain/repositories/remote_config_repository.dart';
 import 'package:sureline/features/remote_config/domain/use_cases/prepare_remote_config_use_case.dart';
+import 'package:sureline/features/search/data/data_source/search_data_source.dart';
+import 'package:sureline/features/search/data/repository/search_repository_impl.dart';
+import 'package:sureline/features/search/domain/repository/search_repository.dart';
+import 'package:sureline/features/search/domain/use_cases/get_search_use_case.dart';
 import 'package:sureline/features/search/presentation/bloc/search_bloc.dart';
 import 'package:sureline/features/share/data/data_source/share_data_source.dart';
 import 'package:sureline/features/share/data/repository/share_repository_impl.dart';
@@ -282,10 +302,21 @@ Future<void> setupLocator() async {
   );
   locator.registerFactory(() => InitializeRecommendationAlgorithm(locator()));
   locator.registerFactory(() => MarkQuoteAsShownUseCase(locator()));
-  locator.registerFactory(() => OwnQuotesBloc(locator(), locator(), locator()));
+  locator.registerFactory(
+    () => OwnQuotesBloc(locator(), locator(), locator(), locator(), locator()),
+  );
 
   locator.registerFactory<CollectionsDataSource>(
-    () => CollectionsDataSourceImpl(locator(), locator(), locator(), locator()),
+    () => CollectionsDataSourceImpl(
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+    ),
   );
   locator.registerFactory<CollectionsDao>(() => CollectionsDao(locator()));
   locator.registerFactory<CollectionsRepository>(
@@ -300,9 +331,28 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => AddOwnQuoteToCollectionUseCase(locator()));
   locator.registerFactory(() => RemoveOwnQuoteFromCollectionUseCase(locator()));
   locator.registerFactory(() => GetOwnQuotesOfCollectionUseCase(locator()));
+  locator.registerFactory(() => GetHistoryOfCollectionUseCase(locator()));
+  locator.registerFactory(() => GetCollectionsOfHistoryUseCase(locator()));
+  locator.registerFactory(() => CollectionsHistoryDao(locator()));
+  locator.registerFactory(() => CollectionsSearchDao(locator()));
   locator.registerFactory(() => GetCollectionsOfOwnQuotesUseCase(locator()));
+  locator.registerFactory(() => AddHistoryToCollectionUseCase(locator()));
+  locator.registerFactory(() => RemoveHistoryFromCollectionUseCase(locator()));
+  locator.registerFactory(() => AddSearchToCollectionUseCase(locator()));
+  locator.registerFactory(() => RemoveSearchFromCollectionUseCase(locator()));
+  locator.registerFactory(() => GetSearchOfCollectionUseCase(locator()));
+  locator.registerFactory(() => GetCollectionsOfSearchUseCase(locator()));
+
   locator.registerFactory(
     () => CollectionsBloc(
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
+      locator(),
       locator(),
       locator(),
       locator(),
@@ -496,6 +546,9 @@ Future<void> setupLocator() async {
     () => FavouritesDataSourceImpl(
       favouritesDao: locator(),
       collectionsFavouritesDao: locator(),
+      collectionsOwnQuotesTableDao: locator(),
+      collectionsHistoryDao: locator(),
+      collectionsSearchDao: locator(),
     ),
   );
   locator.registerFactory<FavouritesRepository>(
@@ -505,6 +558,14 @@ Future<void> setupLocator() async {
 
   locator.registerFactory(() => FavouritesDao(locator()));
   locator.registerFactory(() => CollectionsFavouritesDao(locator()));
+
+  locator.registerFactory<SearchDataSource>(
+    () => SearchDataSourceImpl(locator(), locator()),
+  );
+  locator.registerFactory<SearchRepository>(
+    () => SearchRepositoryImpl(locator()),
+  );
+  locator.registerFactory(() => GetSearchUseCase(locator()));
 
   locator.registerFactory(
     () => FavouritesBloc(locator(), locator(), locator(), locator()),
@@ -530,4 +591,14 @@ Future<void> setupLocator() async {
       locator(),
     ),
   );
+
+  locator.registerFactory(() => GetShownQuotesUseCase(locator()));
+  locator.registerFactory<HistoryDataSource>(
+    () => HistoryDataSourceImpl(locator(), locator()),
+  );
+  locator.registerFactory<HistoryRepository>(
+    () => HistoryRepositoryImpl(locator()),
+  );
+  locator.registerFactory(() => GetHistoryUseCase(locator()));
+  locator.registerFactory(() => HistoryBloc(locator(), locator(), locator()));
 }

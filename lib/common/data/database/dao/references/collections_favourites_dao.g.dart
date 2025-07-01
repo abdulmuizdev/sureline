@@ -4,6 +4,7 @@ part of 'collections_favourites_dao.dart';
 
 // ignore_for_file: type=lint
 mixin _$CollectionsFavouritesDaoMixin on DatabaseAccessor<AppDatabase> {
+  $QuotesTable get quotes => attachedDatabase.quotes;
   $FavouritesTable get favourites => attachedDatabase.favourites;
   $CollectionsFavouritesTable get collectionsFavourites =>
       attachedDatabase.collectionsFavourites;

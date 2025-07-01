@@ -109,7 +109,7 @@ class _CollectionListItemState extends State<CollectionListItem> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${widget.entity.favouriteQuotes.length + widget.entity.ownQuotes.length} quotes',
+                  '${widget.entity.favouriteQuotes.length + widget.entity.ownQuotes.length + widget.entity.historyQuotes.length + widget.entity.searchQuotes.length} quotes',
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.primaryColor.withValues(alpha: 0.5),

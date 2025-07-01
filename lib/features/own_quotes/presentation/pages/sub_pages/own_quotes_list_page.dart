@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:sureline/common/presentation/widgets/favourite_list_item.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/di/injection.dart';
@@ -13,19 +14,19 @@ import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_bloc.d
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_event.dart';
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_state.dart';
 import 'package:sureline/features/own_quotes/presentation/pages/own_quotes_bottom_sheet.dart';
-import 'package:sureline/features/own_quotes/presentation/pages/sub_pages/second_page.dart';
+import 'package:sureline/features/own_quotes/presentation/pages/sub_pages/create_own_quote_page.dart';
 import 'package:sureline/features/own_quotes/presentation/widgets/own_quote_list_item.dart';
 import 'package:sureline/features/search/presentation/widget/sureline_search_bar.dart';
 
-class FirstPage extends StatefulWidget {
+class OwnQuotesListPage extends StatefulWidget {
   final VoidCallback onNext;
-  const FirstPage({super.key, required this.onNext});
+  const OwnQuotesListPage({super.key, required this.onNext});
 
   @override
-  State<FirstPage> createState() => _FirstPageState();
+  State<OwnQuotesListPage> createState() => _OwnQuotesListPageState();
 }
 
-class _FirstPageState extends State<FirstPage> {
+class _OwnQuotesListPageState extends State<OwnQuotesListPage> {
   List<OwnQuoteEntity> _ownQuotes = [];
 
   int _deleteOverlayVisibleIndex = -1;
@@ -42,6 +43,11 @@ class _FirstPageState extends State<FirstPage> {
         listener: (context, state) {
           if (state is GotOwnQuotes) {
             _ownQuotes = [...(state.ownQuotes ?? [])];
+            if (_ownQuotes.isNotEmpty) {
+              print(
+                'collections of own quotes: ${_ownQuotes[0].collections.length}',
+              );
+            }
           }
         },
         child: BlocBuilder<OwnQuotesBloc, OwnQuotesState>(
@@ -88,7 +94,7 @@ class _FirstPageState extends State<FirstPage> {
                           context,
                         ).push<List<OwnQuoteEntity>?>(
                           CupertinoPageRoute(
-                            builder: (context) => const SecondPage(),
+                            builder: (context) => const CreateOwnQuotePage(),
                           ),
                         );
                         setState(() {
@@ -143,8 +149,18 @@ class _FirstPageState extends State<FirstPage> {
                             child: ListView.builder(
                               itemCount: _ownQuotes.length,
                               itemBuilder: (context, index) {
-                                return OwnQuoteListItem(
-                                  entity: _ownQuotes[index],
+                                return FavouriteListItem(
+                                  isOwnQuote: true,
+                                  isFavourite: _ownQuotes[index].isFavourite,
+                                  ownQuoteEntity: _ownQuotes[index],
+                                  onFavouritePressed: () {
+                                    context.read<OwnQuotesBloc>().add(
+                                      OnLikePressed(
+                                        _ownQuotes[index],
+                                        !_ownQuotes[index].isFavourite,
+                                      ),
+                                    );
+                                  },
                                   onDeletePressed:
                                       () => context.read<OwnQuotesBloc>().add(
                                         OnDeletePressed(_ownQuotes[index]),
@@ -206,7 +222,8 @@ class _FirstPageState extends State<FirstPage> {
                                 context,
                               ).push<List<OwnQuoteEntity>?>(
                                 CupertinoPageRoute(
-                                  builder: (context) => const SecondPage(),
+                                  builder:
+                                      (context) => const CreateOwnQuotePage(),
                                 ),
                               );
                               setState(() {

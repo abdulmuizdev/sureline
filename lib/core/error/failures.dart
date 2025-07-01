@@ -50,4 +50,4 @@ class ValidationFailure extends Failure {
 class UnknownFailure extends Failure {
   const UnknownFailure({String message = 'Unknown error occurred', String? code})
       : super(message: message, code: code);
-} 
+}

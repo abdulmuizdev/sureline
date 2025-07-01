@@ -16,6 +16,16 @@ class GetOwnQuotesOfCollection extends CollectionsEvent {
   const GetOwnQuotesOfCollection(this.id);
 }
 
+class GetHistoryOfCollection extends CollectionsEvent {
+  final int collectionId;
+  const GetHistoryOfCollection(this.collectionId);
+}
+
+class GetSearchOfCollection extends CollectionsEvent {
+  final int collectionId;
+  const GetSearchOfCollection(this.collectionId);
+}
+
 class OnDeletePressed extends CollectionsEvent {
   final CollectionEntity entity;
   const OnDeletePressed(this.entity);
@@ -42,10 +52,22 @@ class GetCollectionsOfOwnQuote extends CollectionsEvent {
   const GetCollectionsOfOwnQuote(this.ownQuoteId);
 }
 
+class GetCollectionsOfHistory extends CollectionsEvent {
+  final int quoteId;
+  const GetCollectionsOfHistory(this.quoteId);
+}
+
+class GetCollectionsOfSearch extends CollectionsEvent {
+  final int searchId;
+  const GetCollectionsOfSearch(this.searchId);
+}
+
 class OnAddToCollectionPressed extends CollectionsEvent {
   final int collectionId;
   final int? favouriteId;
   final int? ownQuoteId;
+  final int? quoteId;
+  final int? searchId;
   final bool isSelected;
 
   const OnAddToCollectionPressed({
@@ -53,5 +75,7 @@ class OnAddToCollectionPressed extends CollectionsEvent {
     required this.isSelected,
     this.favouriteId,
     this.ownQuoteId,
+    this.quoteId,
+    this.searchId,
   });
 }

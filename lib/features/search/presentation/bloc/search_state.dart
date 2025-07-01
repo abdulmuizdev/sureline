@@ -1,4 +1,4 @@
-import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
+import 'package:sureline/features/search/domain/entity/search_entity.dart';
 
 abstract class SearchState {
   const SearchState();
@@ -11,11 +11,11 @@ class Initial extends SearchState {
 class SearchingQuotes extends SearchState {}
 
 class SearchedQuotes extends SearchState {
-  final List<QuoteEntity> result;
+  final List<SearchEntity> result;
   const SearchedQuotes(this.result);
 }
 
-class GotQuotes extends SearchState {
-  final List<QuoteEntity> result;
-  const GotQuotes(this.result);
+class GotSearch extends SearchState {
+  final List<SearchEntity> result;
+  const GotSearch(this.result);
 }

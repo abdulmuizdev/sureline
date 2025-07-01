@@ -75,6 +75,8 @@ class _CreateCollectionPageState extends State<CreateCollectionPage> {
                             name: _nameController.text,
                             favouriteQuotes: [],
                             ownQuotes: [],
+                            historyQuotes: [],
+                            searchQuotes: [],
                           ),
                         ),
                       );

@@ -6,8 +6,10 @@ import 'package:sureline/features/collections/domain/entity/collection_entity.da
 import 'package:sureline/features/collections/domain/repository/collections_repository.dart';
 import 'package:sureline/features/favourites/data/model/favourite_model.dart';
 import 'package:sureline/features/favourites/domain/entity/favourite_entity.dart';
+import 'package:sureline/features/history/domain/entity/history_entity.dart';
 import 'package:sureline/features/home/data/model/quote_model.dart';
 import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
+import 'package:sureline/features/search/domain/entity/search_entity.dart';
 
 class CollectionsRepositoryImpl extends CollectionsRepository {
   final CollectionsDataSource dataSource;
@@ -34,7 +36,7 @@ class CollectionsRepositoryImpl extends CollectionsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> addQuoteToCollection(
+  Future<Either<Failure, void>> addFavouriteQuoteToCollection(
     int collectionId,
     int favouriteId,
   ) async {
@@ -42,7 +44,7 @@ class CollectionsRepositoryImpl extends CollectionsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> removeQuoteFromCollection(
+  Future<Either<Failure, void>> removeFavouriteQuoteFromCollection(
     int collectionId,
     int favouriteId,
   ) async {
@@ -91,5 +93,65 @@ class CollectionsRepositoryImpl extends CollectionsRepository {
     int ownQuoteId,
   ) async {
     return dataSource.getCollectionsOfOwnQuote(ownQuoteId);
+  }
+
+  @override
+  Future<Either<Failure, void>> addHistoryToCollection(
+    int collectionId,
+    int quoteId,
+  ) async {
+    return dataSource.addHistoryToCollection(collectionId, quoteId);
+  }
+
+  @override
+  Future<Either<Failure, void>> removeHistoryFromCollection(
+    int collectionId,
+    int quoteId,
+  ) async {
+    return dataSource.removeHistoryFromCollection(collectionId, quoteId);
+  }
+
+  @override
+  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfHistory(
+    int historyId,
+  ) async {
+    return dataSource.getCollectionsOfHistory(historyId);
+  }
+
+  @override
+  Future<Either<Failure, List<HistoryEntity>>> getHistoryOfCollection(
+    int collectionId,
+  ) async {
+    return dataSource.getHistoryOfCollection(collectionId);
+  }
+
+  @override
+  Future<Either<Failure, void>> addSearchToCollection(
+    int collectionId,
+    int searchId,
+  ) async {
+    return dataSource.addSearchToCollection(collectionId, searchId);
+  }
+
+  @override
+  Future<Either<Failure, void>> removeSearchFromCollection(
+    int collectionId,
+    int searchId,
+  ) async {
+    return dataSource.removeSearchFromCollection(collectionId, searchId);
+  }
+
+  @override
+  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfSearch(
+    int searchId,
+  ) async {
+    return dataSource.getCollectionsOfSearch(searchId);
+  }
+
+  @override
+  Future<Either<Failure, List<SearchEntity>>> getSearchOfCollection(
+    int collectionId,
+  ) async {
+    return dataSource.getSearchOfCollection(collectionId);
   }
 }

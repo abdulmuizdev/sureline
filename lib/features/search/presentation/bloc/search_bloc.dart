@@ -7,11 +7,13 @@ import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/features/favourites/domain/use_cases/add_favourite_use_case.dart';
 import 'package:sureline/features/favourites/domain/use_cases/get_favourites_count_use_case.dart';
 import 'package:sureline/features/favourites/domain/use_cases/remove_favourite_use_case.dart';
+import 'package:sureline/features/search/domain/use_cases/get_search_use_case.dart';
 import 'package:sureline/features/search/presentation/bloc/search_event.dart';
 import 'package:sureline/features/search/presentation/bloc/search_state.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
-  final GetQuotesSearchResultsUseCase _getQuotesSearchResultsUseCase;
+  // final GetQuotesSearchResultsUseCase _getQuotesSearchResultsUseCase;
+  final GetSearchUseCase _getSearchUseCase;
 
   // final GetQuotesUseCase _getQuotesUseCase;
 
@@ -25,7 +27,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   Timer? _debounce;
 
   SearchBloc(
-    this._getQuotesSearchResultsUseCase,
+    this._getSearchUseCase,
     // this._getQuotesUseCase,
     this._addFavouriteUseCase,
     this._removeFavouriteUseCase,
@@ -35,10 +37,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       HapticFeedback.lightImpact();
       Either<Failure, int> result;
       if (event.isLiked) {
-        await _addFavouriteUseCase.call(event.entity);
+        await _addFavouriteUseCase.call(search: event.entity);
         result = await _getFavouritesCountUseCase.call();
       } else {
-        // await _removeFavouriteUseCase.call(event.entity.id);
+        await _removeFavouriteUseCase.call(searchId: event.entity.id);
         result = await _getFavouritesCountUseCase.call();
       }
       result.fold((left) {}, (right) {
@@ -78,10 +80,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     emit(SearchingQuotes());
-    final result = await _getQuotesSearchResultsUseCase.execute(
-      query,
-      searchPage,
-    );
+    final result = await _getSearchUseCase.call();
     result.fold((left) {}, (right) {
       emit(SearchedQuotes(right));
     });

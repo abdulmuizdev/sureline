@@ -24,4 +24,9 @@ class RecommendationAlgorithmRepositoryImpl
   Future<Either<Failure, void>> markQuoteAsShown(int id) async {
     return dataSource.markQuoteAsShown(id);
   }
+
+  @override
+  Future<Either<Failure, List<QuoteEntity>>> getShownQuotes() async {
+    return dataSource.getShownQuotes();
+  }
 }

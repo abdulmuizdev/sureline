@@ -12,7 +12,9 @@ import 'package:sureline/features/collections/presentation/bloc/collections_even
 import 'package:sureline/features/collections/presentation/bloc/collections_state.dart';
 import 'package:sureline/features/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
 import 'package:sureline/features/favourites/domain/entity/favourite_entity.dart';
+import 'package:sureline/features/history/domain/entity/history_entity.dart';
 import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
+import 'package:sureline/features/search/domain/entity/search_entity.dart';
 import 'package:sureline/features/search/presentation/widget/sureline_search_bar.dart';
 
 class CollectionDetailPage extends StatefulWidget {
@@ -33,6 +35,8 @@ class CollectionDetailPage extends StatefulWidget {
 class _CollectionDetailPageState extends State<CollectionDetailPage> {
   List<FavouriteEntity> favourites = [];
   List<OwnQuoteEntity> ownQuotes = [];
+  List<HistoryEntity> histories = [];
+  List<SearchEntity> searchQuotes = [];
   int _deleteOverlayVisibleIndex = -1;
 
   @override
@@ -42,7 +46,9 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
           (context) =>
               locator<CollectionsBloc>()
                 ..add(GetFavouritesOfCollection(widget.collectionId))
-                ..add(GetOwnQuotesOfCollection(widget.collectionId)),
+                ..add(GetOwnQuotesOfCollection(widget.collectionId))
+                ..add(GetHistoryOfCollection(widget.collectionId))
+                ..add(GetSearchOfCollection(widget.collectionId)),
       child: BlocListener<CollectionsBloc, CollectionsState>(
         listener: (context, state) {
           if (state is GotFavouritesOfCollection) {
@@ -52,6 +58,14 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
             print('ownQuotes: ${state.ownQuotes?.length}');
 
             ownQuotes = state.ownQuotes ?? [];
+          }
+          if (state is GotHistoryOfCollection) {
+            print('history: ${state.history?.length}');
+
+            histories = state.history ?? [];
+          }
+          if (state is GotSearchOfCollection) {
+            searchQuotes = state.search ?? [];
           }
         },
         child: BlocBuilder<CollectionsBloc, CollectionsState>(
@@ -72,7 +86,10 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                       ),
                     ),
                     SizedBox(height: 24),
-                    if (favourites.isEmpty && ownQuotes.isEmpty) ...[
+                    if (favourites.isEmpty &&
+                        ownQuotes.isEmpty &&
+                        histories.isEmpty &&
+                        searchQuotes.isEmpty) ...[
                       Expanded(
                         child: Center(
                           child: Column(
@@ -106,17 +123,48 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                       SizedBox(height: 27),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: favourites.length + ownQuotes.length,
+                          itemCount:
+                              favourites.length +
+                              ownQuotes.length +
+                              histories.length +
+                              searchQuotes.length,
                           itemBuilder: (context, index) {
+                            // Calculate which list the index belongs to
+                            final favouriteIndex = index;
+                            final ownQuoteIndex = index - favourites.length;
+                            final historyIndex =
+                                index - favourites.length - ownQuotes.length;
+                            final searchIndex =
+                                index -
+                                favourites.length -
+                                ownQuotes.length -
+                                histories.length;
+
+                            // Determine which entity to pass based on index
+                            FavouriteEntity? favouriteEntity;
+                            OwnQuoteEntity? ownQuoteEntity;
+                            HistoryEntity? historyEntity;
+                            SearchEntity? searchEntity;
+
+                            if (index < favourites.length) {
+                              favouriteEntity = favourites[favouriteIndex];
+                            } else if (index <
+                                favourites.length + ownQuotes.length) {
+                              ownQuoteEntity = ownQuotes[ownQuoteIndex];
+                            } else if (index <
+                                favourites.length +
+                                    ownQuotes.length +
+                                    histories.length) {
+                              historyEntity = histories[historyIndex];
+                            } else {
+                              searchEntity = searchQuotes[searchIndex];
+                            }
+
                             return FavouriteListItem(
-                              favouriteEntity:
-                                  (index < favourites.length)
-                                      ? favourites[index]
-                                      : null,
-                              ownQuoteEntity:
-                                  (index < ownQuotes.length)
-                                      ? ownQuotes[index]
-                                      : null,
+                              favouriteEntity: favouriteEntity,
+                              ownQuoteEntity: ownQuoteEntity,
+                              historyEntity: historyEntity,
+                              searchEntity: searchEntity,
                               onDeletePressed: () {
                                 context.read<CollectionsBloc>().add(
                                   OnDeleteQuotePressed(
@@ -134,14 +182,9 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                       ).context,
                                   builder:
                                       (ctx) => CollectionSelectionBottomSheet(
-                                        favouriteId:
-                                            (index < favourites.length)
-                                                ? favourites[index].id
-                                                : null,
-                                        ownQuoteId:
-                                            (index < ownQuotes.length)
-                                                ? ownQuotes[index].id
-                                                : null,
+                                        favouriteId: favouriteEntity?.id,
+                                        ownQuoteId: ownQuoteEntity?.id,
+                                        quoteId: historyEntity?.id,
                                         onFavouritesUpdated:
                                             (favourites, collections) {},
                                       ),
@@ -158,6 +201,9 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                     GetOwnQuotesOfCollection(
                                       widget.collectionId,
                                     ),
+                                  );
+                                  context.read<CollectionsBloc>().add(
+                                    GetHistoryOfCollection(widget.collectionId),
                                   );
                                 }
                               },

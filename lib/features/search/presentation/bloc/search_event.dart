@@ -1,4 +1,5 @@
 import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
+import 'package:sureline/features/search/domain/entity/search_entity.dart';
 
 abstract class SearchEvent {
   const SearchEvent();
@@ -24,6 +25,6 @@ class SearchQuote extends SearchEvent {
 
 class OnLikePressed extends SearchEvent {
   final bool isLiked;
-  final QuoteEntity entity;
+  final SearchEntity entity;
   const OnLikePressed(this.isLiked, this.entity);
 }

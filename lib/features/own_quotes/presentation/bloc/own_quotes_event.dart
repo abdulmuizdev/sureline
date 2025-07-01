@@ -15,3 +15,9 @@ class SaveOwnQuote extends OwnQuotesEvent {
   final OwnQuoteEntity entity;
   const SaveOwnQuote(this.entity);
 }
+
+class OnLikePressed extends OwnQuotesEvent {
+  final OwnQuoteEntity entity;
+  final bool isLiked;
+  const OnLikePressed(this.entity, this.isLiked);
+}

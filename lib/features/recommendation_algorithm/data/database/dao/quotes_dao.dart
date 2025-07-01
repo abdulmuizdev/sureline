@@ -14,9 +14,19 @@ class QuotesDao extends DatabaseAccessor<AppDatabase> with _$QuotesDaoMixin {
 
   Future<List<Quote>> getAllNewQuotes() {
     return (select(quotes)
-      ..where((tbl) => tbl.shownAt.isNull())
-      ..orderBy([(tbl) => OrderingTerm(expression: tbl.createdAt)]))
-      .get();
+          ..where((tbl) => tbl.shownAt.isNull())
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.createdAt)]))
+        .get();
+  }
+
+  Future<List<Quote>> getShownQuotes() {
+    return (select(quotes)
+          ..where((tbl) => tbl.shownAt.isNotNull())
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.shownAt, mode: OrderingMode.desc),
+          ]))
+        .get();
   }
 
   Future<void> addQuote(QuotesCompanion quote) {
@@ -36,5 +46,17 @@ class QuotesDao extends DatabaseAccessor<AppDatabase> with _$QuotesDaoMixin {
 
   Future<void> deleteAllQuotes() {
     return delete(quotes).go();
+  }
+
+  Future<bool> isQuoteFavourite(int quoteId) {
+    return (select(db.favourites)..where(
+      (tbl) => tbl.historyId.equals(quoteId),
+    )).getSingleOrNull().then((favourite) => favourite != null);
+  }
+
+  Future<bool> isSearchFavourite(int searchId) {
+    return (select(db.favourites)..where(
+      (tbl) => tbl.searchId.equals(searchId),
+    )).getSingleOrNull().then((favourite) => favourite != null);
   }
 }

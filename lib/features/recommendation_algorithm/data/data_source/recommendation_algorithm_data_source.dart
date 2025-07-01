@@ -15,6 +15,7 @@ abstract class RecommendationAlgorithmDataSource {
   Future<Either<Failure, void>> initialize();
   Future<Either<Failure, List<QuoteModel>>> getQuotes(int page);
   Future<Either<Failure, void>> markQuoteAsShown(int id);
+  Future<Either<Failure, List<QuoteModel>>> getShownQuotes();
 }
 
 class RecommendationAlgorithmDataSourceImpl
@@ -141,6 +142,19 @@ class RecommendationAlgorithmDataSourceImpl
     try {
       await quotesDao.markQuoteAsShown(id, DateTime.now());
       return Right(unit);
+    } catch (e) {
+      debugPrint(e.toString());
+      return Left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<QuoteModel>>> getShownQuotes() async {
+    try {
+      final shownQuotes = await quotesDao.getShownQuotes();
+      return Right(
+        shownQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList(),
+      );
     } catch (e) {
       debugPrint(e.toString());
       return Left(UnknownFailure());

@@ -16,15 +16,9 @@ class ErrorMapper {
   static Failure _mapAppExceptionToFailure(AppException exception) {
     switch (exception.runtimeType) {
       case ServerException:
-        return ServerFailure(
-          message: exception.message,
-          code: exception.code,
-        );
+        return ServerFailure(message: exception.message, code: exception.code);
       case CacheException:
-        return CacheFailure(
-          message: exception.message,
-          code: exception.code,
-        );
+        return CacheFailure(message: exception.message, code: exception.code);
       case NoInternetConnectionException:
         return const NoInternetConnectionFailure();
       case UnauthorizedException:
@@ -39,10 +33,7 @@ class ErrorMapper {
           code: exception.code,
         );
       default:
-        return UnknownFailure(
-          message: exception.message,
-          code: exception.code,
-        );
+        return UnknownFailure(message: exception.message, code: exception.code);
     }
   }
 
@@ -81,4 +72,4 @@ class ErrorMapper {
         );
     }
   }
-} 
+}

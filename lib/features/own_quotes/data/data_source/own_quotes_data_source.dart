@@ -29,8 +29,11 @@ class OwnQuotesDataSourceImpl extends OwnQuotesDataSource {
       for (final ownQuote in ownQuotes) {
         final collections = await collectionsOwnQuotesDao
             .getCollectionsOfOwnQuote(ownQuote.id);
+        print('collections: ${collections.length}');
         final collectionModels =
             collections.map((c) => CollectionModel.fromCollection(c)).toList();
+
+        final isFavourite = await ownQuotesDao.isOwnQuoteFavourite(ownQuote.id);
 
         ownQuoteModels.add(
           OwnQuoteModel(
@@ -38,6 +41,7 @@ class OwnQuotesDataSourceImpl extends OwnQuotesDataSource {
             quoteText: ownQuote.quoteText,
             createdAt: ownQuote.createdAt.toIso8601String(),
             collections: collectionModels,
+            isFavourite: isFavourite,
           ),
         );
       }

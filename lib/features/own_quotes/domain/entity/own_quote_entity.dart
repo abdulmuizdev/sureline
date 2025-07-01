@@ -5,6 +5,7 @@ class OwnQuoteEntity {
   final int id;
   final String quoteText;
   final String createdAt;
+  final bool isFavourite;
   final List<CollectionEntity> collections;
 
   OwnQuoteEntity({
@@ -12,6 +13,7 @@ class OwnQuoteEntity {
     required this.quoteText,
     required this.createdAt,
     required this.collections,
+    required this.isFavourite,
   });
 
   OwnQuoteEntity copyWith({
@@ -19,12 +21,14 @@ class OwnQuoteEntity {
     String? quoteText,
     String? createdAt,
     int? id,
+    bool? isFavourite,
   }) {
     return OwnQuoteEntity(
       id: id ?? this.id,
       quoteText: quoteText ?? this.quoteText,
       createdAt: createdAt ?? this.createdAt,
       collections: collections ?? this.collections,
+      isFavourite: isFavourite ?? this.isFavourite,
     );
   }
 
@@ -34,6 +38,7 @@ class OwnQuoteEntity {
       quoteText: model.quoteText,
       createdAt: model.createdAt,
       collections: model.collections,
+      isFavourite: model.isFavourite,
     );
   }
 }

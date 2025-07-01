@@ -10,6 +10,8 @@ import 'package:sureline/core/db/tables/own_quotes_table.dart';
 import 'package:sureline/core/db/tables/quotes.dart';
 import 'package:sureline/core/db/tables/references/collections_favourites.dart';
 import 'package:sureline/core/db/tables/references/collections_own_quotes_table.dart';
+import 'package:sureline/core/db/tables/references/collections_history.dart';
+import 'package:sureline/core/db/tables/references/collections_search.dart';
 
 part 'app_database.g.dart';
 
@@ -21,13 +23,15 @@ part 'app_database.g.dart';
     Quotes,
     OwnQuotesTable,
     CollectionsOwnQuotesTable,
+    CollectionsHistoryQuotes,
+    CollectionsSearchQuotes,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -35,10 +39,7 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
     },
     onUpgrade: (Migrator m, int from, int to) async {
-      if (from < 2) {
-        // If upgrading from version 1, create the new table structure
-        await m.createAll();
-      }
+      await m.createAll();
     },
   );
 }

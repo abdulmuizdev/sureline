@@ -12,22 +12,32 @@ import 'package:sureline/features/collections/presentation/bloc/collections_stat
 import 'package:sureline/features/collections/presentation/pages/default/sub_pages/create_collection_page.dart';
 import 'package:sureline/features/collections/presentation/pages/selection/sub_pages/collection_selection_page_one.dart';
 import 'package:sureline/features/favourites/domain/entity/favourite_entity.dart';
+import 'package:sureline/features/history/domain/entity/history_entity.dart';
 import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
+import 'package:sureline/features/search/domain/entity/search_entity.dart';
 
 class CollectionSelectionBottomSheet extends StatefulWidget {
   final int? favouriteId;
   final int? ownQuoteId;
+  final int? quoteId;
+  final int? searchId;
   final Function(List<FavouriteEntity>, List<CollectionEntity>)?
   onFavouritesUpdated;
   final Function(List<OwnQuoteEntity>, List<CollectionEntity>)?
   onOwnQuotesUpdated;
+  final Function(List<HistoryEntity>, List<CollectionEntity>)? onHistoryUpdated;
+  final Function(List<SearchEntity>, List<CollectionEntity>)? onSearchUpdated;
 
   const CollectionSelectionBottomSheet({
     super.key,
     this.favouriteId,
     this.ownQuoteId,
+    this.quoteId,
+    this.searchId,
     this.onFavouritesUpdated,
     this.onOwnQuotesUpdated,
+    this.onHistoryUpdated,
+    this.onSearchUpdated,
   });
 
   @override
@@ -141,15 +151,29 @@ class _CollectionSelectionBottomSheetState
                                     _shouldReloadCollections,
                                 favouriteId: widget.favouriteId,
                                 ownQuoteId: widget.ownQuoteId,
+                                quoteId: widget.quoteId,
+                                searchId: widget.searchId,
                                 onFavouritesUpdated: (favourites, collections) {
                                   widget.onFavouritesUpdated?.call(
                                     favourites,
                                     collections,
                                   );
                                 },
+                                onHistoryUpdated: (histories, collections) {
+                                  widget.onHistoryUpdated?.call(
+                                    histories,
+                                    collections,
+                                  );
+                                },
                                 onOwnQuotesUpdated: (ownQuotes, collections) {
                                   widget.onOwnQuotesUpdated?.call(
                                     ownQuotes,
+                                    collections,
+                                  );
+                                },
+                                onSearchUpdated: (search, collections) {
+                                  widget.onSearchUpdated?.call(
+                                    search,
                                     collections,
                                   );
                                 },

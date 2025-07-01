@@ -5,24 +5,42 @@ import 'package:sureline/common/presentation/widgets/sureline_overlay.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
 import 'package:sureline/features/favourites/domain/entity/favourite_entity.dart';
+import 'package:sureline/features/history/domain/entity/history_entity.dart';
 import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
+import 'package:sureline/features/search/domain/entity/search_entity.dart';
 
 class FavouriteListItem extends StatefulWidget {
   final bool isOverlayVisible;
   final Function(bool) onOverlayToggled;
-  final VoidCallback onDeletePressed;
+
   final FavouriteEntity? favouriteEntity;
   final OwnQuoteEntity? ownQuoteEntity;
+  final HistoryEntity? historyEntity;
+  final SearchEntity? searchEntity;
+
+  final bool? isOwnQuote;
+  final bool? isFavourite;
+  final bool? isHistory;
+  final bool? isSearch;
+  final VoidCallback onDeletePressed;
   final VoidCallback onAddToCollectionPressed;
+  final VoidCallback? onFavouritePressed;
 
   const FavouriteListItem({
     super.key,
     this.favouriteEntity,
     this.ownQuoteEntity,
+    this.historyEntity,
+    this.searchEntity,
     required this.isOverlayVisible,
     required this.onOverlayToggled,
     required this.onDeletePressed,
     required this.onAddToCollectionPressed,
+    this.isOwnQuote,
+    this.isFavourite,
+    this.onFavouritePressed,
+    this.isHistory,
+    this.isSearch,
   });
 
   @override
@@ -47,9 +65,13 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
               children: [
                 Expanded(
                   child: Text(
-                    (widget.favouriteEntity != null)
+                    (widget.historyEntity != null)
+                        ? widget.historyEntity!.quoteText
+                        : (widget.favouriteEntity != null)
                         ? widget.favouriteEntity!.quote
-                        : widget.ownQuoteEntity!.quoteText,
+                        : (widget.ownQuoteEntity != null)
+                        ? widget.ownQuoteEntity!.quoteText
+                        : widget.searchEntity!.quoteText,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -59,56 +81,58 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                     ),
                   ),
                 ),
-
-                SurelineOverlay(
-                  onClose:
-                      () => widget.onOverlayToggled(!widget.isOverlayVisible),
-
-                  overlay: GestureDetector(
-                    onTap: widget.onDeletePressed,
-                    child: Container(
-                      width: 200,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.systemGrey6,
-                        borderRadius: BorderRadius.circular(13),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Delete',
-                            style: TextStyle(
-                              color: CupertinoColors.destructiveRed,
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          Icon(
-                            CupertinoIcons.delete,
-                            color: CupertinoColors.destructiveRed,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  visible: widget.isOverlayVisible,
-                  target: Alignment.bottomRight,
-                  follower: Alignment.topRight,
-                  animateUpwards: true,
-                  child: IconButton(
-                    onPressed:
+                if ((widget.isHistory ?? false) == false) ...[
+                  SurelineOverlay(
+                    onClose:
                         () => widget.onOverlayToggled(!widget.isOverlayVisible),
-                    icon: Icon(
-                      Icons.more_vert_rounded,
-                      size: 20,
-                      color: AppColors.primaryColor,
+
+                    overlay: GestureDetector(
+                      onTap: widget.onDeletePressed,
+                      child: Container(
+                        width: 200,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: CupertinoColors.systemGrey6,
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: CupertinoColors.destructiveRed,
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            Icon(
+                              CupertinoIcons.delete,
+                              color: CupertinoColors.destructiveRed,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    visible: widget.isOverlayVisible,
+                    target: Alignment.bottomRight,
+                    follower: Alignment.topRight,
+                    animateUpwards: true,
+                    child: IconButton(
+                      onPressed:
+                          () =>
+                              widget.onOverlayToggled(!widget.isOverlayVisible),
+                      icon: Icon(
+                        Icons.more_vert_rounded,
+                        size: 20,
+                        color: AppColors.primaryColor,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
             SizedBox(height: 24),
@@ -136,17 +160,35 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                         (widget.favouriteEntity?.collections.isNotEmpty ==
                                     true ||
                                 widget.ownQuoteEntity?.collections.isNotEmpty ==
+                                    true ||
+                                widget.historyEntity?.collections.isNotEmpty ==
+                                    true ||
+                                widget.searchEntity?.collections.isNotEmpty ==
                                     true)
                             ? Icons.bookmark_rounded
                             : Icons.bookmark_border_outlined,
                         color: AppColors.primaryColor,
                       ),
                     ),
+                    if (widget.isOwnQuote == true ||
+                        widget.isHistory == true ||
+                        widget.isSearch == true) ...[
+                      IconButton(
+                        onPressed: widget.onFavouritePressed,
+                        icon: Icon(
+                          widget.isFavourite == true
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                    ],
                     IconButton(
                       onPressed: () {
                         final quoteText =
                             widget.favouriteEntity?.quote ??
                             widget.ownQuoteEntity?.quoteText ??
+                            widget.searchEntity?.quoteText ??
                             '';
                         if (quoteText.isNotEmpty) {
                           SharePlus.instance.share(

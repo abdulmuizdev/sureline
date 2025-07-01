@@ -11,14 +11,14 @@ import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_bloc.d
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_event.dart';
 import 'package:sureline/features/own_quotes/presentation/bloc/own_quotes_state.dart';
 
-class SecondPage extends StatefulWidget {
-  const SecondPage({super.key});
+class CreateOwnQuotePage extends StatefulWidget {
+  const CreateOwnQuotePage({super.key});
 
   @override
-  State<SecondPage> createState() => _SecondPageState();
+  State<CreateOwnQuotePage> createState() => _CreateOwnQuotePageState();
 }
 
-class _SecondPageState extends State<SecondPage> {
+class _CreateOwnQuotePageState extends State<CreateOwnQuotePage> {
   final _quoteController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -75,6 +75,7 @@ class _SecondPageState extends State<SecondPage> {
                             createdAt: DateTime.now().toIso8601String(),
                             quoteText: _quoteController.text,
                             collections: [],
+                            isFavourite: false,
                           ),
                         ),
                       );

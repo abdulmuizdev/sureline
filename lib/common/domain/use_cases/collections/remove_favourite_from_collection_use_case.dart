@@ -12,6 +12,9 @@ class RemoveFavouriteFromCollectionUseCase {
     int collectionId,
     int favouriteId,
   ) async {
-    return repository.removeQuoteFromCollection(collectionId, favouriteId);
+    return repository.removeFavouriteQuoteFromCollection(
+      collectionId,
+      favouriteId,
+    );
   }
 }

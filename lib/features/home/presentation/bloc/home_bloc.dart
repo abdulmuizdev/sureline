@@ -162,10 +162,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       HapticFeedback.lightImpact();
       Either<Failure, int> result;
       if (event.isLiked) {
-        await _addFavouriteUseCase.call(event.entity);
+        await _addFavouriteUseCase.call(quote: event.entity);
         result = await _getFavouritesCountUseCase.call();
       } else {
-        // await _removeFavouriteUseCase.call(event.entity.id);
+        await _removeFavouriteUseCase.call(quoteId: event.entity.id);
         result = await _getFavouritesCountUseCase.call();
       }
       result.fold((left) {}, (right) {

@@ -7,7 +7,17 @@ class RemoveFavouriteUseCase {
 
   RemoveFavouriteUseCase(this.repository);
 
-  Future<Either<Failure, void>> call(int id) async {
-    return repository.removeFavourite(id);
+  Future<Either<Failure, void>> call({
+    int? quoteId,
+    int? ownQuoteId,
+    int? historyId,
+    int? searchId,
+  }) async {
+    return repository.removeFavourite(
+      quoteId: quoteId,
+      ownQuoteId: ownQuoteId,
+      historyId: historyId,
+      searchId: searchId,
+    );
   }
 }

@@ -13,6 +13,6 @@ class AddFavouriteToCollectionUseCase {
     int collectionId,
     int favouriteId,
   ) async {
-    return repository.addQuoteToCollection(collectionId, favouriteId);
+    return repository.addFavouriteQuoteToCollection(collectionId, favouriteId);
   }
 }

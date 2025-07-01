@@ -7,22 +7,33 @@ import 'package:sureline/features/collections/presentation/bloc/collections_even
 import 'package:sureline/features/collections/presentation/bloc/collections_state.dart';
 import 'package:sureline/features/collections/presentation/widgets/collection_selection_list_item.dart';
 import 'package:sureline/features/favourites/domain/entity/favourite_entity.dart';
+import 'package:sureline/features/history/domain/entity/history_entity.dart';
+import 'package:sureline/features/home/domain/entity/quote_entity.dart';
 import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
+import 'package:sureline/features/search/domain/entity/search_entity.dart';
 
 class CollectionSelectionPageOne extends StatefulWidget {
   final int? favouriteId;
   final int? ownQuoteId;
+  final int? quoteId;
+  final int? searchId;
   final Function(List<FavouriteEntity>, List<CollectionEntity>)?
   onFavouritesUpdated;
   final Function(List<OwnQuoteEntity>, List<CollectionEntity>)?
   onOwnQuotesUpdated;
+  final Function(List<HistoryEntity>, List<CollectionEntity>)? onHistoryUpdated;
+  final Function(List<SearchEntity>, List<CollectionEntity>)? onSearchUpdated;
   final bool shouldReloadCollections;
   const CollectionSelectionPageOne({
     super.key,
     this.favouriteId,
     this.ownQuoteId,
+    this.quoteId,
+    this.searchId,
     this.onFavouritesUpdated,
     this.onOwnQuotesUpdated,
+    this.onHistoryUpdated,
+    this.onSearchUpdated,
     required this.shouldReloadCollections,
   });
 
@@ -52,6 +63,16 @@ class _CollectionSelectionPageOneState
             GetCollectionsOfOwnQuote(widget.ownQuoteId!),
           );
         }
+        if (widget.quoteId != null) {
+          context.read<CollectionsBloc>().add(
+            GetCollectionsOfHistory(widget.quoteId!),
+          );
+        }
+        if (widget.searchId != null) {
+          context.read<CollectionsBloc>().add(
+            GetCollectionsOfSearch(widget.searchId!),
+          );
+        }
       }
     });
   }
@@ -77,6 +98,12 @@ class _CollectionSelectionPageOneState
         if (state is GotCollectionsOfOwnQuote) {
           _selectedCollections = state.collections ?? [];
         }
+        if (state is GotCollectionsOfHistory) {
+          _selectedCollections = state.collections ?? [];
+        }
+        if (state is GotCollectionsOfSearch) {
+          _selectedCollections = state.collections ?? [];
+        }
         if (state is GotFavouritesOfCollectionAndCollectionsOfFavourite) {
           _selectedCollections = state.collections;
           widget.onFavouritesUpdated?.call(state.favourites, state.collections);
@@ -84,6 +111,14 @@ class _CollectionSelectionPageOneState
         if (state is GotOwnQuotesOfCollectionAndCollectionsOfOwnQuote) {
           _selectedCollections = state.collections;
           widget.onOwnQuotesUpdated?.call(state.ownQuotes, state.collections);
+        }
+        if (state is GotHistoryOfCollectionAndCollectionsOfHistory) {
+          _selectedCollections = state.collections;
+          widget.onHistoryUpdated?.call(state.history, state.collections);
+        }
+        if (state is GotSearchOfCollectionAndCollectionsOfSearch) {
+          _selectedCollections = state.collections;
+          widget.onSearchUpdated?.call(state.search, state.collections);
         }
       },
       child: BlocBuilder<CollectionsBloc, CollectionsState>(
@@ -120,6 +155,8 @@ class _CollectionSelectionPageOneState
                               isSelected: !isSelected,
                               favouriteId: widget.favouriteId,
                               ownQuoteId: widget.ownQuoteId,
+                              quoteId: widget.quoteId,
+                              searchId: widget.searchId,
                             ),
                           );
                         },

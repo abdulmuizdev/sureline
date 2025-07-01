@@ -25,7 +25,12 @@ class FavouritesBloc extends Bloc<FavouritesEvent, FavouritesState> {
     });
 
     on<OnDeletePressed>((event, emit) async {
-      final result = await _removeFavouriteUseCase.call(event.entity.id);
+      final result = await _removeFavouriteUseCase.call(
+        quoteId: event.entity.quoteId,
+        ownQuoteId: event.entity.ownQuoteId,
+        searchId: event.entity.searchId,
+        historyId: event.entity.historyId,
+      );
       await result.fold((left) {}, (right) async {
         await _getFavouriteQuotes(emit);
       });

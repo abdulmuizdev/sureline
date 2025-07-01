@@ -130,6 +130,8 @@ class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
                                     builder:
                                         (ctx) => CollectionSelectionBottomSheet(
                                           favouriteId: _quotes[index].id,
+                                          ownQuoteId: _quotes[index].ownQuoteId,
+                                          quoteId: _quotes[index].quoteId,
                                           onFavouritesUpdated: (
                                             _,
                                             collectionsOfFavourite,

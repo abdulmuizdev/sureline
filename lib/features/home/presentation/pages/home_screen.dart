@@ -271,6 +271,11 @@ class _HomeScreenState extends State<HomeScreen>
                             controller: _pageController,
                             scrollDirection: Axis.vertical,
                             onPageChanged: (int pageIndex) {
+                              if (_quotes.isNotEmpty) {
+                                context.read<HomeBloc>().add(
+                                  MarkQuoteAsShown(_quotes[pageIndex].id),
+                                );
+                              }
                               // Handle swipe completion
                               if (pageIndex >= 1 &&
                                   _controlsFadeAnimation.value == 0) {

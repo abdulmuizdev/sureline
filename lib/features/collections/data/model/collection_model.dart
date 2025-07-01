@@ -1,18 +1,29 @@
 import 'package:sureline/core/db/app_database.dart';
 import 'package:sureline/features/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/favourites/data/model/favourite_model.dart';
+import 'package:sureline/features/history/data/model/history_model.dart';
 import 'package:sureline/features/home/data/model/quote_model.dart';
 import 'package:sureline/features/own_quotes/data/model/own_quote_model.dart';
+import 'package:sureline/features/search/data/model/search_model.dart';
 
 class CollectionModel extends CollectionEntity {
   final List<FavouriteModel> favouriteQuotes;
   final List<OwnQuoteModel> ownQuotes;
+  final List<HistoryModel> historyQuotes;
+  final List<SearchModel> searchQuotes;
   CollectionModel({
     required super.id,
     required super.name,
     required this.favouriteQuotes,
     required this.ownQuotes,
-  }) : super(favouriteQuotes: favouriteQuotes, ownQuotes: ownQuotes);
+    required this.historyQuotes,
+    required this.searchQuotes,
+  }) : super(
+         favouriteQuotes: favouriteQuotes,
+         ownQuotes: ownQuotes,
+         historyQuotes: historyQuotes,
+         searchQuotes: searchQuotes,
+       );
 
   factory CollectionModel.fromJson(Map<String, dynamic> json) {
     List<FavouriteModel> quotes = [];
@@ -34,6 +45,8 @@ class CollectionModel extends CollectionEntity {
       name: json['name'] as String,
       favouriteQuotes: quotes,
       ownQuotes: [],
+      historyQuotes: [],
+      searchQuotes: [],
     );
   }
 
@@ -48,6 +61,14 @@ class CollectionModel extends CollectionEntity {
           ownQuotes
               .map((quote) => OwnQuoteModel.fromEntity(quote).toJson())
               .toList(),
+      'historyQuotes':
+          historyQuotes
+              .map((quote) => HistoryModel.fromEntity(quote).toJson())
+              .toList(),
+      'searchQuotes':
+          searchQuotes
+              .map((quote) => SearchModel.fromEntity(quote).toJson())
+              .toList(),
     };
   }
 
@@ -61,6 +82,10 @@ class CollectionModel extends CollectionEntity {
               .toList(),
       ownQuotes:
           entity.ownQuotes.map((e) => OwnQuoteModel.fromEntity(e)).toList(),
+      historyQuotes:
+          entity.historyQuotes.map((e) => HistoryModel.fromEntity(e)).toList(),
+      searchQuotes:
+          entity.searchQuotes.map((e) => SearchModel.fromEntity(e)).toList(),
     );
   }
 
@@ -70,6 +95,8 @@ class CollectionModel extends CollectionEntity {
       name: dbCollection.name,
       favouriteQuotes: [],
       ownQuotes: [],
+      historyQuotes: [],
+      searchQuotes: [],
     );
   }
 }

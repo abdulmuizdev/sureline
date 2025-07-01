@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/own_quotes/presentation/pages/sub_pages/first_page.dart';
+import 'package:sureline/features/own_quotes/presentation/pages/sub_pages/own_quotes_list_page.dart';
 import 'package:sureline/common/presentation/widgets/bottom_sheet_app_bar.dart';
 
 class OwnQuotesBottomSheet extends StatefulWidget {
@@ -57,7 +57,7 @@ class _OwnQuotesBottomSheetState extends State<OwnQuotesBottomSheet> {
                 onGenerateRoute: (settings) {
                   return CupertinoPageRoute(
                     builder:
-                        (context) => FirstPage(
+                        (context) => OwnQuotesListPage(
                           onNext: () {
                             setState(() {
                               _appBarTitle = 'Back';
@@ -74,5 +74,4 @@ class _OwnQuotesBottomSheetState extends State<OwnQuotesBottomSheet> {
       ),
     );
   }
-
 }

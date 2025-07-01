@@ -6,4 +6,5 @@ abstract class RecommendationAlgorithmRepository {
   Future<Either<Failure, void>> initialize();
   Future<Either<Failure, List<QuoteEntity>>> getQuotes(int page);
   Future<Either<Failure, void>> markQuoteAsShown(int id);
+  Future<Either<Failure, List<QuoteEntity>>> getShownQuotes();
 }

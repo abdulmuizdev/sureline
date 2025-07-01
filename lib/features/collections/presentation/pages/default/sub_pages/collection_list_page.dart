@@ -63,11 +63,6 @@ class _CollectionListPageState extends State<CollectionListPage> {
       listener: (context, state) {
         if (state is GotCollections) {
           _collections = state.collections ?? [];
-          print(
-            (_collections.length > 0)
-                ? '${_collections[0].ownQuotes.length} and ${_collections[0].favouriteQuotes.length}'
-                : '',
-          );
         }
       },
       child: BlocBuilder<CollectionsBloc, CollectionsState>(
