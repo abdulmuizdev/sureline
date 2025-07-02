@@ -22,15 +22,31 @@ class NameScreen extends StatefulWidget {
 
 class _NameScreenState extends State<NameScreen> {
   final TextEditingController _nameController = TextEditingController();
+  bool _isContinueButtonDisabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _nameController.addListener(() {
+        setState(() {
+          _isContinueButtonDisabled = _nameController.text.isEmpty;
+        });
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => locator<OnboardingNameBloc>()..add(GetName()))
+        BlocProvider(
+          create: (_) => locator<OnboardingNameBloc>()..add(GetName()),
+        ),
       ],
       child: BlocListener<OnboardingNameBloc, OnboardingNameState>(
-        listener: (context, state){
-          if (state is GotName){
+        listener: (context, state) {
+          if (state is GotName) {
             _nameController.text = state.name;
           }
           if (state is NameSaved) {
@@ -39,15 +55,15 @@ class _NameScreenState extends State<NameScreen> {
               MaterialPageRoute(
                 builder:
                     (context) => SurveyScreen(
-                  entities: App.remoteConfigEntity.survey2,
-                  navigateTo: BenefitsScreen(),
-                ),
+                      entities: App.remoteConfigEntity.survey2,
+                      navigateTo: BenefitsScreen(),
+                    ),
               ),
             );
           }
         },
         child: BlocBuilder<OnboardingNameBloc, OnboardingNameState>(
-          builder: (context, state){
+          builder: (context, state) {
             return PopScope(
               canPop: false,
               child: Scaffold(
@@ -62,11 +78,14 @@ class _NameScreenState extends State<NameScreen> {
                             children: [
                               OnboardingHeading(
                                 title: 'What do you want to be called?',
-                                subTitle: 'Your name will appear in your quotes',
+                                subTitle:
+                                    'Your name will appear in your quotes',
                                 reduceMargins: true,
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                ),
                                 child: SurelineTextField(
                                   isNameInput: true,
                                   controller: _nameController,
@@ -76,8 +95,11 @@ class _NameScreenState extends State<NameScreen> {
                           ),
                           SurelineButton(
                             text: 'Continue',
+                            isDisabled: _isContinueButtonDisabled,
                             onPressed: () {
-                              context.read<OnboardingNameBloc>().add(OnContinuePressed(_nameController.text));
+                              context.read<OnboardingNameBloc>().add(
+                                OnContinuePressed(_nameController.text),
+                              );
                             },
                           ),
                         ],

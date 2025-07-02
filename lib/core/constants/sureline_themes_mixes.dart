@@ -21,6 +21,7 @@ class SurelineThemesMixes {
       isNew: false,
       isSeasonal: false,
       isMostPopular: false,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-3',
@@ -40,6 +41,7 @@ class SurelineThemesMixes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: true,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-6',
@@ -61,6 +63,7 @@ class SurelineThemesMixes {
       isNew: true,
       isSeasonal: true,
       isMostPopular: false,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-8',
@@ -82,6 +85,7 @@ class SurelineThemesMixes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: true,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-9',
@@ -101,6 +105,7 @@ class SurelineThemesMixes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: false,
+      isUserCreated: false,
     ),
   ];
 }

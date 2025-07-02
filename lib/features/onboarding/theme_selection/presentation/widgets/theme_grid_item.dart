@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/common/presentation/widgets/playable.dart';
 import 'package:sureline/common/presentation/widgets/tick.dart';
@@ -29,7 +30,9 @@ class _ThemeGridItemState extends State<ThemeGridItem> {
     super.initState();
 
     if (widget.entity.backgroundEntity.isLiveBackground) {
-      _controller = VideoPlayerController.asset(widget.entity.backgroundEntity.path!)
+      _controller = VideoPlayerController.asset(
+          widget.entity.backgroundEntity.path!,
+        )
         ..initialize().then((_) {
           _controller.setLooping(true);
           _controller.setVolume(0);
@@ -81,17 +84,35 @@ class _ThemeGridItemState extends State<ThemeGridItem> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.asset(
-                      widget.entity.backgroundEntity.path ?? 'assets/images/two.png',
+                      widget.entity.backgroundEntity.path ??
+                          'assets/images/two.png',
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
               ],
 
+              Center(
+                child: Text(
+                  'Sureline',
+                  style: GoogleFonts.getFont(
+                    widget.entity.textDecorEntity.fontFamily,
+                    textStyle: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: widget.entity.textDecorEntity.textColor,
+                    ),
+                  ),
+                ),
+              ),
+
               if (widget.isSelected) ...[
                 Align(
                   alignment: Alignment.topRight,
-                  child: Padding(padding: const EdgeInsets.all(7), child: Tick()),
+                  child: Padding(
+                    padding: const EdgeInsets.all(7),
+                    child: Tick(),
+                  ),
                 ),
               ],
             ],

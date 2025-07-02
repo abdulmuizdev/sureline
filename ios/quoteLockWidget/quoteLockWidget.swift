@@ -33,7 +33,7 @@ struct Provider: AppIntentTimelineProvider {
     }
     private func loadValues() -> (String, String?, Int?, Int?, Int?) {
             let userDefaults = UserDefaults(suiteName: "group.com.abdulmuiz.sureline.quoteWidget")
-        let quote = getRandomStringFromUserDefaultsArray(appGroupID: "group.com.abdulmuiz.sureline.quoteWidget", key: "quotes_data_app_group",maxLength: 50) ?? "Never give up"
+        let quote = getRandomStringFromUserDefaultsArray(appGroupID: "group.com.abdulmuiz.sureline.quoteWidget", key: "quotes_data_app_group",maxLength: 40) ?? "Never give up"
             let imagePath = userDefaults?.string(forKey: "image_path_app_group")
             let textSize = userDefaults?.integer(forKey: "text_size_app_group")
             let textColor = userDefaults?.integer(forKey: "text_color_app_group")

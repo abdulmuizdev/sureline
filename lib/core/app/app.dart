@@ -37,6 +37,7 @@ class App {
     isNew: false,
     isSeasonal: false,
     isMostPopular: false,
+    isUserCreated: false,
   );
   static ThemeEntity themeEntity = defaultTheme;
 

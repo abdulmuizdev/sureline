@@ -12,6 +12,7 @@ import 'package:sureline/features/general_settings/voice/data/model/voice_model.
 import 'package:sureline/features/home/domain/use_cases/save_all_quotes_to_app_group_use_case.dart';
 import 'package:sureline/features/home/presentation/pages/home_screen.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/initialize_notifications_presets_use_case.dart';
+import 'package:sureline/features/onboarding/getting_started/getting_started_screen.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/use_cases/initialize_recommendation_algorithm.dart';
 import 'package:sureline/features/remote_config/domain/use_cases/prepare_remote_config_use_case.dart';
 import 'package:sureline/features/theme_selection/domain/use_case/set_theme_use_case.dart';
@@ -19,43 +20,38 @@ import 'package:sureline/features/theme_selection/domain/use_case/set_theme_use_
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
+
+  
+
   await locator<InitializeRecommendationAlgorithm>().call();
-  debugPrint(
-    'pending ${(await FlutterLocalNotificationsPlugin().pendingNotificationRequests()).length}',
-  );
-  await locator<InitializeNotificationsPresetsUseCase>().execute();
-  debugPrint('check 1');
   await locator<PrepareRemoteConfigUseCase>().execute();
-  debugPrint('check 2');
   final result = await locator<GetVolumeUseCase>().execute();
   result.fold((left) {}, (right) {
     App.volume = right;
   });
-  debugPrint('check 3');
   final voice = await locator<GetVoiceUseCase>().execute();
   voice.fold((left) {}, (right) {
     if (right != null) {
       App.voice = VoiceModel.fromEntity(right).toJson();
     }
   });
-  await locator<ScheduleUpToSixtyNotificationsUseCase>().execute();
-  debugPrint('check 4');
+
   await locator<SetThemeUseCase>().execute();
-  debugPrint('check 5');
-  
+
   // await locator<SaveAllQuotesToAppGroupUseCase>().execute();
-  debugPrint('check 6');
   _cacheFonts();
-  (await locator<IsOnboardingCompletedUseCase>().execute()).fold((left) {}, (
-    right,
-  ) {
-    if (right) {
-      runApp(const MyApp(isOnboarded: true));
-    } else {
-      runApp(const MyApp(isOnboarded: false));
-    }
-  });
-  debugPrint('check 7');
+  await (await locator<IsOnboardingCompletedUseCase>().execute()).fold(
+    (left) {},
+    (right) async {
+      if (right) {
+        await locator<InitializeNotificationsPresetsUseCase>().execute();
+        await locator<ScheduleUpToSixtyNotificationsUseCase>().execute();
+        runApp(const MyApp(isOnboarded: true));
+      } else {
+        runApp(const MyApp(isOnboarded: false));
+      }
+    },
+  );
 }
 
 void _cacheFonts() {
@@ -178,7 +174,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // fontFamily: Constants.defaultFontFamily,
       ),
-      home: (isOnboarded) ? HomeScreen() : HomeScreen(),
+      home: (isOnboarded) ? HomeScreen() : GettingStartedScreen(),
     );
   }
 }

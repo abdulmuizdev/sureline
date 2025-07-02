@@ -14,6 +14,7 @@ class ThemeEntity extends Equatable {
   final bool isNew;
   final bool isSeasonal;
   final bool isMostPopular;
+  final bool isUserCreated;
 
   ThemeEntity({
     required this.id,
@@ -26,6 +27,7 @@ class ThemeEntity extends Equatable {
     required this.isNew,
     required this.isSeasonal,
     required this.isMostPopular,
+    required this.isUserCreated,
   });
   // : id = id ?? const Uuid().v4();
 
@@ -38,6 +40,7 @@ class ThemeEntity extends Equatable {
     isNew,
     isSeasonal,
     isMostPopular,
+    isUserCreated,
   ];
 
   factory ThemeEntity.fromModel(ThemeModel model) {
@@ -52,6 +55,7 @@ class ThemeEntity extends Equatable {
       isNew: model.isNew,
       isSeasonal: model.isSeasonal,
       isMostPopular: model.isMostPopular,
+      isUserCreated: model.isUserCreated,
     );
   }
 }

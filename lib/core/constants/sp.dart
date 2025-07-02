@@ -29,7 +29,7 @@ class SP {
   static const String quotesDataAppGroup = 'quotes_data_app_group';
   static const String textColorAppGroup = 'text_color_app_group';
   static const String textSizeAppGroup = 'text_size_app_group';
-  static const String imagePathAppGroup = 'image_path_app_group';
+  static const String imageAssetAppGroup = 'image_asset_app_group';
   static const String solidColorAppGroup = 'solid_color_app_group';
 
   static const String lastNotificationScheduledAt =

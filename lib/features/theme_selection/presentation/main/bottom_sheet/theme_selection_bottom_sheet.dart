@@ -368,19 +368,7 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
       enableDrag: false,
       context: context,
       builder:
-          (context) => CreateAndEditThemeBottomSheet(
-            entity: ThemeEntity(
-              lastAccessed: DateTime.now(),
-              textDecorEntity: App.themeEntity.textDecorEntity,
-              backgroundEntity: App.themeEntity.backgroundEntity,
-              previewQuote: widget.quote,
-              id: Uuid().v4(),
-              isFree: false,
-              isNew: false,
-              isSeasonal: false,
-              isMostPopular: false,
-            ),
-          ),
+          (context) => CreateAndEditThemeBottomSheet(entity: App.themeEntity),
     );
   }
 }

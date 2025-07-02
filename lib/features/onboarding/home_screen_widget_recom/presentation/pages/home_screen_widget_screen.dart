@@ -108,7 +108,11 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
                 ),
                 SizedBox(height: 16),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
+                  },
                   child: Text(
                     'Remind me later',
                     style: TextStyle(

@@ -7,6 +7,7 @@ class SurelineButton extends StatelessWidget {
   final bool? disableVerticalPadding;
   final bool? disableHorizontalPadding;
   final bool? isOutlined;
+  final bool? isDisabled;
 
   const SurelineButton({
     super.key,
@@ -15,6 +16,7 @@ class SurelineButton extends StatelessWidget {
     this.disableVerticalPadding,
     this.disableHorizontalPadding,
     this.isOutlined,
+    this.isDisabled,
   });
 
   @override
@@ -25,11 +27,16 @@ class SurelineButton extends StatelessWidget {
         vertical: (disableVerticalPadding ?? false) ? 0 : 50,
       ),
       child: GestureDetector(
-        onTap: onPressed,
+        onTap: (isDisabled ?? false) ? null : onPressed,
         child: Container(
           height: 48,
           decoration: BoxDecoration(
-            color: (isOutlined ?? false) ? null : AppColors.primaryColor,
+            color:
+                (isOutlined ?? false)
+                    ? null
+                    : (isDisabled ?? false)
+                    ? AppColors.primaryColor.withValues(alpha: 0.5)
+                    : AppColors.primaryColor,
             borderRadius: BorderRadius.circular(10),
             border:
                 (isOutlined ?? false)

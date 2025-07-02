@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
@@ -200,12 +202,29 @@ class _OnboardingNotificationScreenState
                             Spacer(),
                             SurelineButton(
                               text: 'Allow and Save',
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => IconSelectionScreen(),
-                                  ),
-                                );
+                              onPressed: () async {
+                                final settings =
+                                    await FlutterLocalNotificationsPlugin()
+                                        .resolvePlatformSpecificImplementation<
+                                          IOSFlutterLocalNotificationsPlugin
+                                        >()
+                                        ?.requestPermissions(
+                                          alert: true,
+                                          badge: true,
+                                          sound: true,
+                                        );
+
+                                await Future.delayed(Duration(seconds: 1));
+                                await HapticFeedback.lightImpact();
+
+                                if (mounted && context.mounted) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => IconSelectionScreen(),
+                                    ),
+                                  );
+                                }
                               },
                             ),
                           ],

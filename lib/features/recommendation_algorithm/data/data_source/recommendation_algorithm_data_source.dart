@@ -4,6 +4,8 @@ import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:ios_color_picker_with_title/custom_picker/extensions.dart';
+import 'package:path/path.dart' as path;
 import 'package:shared_preference_app_group/shared_preference_app_group.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/constants.dart';
@@ -291,52 +293,6 @@ class RecommendationAlgorithmDataSourceImpl
       SP.quotesDataAppGroup,
       quoteTexts,
     );
-    await _saveThemeOnAppGroup();
-    Utils.updateWidgets();
-  }
-
-  Future<void> _saveThemeOnAppGroup() async {
-    try {
-      await SharedPreferenceAppGroup.setAppGroup(
-        'group.com.abdulmuiz.sureline.quoteWidget',
-      );
-      if (App.themeEntity.backgroundEntity.solidColor == null) {
-        await SharedPreferenceAppGroup.remove(SP.solidColorAppGroup);
-      } else {
-        await SharedPreferenceAppGroup.setInt(
-          SP.solidColorAppGroup,
-          App.themeEntity.backgroundEntity.solidColor?.value,
-        );
-      }
-      try {
-        // final appGroupDir = await FlutterAppGroupDirectory.getAppGroupDirectory('group.com.abdulmuiz.sureline.quoteWidget',);
-        // if (appGroupDir == null) return null;
-        //
-        // final XFile xFile = XFile(App.themeEntity.backgroundEntity.path!);
-        // final fileName = p.basename(xFile.path) + '.png';
-        // final destPath = p.join(appGroupDir.path, fileName);
-        // debugPrint(destPath);
-
-        // Save XFile to the destination path
-        // await xFile.saveTo(destPath);
-
-        await SharedPreferenceAppGroup.setString(
-          SP.imagePathAppGroup,
-          App.themeEntity.backgroundEntity.path,
-        );
-        await SharedPreferenceAppGroup.setInt(
-          SP.textColorAppGroup,
-          App.themeEntity.textDecorEntity.textColor.value,
-        );
-        await SharedPreferenceAppGroup.setInt(
-          SP.textSizeAppGroup,
-          App.themeEntity.textDecorEntity.fontSize.round(),
-        );
-      } catch (e) {
-        debugPrint("Error saving image to App Group: $e");
-      }
-    } catch (e) {
-      debugPrint('${e}');
-    }
+    await Utils.saveThemeOnAppGroup();
   }
 }

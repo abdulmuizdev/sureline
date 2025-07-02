@@ -66,6 +66,7 @@ class _InfoCopyState extends State<InfoCopy> {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     'Sureline app - version ${_version}',
@@ -75,15 +76,15 @@ class _InfoCopyState extends State<InfoCopy> {
                       color: AppColors.primaryColor,
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Text(
-                    'User ID: 12345678-AAAA-AAAA-A...',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                      color: AppColors.primaryColor,
-                    ),
-                  ),
+                  // SizedBox(height: 10),
+                  // Text(
+                  //   'User ID: 12345678-AAAA-AAAA-A...',
+                  //   style: TextStyle(
+                  //     fontSize: 14,
+                  //     fontWeight: FontWeight.normal,
+                  //     color: AppColors.primaryColor,
+                  //   ),
+                  // ),
                 ],
               ),
               Container(

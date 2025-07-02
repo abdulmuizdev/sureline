@@ -53,41 +53,44 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
                           reduceMargins: true,
                         ),
 
-                        Padding(
-                          padding: const EdgeInsets.all(15),
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  childAspectRatio: (110 / 162),
-                                  crossAxisSpacing: 4,
-                                  mainAxisSpacing: 4,
-                                ),
-                            itemCount: _themes.length,
-                            itemBuilder: (context, index) {
-                              return ThemeGridItem(
-                                entity: _themes[index],
-                                isSelected: _selectedIndex == index,
-                                onPressed: (){
-                                  setState(() {
-                                    _selectedIndex = index;
-                                  });
-                                },
-                              );
-                            },
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    childAspectRatio: (110 / 162),
+                                    crossAxisSpacing: 4,
+                                    mainAxisSpacing: 4,
+                                  ),
+                              itemCount: _themes.length,
+                              itemBuilder: (context, index) {
+                                return ThemeGridItem(
+                                  entity: _themes[index],
+                                  isSelected: _selectedIndex == index,
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedIndex = index;
+                                    });
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
 
                         SurelineButton(
                           text: 'Continue',
+                          disableVerticalPadding: true,
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => SurveyScreen(entities:
-                                App.remoteConfigEntity.survey4,
-                                    navigateTo: GoalsScreen()),
+                                builder:
+                                    (context) => SurveyScreen(
+                                      entities: App.remoteConfigEntity.survey4,
+                                      navigateTo: GoalsScreen(),
+                                    ),
                               ),
                             );
                           },

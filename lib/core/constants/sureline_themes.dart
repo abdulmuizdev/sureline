@@ -6,12 +6,30 @@ import 'package:uuid/uuid.dart';
 
 class SurelineThemes {
   static final List<ThemeEntity> values = [
+    // ThemeEntity(
+    //   id: 'sureline-theme-2',
+    //   lastAccessed: DateTime.now(),
+    //   textDecorEntity: App.defaultTheme.textDecorEntity,
+    //   backgroundEntity: ThemeBackgroundEntity(
+    //     path: 'assets/images/background.png',
+    //     isNetwork: false,
+    //     solidColor: null,
+    //     isLiveBackground: false,
+    //     isLocallyStored: false,
+    //   ),
+    //   previewQuote: "Sureline",
+    //   isFree: true,
+    //   isNew: false,
+    //   isSeasonal: false,
+    //   isMostPopular: false,
+    //   isUserCreated: false,
+    // ),
     ThemeEntity(
-      id: 'sureline-theme-2',
+      id: 'sureline-theme-1',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity,
       backgroundEntity: ThemeBackgroundEntity(
-        path: 'assets/images/background.png',
+        path: 'assets/images/background2.png',
         isNetwork: false,
         solidColor: null,
         isLiveBackground: false,
@@ -22,6 +40,7 @@ class SurelineThemes {
       isNew: false,
       isSeasonal: false,
       isMostPopular: false,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-11',
@@ -41,6 +60,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: true,
       isMostPopular: false,
+      isUserCreated: false,
     ),
 
     ThemeEntity(
@@ -61,6 +81,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: true,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-4',
@@ -80,6 +101,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: true,
       isMostPopular: false,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-5',
@@ -99,6 +121,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: false,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-6',
@@ -120,6 +143,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: true,
       isMostPopular: false,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-7',
@@ -139,6 +163,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: false,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-8',
@@ -160,6 +185,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: true,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-9',
@@ -179,6 +205,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: false,
+      isUserCreated: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-10',
@@ -198,24 +225,7 @@ class SurelineThemes {
       isNew: true,
       isSeasonal: false,
       isMostPopular: true,
-    ),
-
-    ThemeEntity(
-      id: 'sureline-theme-1',
-      lastAccessed: DateTime.now(),
-      textDecorEntity: App.defaultTheme.textDecorEntity,
-      backgroundEntity: ThemeBackgroundEntity(
-        path: 'assets/images/background2.png',
-        isNetwork: false,
-        solidColor: null,
-        isLiveBackground: false,
-        isLocallyStored: false,
-      ),
-      previewQuote: "Sureline",
-      isFree: true,
-      isNew: false,
-      isSeasonal: false,
-      isMostPopular: false,
+      isUserCreated: false,
     ),
 
     // ThemeEntity(

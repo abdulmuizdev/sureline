@@ -12,7 +12,6 @@ import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_bloc.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_event.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_state.dart';
-import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bottom_sheets/confirmation_bottom_sheet/confirmation_bottom_sheet.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/widgets/back_button.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/widgets/background_actions_bar.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/widgets/bg_text_switcher.dart';
@@ -25,6 +24,7 @@ import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentatio
 import 'package:sureline/features/home/presentation/pages/home_screen.dart';
 import 'package:sureline/features/unsplash_screen/domain/entity/photo_entity.dart';
 import 'package:sureline/features/unsplash_screen/presentation/pages/unsplash_screen.dart';
+import 'package:uuid/uuid.dart';
 
 class CreateAndEditThemeBottomSheet extends StatefulWidget {
   final ThemeEntity entity;
@@ -210,11 +210,12 @@ class _CreateAndEditThemeBottomSheetState
                                     previewImage: _previewUrl,
                                   ),
                                   previewQuote: widget.entity.previewQuote,
-                                  id: widget.entity.id,
+                                  id: Uuid().v4(),
                                   isFree: widget.entity.isFree,
                                   isNew: widget.entity.isNew,
                                   isSeasonal: widget.entity.isSeasonal,
                                   isMostPopular: widget.entity.isMostPopular,
+                                  isUserCreated: true,
                                 ),
                               ),
                             );
@@ -506,6 +507,7 @@ class _CreateAndEditThemeBottomSheetState
         isNew: widget.entity.isNew,
         isSeasonal: widget.entity.isSeasonal,
         isMostPopular: widget.entity.isMostPopular,
+        isUserCreated: widget.entity.isUserCreated,
       );
 
       if (newEntity == widget.entity) {

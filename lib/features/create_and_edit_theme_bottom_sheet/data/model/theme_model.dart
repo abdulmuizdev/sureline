@@ -18,6 +18,7 @@ class ThemeModel extends ThemeEntity {
     required super.isNew,
     required super.isSeasonal,
     required super.isMostPopular,
+    required super.isUserCreated,
   }) : super(
          textDecorEntity: textDecorModel,
          backgroundEntity: backgroundModel,
@@ -35,6 +36,7 @@ class ThemeModel extends ThemeEntity {
       isNew: json['isNew'] ?? false,
       isSeasonal: json['isSeasonal'] ?? false,
       isMostPopular: json['isMostPopular'] ?? false,
+      isUserCreated: json['isUserCreated'] ?? false,
     );
   }
 
@@ -50,6 +52,7 @@ class ThemeModel extends ThemeEntity {
       isNew: entity.isNew,
       isSeasonal: entity.isSeasonal,
       isMostPopular: entity.isMostPopular,
+      isUserCreated: entity.isUserCreated,
     );
   }
 
@@ -63,6 +66,7 @@ class ThemeModel extends ThemeEntity {
     bool? isNew,
     bool? isSeasonal,
     bool? isMostPopular,
+    bool? isUserCreated,
   }) {
     return ThemeModel(
       lastAccessed: lastAccessed ?? this.lastAccessed,
@@ -75,6 +79,7 @@ class ThemeModel extends ThemeEntity {
       isNew: isNew ?? this.isNew,
       isSeasonal: isSeasonal ?? this.isSeasonal,
       isMostPopular: isMostPopular ?? this.isMostPopular,
+      isUserCreated: isUserCreated ?? this.isUserCreated,
     );
   }
 
@@ -92,6 +97,7 @@ class ThemeModel extends ThemeEntity {
       'isNew': isNew,
       'isSeasonal': isSeasonal,
       'isMostPopular': isMostPopular,
+      'isUserCreated': isUserCreated,
     };
   }
 }

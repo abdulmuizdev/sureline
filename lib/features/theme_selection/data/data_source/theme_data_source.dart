@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/rendering.dart';
+import 'package:ios_color_picker_with_title/custom_picker/extensions.dart';
+import 'package:path/path.dart' as path;
+import 'package:shared_preference_app_group/shared_preference_app_group.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/core/app/app.dart';
@@ -8,6 +12,7 @@ import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/constants/sureline_themes.dart';
 import 'package:sureline/core/constants/sureline_themes_mixes.dart';
 import 'package:sureline/core/error/failures.dart';
+import 'package:sureline/core/utils/utils.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/theme_model.dart';
 
 abstract class ThemeDataSource {
@@ -28,10 +33,13 @@ class ThemeDataSourceImpl extends ThemeDataSource {
   Future<Either<Failure, List<ThemeModel>>> getThemes() async {
     List<ThemeModel> spThemes = _getThemesFromSP();
 
-    final spEntities =
+    List<ThemeEntity> spEntities =
         spThemes.map((model) => ThemeEntity.fromModel(model)).toList();
 
-    bool isSame = false;
+    spEntities =
+        spEntities.where((entity) => entity.isUserCreated == false).toList();
+
+    bool isSame = true;
 
     for (int i = 0; i < spEntities.length; i++) {
       if (spEntities[i] != SurelineThemes.values[i]) {
@@ -107,7 +115,7 @@ class ThemeDataSourceImpl extends ThemeDataSource {
       );
       debugPrint('isSuccessful: $isSuccessful');
       if (isSuccessful) {
-        _setThemeGlobally(newModel);
+        await _setThemeGlobally(newModel);
         return Right(unit);
       } else {
         return Left(UnknownFailure());
@@ -138,7 +146,9 @@ class ThemeDataSourceImpl extends ThemeDataSource {
         return Left(UnknownFailure());
       }
 
-      _setThemeGlobally(result.firstWhere((model) => model.id == newActiveId));
+      await _setThemeGlobally(
+        result.firstWhere((model) => model.id == newActiveId),
+      );
       return Right(unit);
     } catch (e) {
       debugPrint('error in set theme');
@@ -147,7 +157,7 @@ class ThemeDataSourceImpl extends ThemeDataSource {
     }
   }
 
-  void _setThemeGlobally(ThemeModel model) {
+  Future<void> _setThemeGlobally(ThemeModel model) async {
     // App.homeActionColor = model.actionButtonColor;
     // App.homeButtonColor = model.buttonColor;
 
@@ -157,7 +167,32 @@ class ThemeDataSourceImpl extends ThemeDataSource {
     //   previewQuote: model.previewQuote,
     //   lastAccessed: DateTime.now(),
     // );
+
     App.themeEntity = ThemeEntity.fromModel(model);
+
+    await Utils.saveThemeOnAppGroup();
+  }
+
+  Future<void> _writeBackgroundAssetToAppGroup(
+    String nameWithoutExtension,
+  ) async {
+    await SharedPreferenceAppGroup.setAppGroup(
+      'group.com.abdulmuiz.sureline.quoteWidget',
+    );
+    await SharedPreferenceAppGroup.setString(
+      SP.imageAssetAppGroup,
+      nameWithoutExtension,
+    );
+  }
+
+  Future<void> _writeTextColorToAppGroup(String textColorHex) async {
+    await SharedPreferenceAppGroup.setAppGroup(
+      'group.com.abdulmuiz.sureline.quoteWidget',
+    );
+    await SharedPreferenceAppGroup.setString(
+      SP.textColorAppGroup,
+      textColorHex,
+    );
   }
 
   Future<void> _initializeActiveThemeFromSP() async {

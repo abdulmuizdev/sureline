@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ios_color_picker_with_title/custom_picker/extensions.dart';
+import 'package:path/path.dart' as path;
+import 'package:shared_preference_app_group/shared_preference_app_group.dart';
+import 'package:sureline/core/app/app.dart';
+import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/notifications_settings/domain/entity/day_entity.dart';
 
@@ -106,6 +111,53 @@ class Utils {
         return "Dec";
       default:
         return "";
+    }
+  }
+
+  static Future<void> saveThemeOnAppGroup() async {
+    try {
+      await SharedPreferenceAppGroup.setAppGroup(
+        'group.com.abdulmuiz.sureline.quoteWidget',
+      );
+      if (App.themeEntity.backgroundEntity.solidColor == null) {
+        await SharedPreferenceAppGroup.remove(SP.solidColorAppGroup);
+      } else {
+        await SharedPreferenceAppGroup.setString(
+          SP.solidColorAppGroup,
+          App.themeEntity.backgroundEntity.solidColor?.toHex(),
+        );
+      }
+
+      final backgroundPath = App.themeEntity.backgroundEntity.path;
+      if (backgroundPath == null) {
+        await SharedPreferenceAppGroup.remove(SP.imageAssetAppGroup);
+      } else {
+        final filename = path.basename(backgroundPath); // Gets "background.png"
+        final nameWithoutExtension = path.basenameWithoutExtension(
+          backgroundPath,
+        ); // Gets "background"
+        final extension = path.extension(backgroundPath); // Gets ".png"
+
+        await SharedPreferenceAppGroup.setString(
+          SP.imageAssetAppGroup,
+          nameWithoutExtension,
+        );
+      }
+
+      await SharedPreferenceAppGroup.setString(
+        SP.textColorAppGroup,
+        App.themeEntity.textDecorEntity.textColor.toHex(),
+      );
+      print(
+        'text color is this in recm ${App.themeEntity.textDecorEntity.textColor.toHex()}',
+      );
+      await SharedPreferenceAppGroup.setInt(
+        SP.textSizeAppGroup,
+        App.themeEntity.textDecorEntity.fontSize.round(),
+      );
+      Utils.updateWidgets();
+    } catch (e) {
+      debugPrint('${e}');
     }
   }
 
