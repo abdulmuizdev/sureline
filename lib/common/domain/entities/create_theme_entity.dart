@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/create_and_edit_theme_model.dart';
+import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/theme_model.dart';
 import 'package:uuid/uuid.dart';
 
 class ThemeEntity extends Equatable {
@@ -10,6 +10,10 @@ class ThemeEntity extends Equatable {
   final ThemeBackgroundEntity backgroundEntity;
   final ThemeTextDecorEntity textDecorEntity;
   final bool isActive;
+  final bool isFree;
+  final bool isNew;
+  final bool isSeasonal;
+  final bool isMostPopular;
 
   ThemeEntity({
     required this.id,
@@ -18,11 +22,23 @@ class ThemeEntity extends Equatable {
     required this.backgroundEntity,
     required this.previewQuote,
     this.isActive = false,
+    required this.isFree,
+    required this.isNew,
+    required this.isSeasonal,
+    required this.isMostPopular,
   });
   // : id = id ?? const Uuid().v4();
 
   @override
-  List<Object?> get props => [previewQuote, backgroundEntity, textDecorEntity];
+  List<Object?> get props => [
+    previewQuote,
+    backgroundEntity,
+    textDecorEntity,
+    isFree,
+    isNew,
+    isSeasonal,
+    isMostPopular,
+  ];
 
   factory ThemeEntity.fromModel(ThemeModel model) {
     return ThemeEntity(
@@ -32,6 +48,10 @@ class ThemeEntity extends Equatable {
       previewQuote: model.previewQuote,
       isActive: model.isActive,
       id: model.id,
+      isFree: model.isFree,
+      isNew: model.isNew,
+      isSeasonal: model.isSeasonal,
+      isMostPopular: model.isMostPopular,
     );
   }
 }

@@ -7,19 +7,6 @@ import 'package:uuid/uuid.dart';
 class SurelineThemes {
   static final List<ThemeEntity> values = [
     ThemeEntity(
-      id: 'sureline-theme-1',
-      lastAccessed: DateTime.now(),
-      textDecorEntity: App.defaultTheme.textDecorEntity,
-      backgroundEntity: ThemeBackgroundEntity(
-        path: 'assets/images/background2.png',
-        isNetwork: false,
-        solidColor: null,
-        isLiveBackground: false,
-        isLocallyStored: false,
-      ),
-      previewQuote: "Sureline",
-    ),
-    ThemeEntity(
       id: 'sureline-theme-2',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity,
@@ -31,7 +18,31 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: false,
+      isSeasonal: false,
+      isMostPopular: false,
     ),
+    ThemeEntity(
+      id: 'sureline-theme-11',
+      lastAccessed: DateTime.now(),
+      textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
+        textColor: AppColors.pureWhite,
+      ),
+      backgroundEntity: ThemeBackgroundEntity(
+        path: 'assets/images/theme/forest.jpg',
+        isNetwork: false,
+        solidColor: null,
+        isLiveBackground: false,
+        isLocallyStored: false,
+      ),
+      previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: true,
+      isMostPopular: false,
+    ),
+
     ThemeEntity(
       id: 'sureline-theme-3',
       lastAccessed: DateTime.now(),
@@ -46,6 +57,10 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: false,
+      isMostPopular: true,
     ),
     ThemeEntity(
       id: 'sureline-theme-4',
@@ -61,6 +76,10 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: true,
+      isMostPopular: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-5',
@@ -76,6 +95,10 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: false,
+      isMostPopular: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-6',
@@ -93,6 +116,10 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: true,
+      isMostPopular: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-7',
@@ -108,6 +135,10 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: false,
+      isMostPopular: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-8',
@@ -125,6 +156,10 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: false,
+      isMostPopular: true,
     ),
     ThemeEntity(
       id: 'sureline-theme-9',
@@ -140,6 +175,10 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: false,
+      isMostPopular: false,
     ),
     ThemeEntity(
       id: 'sureline-theme-10',
@@ -155,22 +194,30 @@ class SurelineThemes {
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: true,
+      isSeasonal: false,
+      isMostPopular: true,
     ),
+
     ThemeEntity(
-      id: 'sureline-theme-11',
+      id: 'sureline-theme-1',
       lastAccessed: DateTime.now(),
-      textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
-        textColor: AppColors.pureWhite,
-      ),
+      textDecorEntity: App.defaultTheme.textDecorEntity,
       backgroundEntity: ThemeBackgroundEntity(
-        path: 'assets/images/theme/forest.jpg',
+        path: 'assets/images/background2.png',
         isNetwork: false,
         solidColor: null,
         isLiveBackground: false,
         isLocallyStored: false,
       ),
       previewQuote: "Sureline",
+      isFree: true,
+      isNew: false,
+      isSeasonal: false,
+      isMostPopular: false,
     ),
+
     // ThemeEntity(
     //   lastAccessed: DateTime.now(),
     //   textDecorEntity: App.themeEntity.textDecorEntity.copyWith(

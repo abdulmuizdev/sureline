@@ -10,7 +10,8 @@ import 'package:sureline/features/theme_selection/presentation/bloc/theme_select
 import 'package:sureline/features/theme_selection/presentation/theme_mixes/bottom_sheet/widget/theme_mix_grid_item.dart';
 
 class ThemeMixesBottomSheet extends StatefulWidget {
-  const ThemeMixesBottomSheet({super.key});
+  final VoidCallback onCreatePressed;
+  const ThemeMixesBottomSheet({super.key, required this.onCreatePressed});
 
   @override
   State<ThemeMixesBottomSheet> createState() => _ThemeMixesBottomSheetState();
@@ -50,11 +51,14 @@ class _ThemeMixesBottomSheetState extends State<ThemeMixesBottomSheet> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      Text(
-                        'Create',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
+                      GestureDetector(
+                        onTap: widget.onCreatePressed,
+                        child: Text(
+                          'Create',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       ),
                     ],
@@ -69,7 +73,7 @@ class _ThemeMixesBottomSheetState extends State<ThemeMixesBottomSheet> {
                         mainAxisSpacing: 16,
                       ),
                       itemCount: _mixes.length,
-                      itemBuilder: (context, index){
+                      itemBuilder: (context, index) {
                         return ThemeMixGridItem(entity: _mixes[index]);
                       },
                     ),

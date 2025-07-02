@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/create_and_edit_theme_model.dart';
+import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/theme_model.dart';
 import 'package:sureline/features/theme_selection/data/data_source/theme_data_source.dart';
 import 'package:sureline/features/theme_selection/domain/repository/theme_selector_repository.dart';
 

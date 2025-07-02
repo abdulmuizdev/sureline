@@ -14,6 +14,10 @@ class ThemeModel extends ThemeEntity {
     super.isActive,
     super.id,
     required super.lastAccessed,
+    required super.isFree,
+    required super.isNew,
+    required super.isSeasonal,
+    required super.isMostPopular,
   }) : super(
          textDecorEntity: textDecorModel,
          backgroundEntity: backgroundModel,
@@ -27,6 +31,10 @@ class ThemeModel extends ThemeEntity {
       previewQuote: json['previewQuote'],
       isActive: json['isActive'] ?? false,
       id: json['id'],
+      isFree: json['isFree'] ?? false,
+      isNew: json['isNew'] ?? false,
+      isSeasonal: json['isSeasonal'] ?? false,
+      isMostPopular: json['isMostPopular'] ?? false,
     );
   }
 
@@ -38,6 +46,10 @@ class ThemeModel extends ThemeEntity {
       previewQuote: entity.previewQuote,
       isActive: entity.isActive,
       id: entity.id,
+      isFree: entity.isFree,
+      isNew: entity.isNew,
+      isSeasonal: entity.isSeasonal,
+      isMostPopular: entity.isMostPopular,
     );
   }
 
@@ -47,6 +59,10 @@ class ThemeModel extends ThemeEntity {
     String? previewQuote,
     bool? isActive,
     DateTime? lastAccessed,
+    bool? isFree,
+    bool? isNew,
+    bool? isSeasonal,
+    bool? isMostPopular,
   }) {
     return ThemeModel(
       lastAccessed: lastAccessed ?? this.lastAccessed,
@@ -55,6 +71,10 @@ class ThemeModel extends ThemeEntity {
       previewQuote: previewQuote ?? this.previewQuote,
       isActive: isActive ?? this.isActive,
       id: id,
+      isFree: isFree ?? this.isFree,
+      isNew: isNew ?? this.isNew,
+      isSeasonal: isSeasonal ?? this.isSeasonal,
+      isMostPopular: isMostPopular ?? this.isMostPopular,
     );
   }
 
@@ -68,6 +88,10 @@ class ThemeModel extends ThemeEntity {
       'isActive': isActive,
       'lastAccessed': lastAccessed.toIso8601String(),
       'id': id,
+      'isFree': isFree,
+      'isNew': isNew,
+      'isSeasonal': isSeasonal,
+      'isMostPopular': isMostPopular,
     };
   }
 }

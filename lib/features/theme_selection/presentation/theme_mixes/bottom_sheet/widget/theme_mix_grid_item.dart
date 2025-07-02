@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:video_player/video_player.dart';
@@ -54,7 +55,10 @@ class _ThemeMixGridItemState extends State<ThemeMixGridItem> {
               borderRadius: BorderRadius.circular(16),
               child:
                   (!widget.entity.backgroundEntity.isLiveBackground)
-                      ? Image.asset(widget.entity.backgroundEntity.path!, fit: BoxFit.cover,)
+                      ? Image.asset(
+                        widget.entity.backgroundEntity.path!,
+                        fit: BoxFit.cover,
+                      )
                       : VideoPlayer(_videoPlayerController),
             ),
           ),
@@ -62,10 +66,13 @@ class _ThemeMixGridItemState extends State<ThemeMixGridItem> {
           Center(
             child: Text(
               widget.entity.previewQuote ?? "Sureline",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: widget.entity.textDecorEntity.fontWeight,
-                color: widget.entity.textDecorEntity.textColor,
+              style: GoogleFonts.getFont(
+                widget.entity.textDecorEntity.fontFamily,
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  fontWeight: widget.entity.textDecorEntity.fontWeight,
+                  color: widget.entity.textDecorEntity.textColor,
+                ),
               ),
             ),
           ),

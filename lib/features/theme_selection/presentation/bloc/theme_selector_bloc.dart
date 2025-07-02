@@ -27,6 +27,66 @@ class ThemeSelectorBloc extends Bloc<ThemeSelectorEvent, ThemeSelectorState> {
       });
     });
 
+    on<GetFreeThemes>((event, emit) async {
+      emit(GettingThemes());
+      final result = await _getThemesUseCase.execute();
+      result.fold((left) {}, (right) {
+        right = right.where((entity) => entity.isFree == true).toList();
+        final activeIndex = right.indexWhere(
+          (entity) => entity.isActive == true,
+        );
+        emit(GotThemes(right, activeIndex));
+      });
+    });
+
+    on<GetNewThemes>((event, emit) async {
+      emit(GettingThemes());
+      final result = await _getThemesUseCase.execute();
+      result.fold((left) {}, (right) {
+        right = right.where((entity) => entity.isNew == true).toList();
+        final activeIndex = right.indexWhere(
+          (entity) => entity.isActive == true,
+        );
+        emit(GotThemes(right, activeIndex));
+      });
+    });
+
+    on<GetSeasonalThemes>((event, emit) async {
+      emit(GettingThemes());
+      final result = await _getThemesUseCase.execute();
+      result.fold((left) {}, (right) {
+        right = right.where((entity) => entity.isSeasonal == true).toList();
+        final activeIndex = right.indexWhere(
+          (entity) => entity.isActive == true,
+        );
+        emit(GotThemes(right, activeIndex));
+      });
+    });
+
+    on<GetMostPopularThemes>((event, emit) async {
+      emit(GettingThemes());
+      final result = await _getThemesUseCase.execute();
+      result.fold((left) {}, (right) {
+        right = right.where((entity) => entity.isMostPopular == true).toList();
+        final activeIndex = right.indexWhere(
+          (entity) => entity.isActive == true,
+        );
+        emit(GotThemes(right, activeIndex));
+      });
+    });
+
+    on<GetRecentThemes>((event, emit) async {
+      emit(GettingThemes());
+      final result = await _getThemesUseCase.execute();
+      result.fold((left) {}, (right) {
+        right.sort((a, b) => b.lastAccessed.compareTo(a.lastAccessed));
+        final activeIndex = right.indexWhere(
+          (entity) => entity.isActive == true,
+        );
+        emit(GotThemes(right, activeIndex));
+      });
+    });
+
     on<GetThemeMixes>((event, emit) async {
       emit(GettingThemeMixes());
       final result = await _getThemeMixesUseCase.execute();

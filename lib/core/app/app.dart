@@ -33,6 +33,10 @@ class App {
       isLocallyStored: false,
     ),
     previewQuote: null,
+    isFree: false,
+    isNew: false,
+    isSeasonal: false,
+    isMostPopular: false,
   );
   static ThemeEntity themeEntity = defaultTheme;
 

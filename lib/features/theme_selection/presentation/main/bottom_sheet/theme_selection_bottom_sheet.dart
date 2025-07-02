@@ -128,33 +128,7 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                   onPressed: () {
                                     switch (index) {
                                       case 0:
-                                        showModalBottomSheet(
-                                          isScrollControlled: true,
-                                          useSafeArea: false,
-                                          isDismissible: false,
-                                          enableDrag: false,
-                                          context: context,
-                                          builder:
-                                              (context) =>
-                                                  CreateAndEditThemeBottomSheet(
-                                                    entity: ThemeEntity(
-                                                      lastAccessed:
-                                                          DateTime.now(),
-                                                      textDecorEntity:
-                                                          App
-                                                              .themeEntity
-                                                              .textDecorEntity,
-                                                      backgroundEntity:
-                                                          App
-                                                              .themeEntity
-                                                              .backgroundEntity,
-                                                      previewQuote:
-                                                          widget.quote,
-                                                      id: Uuid().v4(),
-                                                    ),
-                                                  ),
-                                        );
-
+                                        _showCreateThemeBottomSheet();
                                         break;
                                       case 1:
                                         setState(() {
@@ -163,7 +137,9 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                           _showThemeMixes = true;
                                           _heading = 'For you';
                                         });
-                                        ;
+                                        context.read<ThemeSelectorBloc>().add(
+                                          GetThemes(),
+                                        );
                                         break;
                                       case 2:
                                         setState(() {
@@ -171,6 +147,9 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                           _showHeading = false;
                                           _showThemeMixes = false;
                                         });
+                                        context.read<ThemeSelectorBloc>().add(
+                                          GetFreeThemes(),
+                                        );
                                         break;
                                       case 3:
                                         setState(() {
@@ -179,6 +158,9 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                           _showThemeMixes = false;
                                           _heading = 'New';
                                         });
+                                        context.read<ThemeSelectorBloc>().add(
+                                          GetNewThemes(),
+                                        );
                                         break;
                                       case 4:
                                         setState(() {
@@ -187,6 +169,9 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                           _showThemeMixes = true;
                                           _heading = 'Seasonal';
                                         });
+                                        context.read<ThemeSelectorBloc>().add(
+                                          GetSeasonalThemes(),
+                                        );
                                         break;
                                       case 5:
                                         setState(() {
@@ -195,6 +180,9 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                           _showThemeMixes = true;
                                           _heading = 'Most popular';
                                         });
+                                        context.read<ThemeSelectorBloc>().add(
+                                          GetMostPopularThemes(),
+                                        );
                                         break;
                                       case 6:
                                         setState(() {
@@ -202,6 +190,9 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                           _showHeading = false;
                                           _showThemeMixes = false;
                                         });
+                                        context.read<ThemeSelectorBloc>().add(
+                                          GetRecentThemes(),
+                                        );
                                         break;
                                     }
                                   },
@@ -232,8 +223,12 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                         useSafeArea: true,
                                         context: context,
                                         builder:
-                                            (context) =>
-                                                ThemeMixesBottomSheet(),
+                                            (context) => ThemeMixesBottomSheet(
+                                              onCreatePressed: () {
+                                                Navigator.of(context).pop();
+                                                _showCreateThemeBottomSheet();
+                                              },
+                                            ),
                                       );
                                     },
                                     child: Text(
@@ -289,35 +284,67 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
 
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 9),
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    childAspectRatio: 126 / 178,
-                                    crossAxisSpacing: 1,
-                                    mainAxisSpacing: 1,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 500),
+                              transitionBuilder: (
+                                Widget child,
+                                Animation<double> animation,
+                              ) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: const Offset(0, 0.3),
+                                      end: Offset.zero,
+                                    ).animate(
+                                      CurvedAnimation(
+                                        parent: animation,
+                                        curve: Curves.easeOutCubic,
+                                      ),
+                                    ),
+                                    child: child,
                                   ),
-                              itemCount: _themes.length,
-                              itemBuilder: (context, index) {
-                                if (_themes[index].isActive) {
-                                  debugPrint('here it is $index');
-                                }
-
-                                return ThemeSelectorItem(
-                                  entity: _themes[index],
-                                  isSelected: _themeSelectedIndex == index,
-                                  onPressed: () {
-                                    context.read<ThemeSelectorBloc>().add(
-                                      ChangeTheme(_themes[index]),
-                                    );
-                                    setState(() {
-                                      _themeSelectedIndex = index;
-                                    });
-                                  },
                                 );
                               },
+                              child: GridView.builder(
+                                key: ValueKey(
+                                  _themes.length,
+                                ), // Force rebuild when themes change
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      childAspectRatio: 126 / 178,
+                                      crossAxisSpacing: 1,
+                                      mainAxisSpacing: 1,
+                                    ),
+                                itemCount: _themes.length,
+                                itemBuilder: (context, index) {
+                                  if (_themes[index].isActive) {
+                                    debugPrint('here it is $index');
+                                  }
+
+                                  return AnimatedContainer(
+                                    duration: Duration(
+                                      milliseconds: 300 + (index * 50),
+                                    ), // Staggered delay
+                                    curve: Curves.easeOutBack,
+                                    child: ThemeSelectorItem(
+                                      entity: _themes[index],
+                                      isSelected: _themeSelectedIndex == index,
+                                      onPressed: () {
+                                        context.read<ThemeSelectorBloc>().add(
+                                          ChangeTheme(_themes[index]),
+                                        );
+                                        setState(() {
+                                          _themeSelectedIndex = index;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ],
@@ -330,6 +357,30 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
           },
         ),
       ),
+    );
+  }
+
+  void _showCreateThemeBottomSheet() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      useSafeArea: false,
+      isDismissible: false,
+      enableDrag: false,
+      context: context,
+      builder:
+          (context) => CreateAndEditThemeBottomSheet(
+            entity: ThemeEntity(
+              lastAccessed: DateTime.now(),
+              textDecorEntity: App.themeEntity.textDecorEntity,
+              backgroundEntity: App.themeEntity.backgroundEntity,
+              previewQuote: widget.quote,
+              id: Uuid().v4(),
+              isFree: false,
+              isNew: false,
+              isSeasonal: false,
+              isMostPopular: false,
+            ),
+          ),
     );
   }
 }

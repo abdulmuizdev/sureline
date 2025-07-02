@@ -6,8 +6,9 @@ import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/constants/sureline_themes.dart';
+import 'package:sureline/core/constants/sureline_themes_mixes.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/create_and_edit_theme_model.dart';
+import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/theme_model.dart';
 
 abstract class ThemeDataSource {
   Future<Either<Failure, List<ThemeModel>>> getThemes();
@@ -42,9 +43,19 @@ class ThemeDataSourceImpl extends ThemeDataSource {
     }
 
     if (spThemes.isEmpty || !isSame) {
+      String? activeId =
+          spThemes.where((model) => model.isActive == true).firstOrNull?.id;
+
       debugPrint('Initializing themes');
       await _initializeThemesInSP();
       spThemes = _getThemesFromSP();
+
+      if (activeId != null) {
+        spThemes =
+            spThemes
+                .map((model) => model.copyWith(isActive: model.id == activeId))
+                .toList();
+      }
     }
 
     if (spThemes.isEmpty) {
@@ -61,7 +72,7 @@ class ThemeDataSourceImpl extends ThemeDataSource {
   @override
   Future<Either<Failure, List<ThemeModel>>> getThemesMixes() async {
     return Right(
-      SurelineThemes.values
+      SurelineThemesMixes.values
           .map((entity) => ThemeModel.fromEntity(entity))
           .toList(),
     );
@@ -111,32 +122,23 @@ class ThemeDataSourceImpl extends ThemeDataSource {
   Future<Either<Failure, void>> setTheme() async {
     try {
       final spThemes = _getThemesFromSP();
-      int activeIndex = spThemes.indexWhere((model) => model.isActive == true);
-      if (activeIndex < 0) {
+      String? activeId =
+          spThemes.where((model) => model.isActive == true).firstOrNull?.id;
+      if (activeId == null) {
         await _initializeActiveThemeFromSP();
       }
 
       final result = _getThemesFromSP();
 
-      int newActiveIndex = result.indexWhere((model) => model.isActive == true);
+      String? newActiveId =
+          result.firstWhere((model) => model.isActive == true).id;
 
-      // Alternative implementation with for loop
-      int newActiveIndexForLoop = -1;
-      for (int i = 0; i < result.length; i++) {
-        if (result[i].isActive == true) {
-          newActiveIndexForLoop = i;
-          break;
-        }
-      }
-      debugPrint('indexWhere result: $newActiveIndex');
-      debugPrint('for loop result: $newActiveIndexForLoop');
-
-      if (newActiveIndex < 0) {
+      if (newActiveId == null) {
         debugPrint('it sould be greater than 0');
         return Left(UnknownFailure());
       }
 
-      _setThemeGlobally(result[newActiveIndex]);
+      _setThemeGlobally(result.firstWhere((model) => model.id == newActiveId));
       return Right(unit);
     } catch (e) {
       debugPrint('error in set theme');

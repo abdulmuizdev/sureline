@@ -8,7 +8,7 @@ import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/create_and_edit_theme_model.dart';
+import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/theme_model.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_bloc.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_event.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_state.dart';
@@ -211,6 +211,10 @@ class _CreateAndEditThemeBottomSheetState
                                   ),
                                   previewQuote: widget.entity.previewQuote,
                                   id: widget.entity.id,
+                                  isFree: widget.entity.isFree,
+                                  isNew: widget.entity.isNew,
+                                  isSeasonal: widget.entity.isSeasonal,
+                                  isMostPopular: widget.entity.isMostPopular,
                                 ),
                               ),
                             );
@@ -498,6 +502,10 @@ class _CreateAndEditThemeBottomSheetState
         ),
         previewQuote: widget.entity.previewQuote,
         id: widget.entity.id,
+        isFree: widget.entity.isFree,
+        isNew: widget.entity.isNew,
+        isSeasonal: widget.entity.isSeasonal,
+        isMostPopular: widget.entity.isMostPopular,
       );
 
       if (newEntity == widget.entity) {
