@@ -26,7 +26,22 @@ class ThemeDataSourceImpl extends ThemeDataSource {
   @override
   Future<Either<Failure, List<ThemeModel>>> getThemes() async {
     List<ThemeModel> spThemes = _getThemesFromSP();
-    if (spThemes.isEmpty || spThemes != SurelineThemes.values) {
+
+    final spEntities =
+        spThemes.map((model) => ThemeEntity.fromModel(model)).toList();
+
+    bool isSame = false;
+
+    for (int i = 0; i < spEntities.length; i++) {
+      if (spEntities[i] != SurelineThemes.values[i]) {
+        isSame = false;
+        break;
+      } else {
+        isSame = true;
+      }
+    }
+
+    if (spThemes.isEmpty || !isSame) {
       debugPrint('Initializing themes');
       await _initializeThemesInSP();
       spThemes = _getThemesFromSP();
@@ -55,15 +70,7 @@ class ThemeDataSourceImpl extends ThemeDataSource {
   @override
   Future<Either<Failure, void>> changeTheme(ThemeModel newModel) async {
     try {
-      print(
-        'change theme is called with font size ${newModel.textDecorModel.fontSize}',
-      );
       List<ThemeModel> spThemes = _getThemesFromSP();
-
-      debugPrint('new model id: ${newModel.id}');
-      for (int i = 0; i < spThemes.length; i++) {
-        debugPrint('Theme ${i}: ${spThemes[i].id}');
-      }
 
       int foundIndex = spThemes.indexWhere((model) {
         return model.id == newModel.id;
@@ -79,10 +86,15 @@ class ThemeDataSourceImpl extends ThemeDataSource {
         spThemes[foundIndex] = newModel.copyWith(isActive: true);
       }
 
+      for (int i = 0; i < spThemes.length; i++) {
+        debugPrint('Theme ${i}: isActive = ${spThemes[i].isActive}');
+      }
+
       final isSuccessful = await prefs.setString(
         SP.themes,
         jsonEncode(spThemes.map((model) => model.toJson()).toList()),
       );
+      debugPrint('isSuccessful: $isSuccessful');
       if (isSuccessful) {
         _setThemeGlobally(newModel);
         return Right(unit);
@@ -143,11 +155,7 @@ class ThemeDataSourceImpl extends ThemeDataSource {
     //   previewQuote: model.previewQuote,
     //   lastAccessed: DateTime.now(),
     // );
-    print('font size model check is this ${model.textDecorModel.fontSize}');
     App.themeEntity = ThemeEntity.fromModel(model);
-    print(
-      'font size app check is this ${App.themeEntity.textDecorEntity.fontSize}',
-    );
   }
 
   Future<void> _initializeActiveThemeFromSP() async {

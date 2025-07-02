@@ -42,8 +42,6 @@ class _BackgroundState extends State<Background> {
   }
 
   void _initializeBackground() {
-    debugPrint('widget entity preview ');
-    debugPrint(widget.entity?.previewImage);
     if (widget.entity != null) {
       _path = widget.entity!.path;
       _isLiveBackground = widget.entity!.isLiveBackground;

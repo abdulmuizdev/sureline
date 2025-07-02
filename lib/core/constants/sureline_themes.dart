@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 class SurelineThemes {
   static final List<ThemeEntity> values = [
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-1',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity,
       backgroundEntity: ThemeBackgroundEntity(
@@ -20,7 +20,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-2',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity,
       backgroundEntity: ThemeBackgroundEntity(
@@ -33,7 +33,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-3',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
@@ -48,7 +48,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-4',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
@@ -63,7 +63,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-5',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
@@ -78,7 +78,7 @@ class SurelineThemes {
       previewQuote: "Sureline",
     ),
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-6',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
@@ -94,9 +94,8 @@ class SurelineThemes {
       ),
       previewQuote: "Sureline",
     ),
-
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-7',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
@@ -110,9 +109,8 @@ class SurelineThemes {
       ),
       previewQuote: "Sureline",
     ),
-
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-8',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: Color(0xFF333333),
@@ -128,9 +126,8 @@ class SurelineThemes {
       ),
       previewQuote: "Sureline",
     ),
-
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-9',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
@@ -144,9 +141,8 @@ class SurelineThemes {
       ),
       previewQuote: "Sureline",
     ),
-
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-10',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
@@ -160,9 +156,8 @@ class SurelineThemes {
       ),
       previewQuote: "Sureline",
     ),
-
     ThemeEntity(
-      id: Uuid().v4(),
+      id: 'sureline-theme-11',
       lastAccessed: DateTime.now(),
       textDecorEntity: App.defaultTheme.textDecorEntity.copyWith(
         textColor: AppColors.pureWhite,
@@ -176,7 +171,6 @@ class SurelineThemes {
       ),
       previewQuote: "Sureline",
     ),
-
     // ThemeEntity(
     //   lastAccessed: DateTime.now(),
     //   textDecorEntity: App.themeEntity.textDecorEntity.copyWith(
