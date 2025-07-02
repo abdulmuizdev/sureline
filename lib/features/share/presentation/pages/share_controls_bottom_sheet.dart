@@ -9,15 +9,20 @@ import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/libraries/direct_social_share/direct_social_share_schemas.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
+import 'package:sureline/features/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
 import 'package:sureline/features/share/domain/entity/render_entity.dart';
 import 'package:sureline/features/share/domain/entity/share_entity.dart';
 import 'package:sureline/features/share/presentation/bloc/share_bloc.dart';
 import 'package:sureline/features/share/presentation/bloc/share_event.dart';
 import 'package:sureline/features/share/presentation/bloc/share_state.dart';
+import 'package:sureline/features/share/presentation/snackbars/disliked_snackbar.dart';
+import 'package:sureline/features/share/presentation/snackbars/reported_snackbar.dart';
 import 'package:sureline/features/share/presentation/widget/share_control_list_item.dart';
 import 'package:sureline/features/share/presentation/widget/tag_dialog.dart';
+import 'package:sureline/features/share/presentation/widget/times_widget.dart';
 
 class ShareControlsBottomSheet extends StatefulWidget {
+  final int quoteId;
   final String quote;
   final VoidCallback onPop;
   final GlobalKey exportKey;
@@ -28,6 +33,7 @@ class ShareControlsBottomSheet extends StatefulWidget {
 
   const ShareControlsBottomSheet({
     super.key,
+    required this.quoteId,
     required this.quote,
     required this.onPop,
     required this.exportKey,
@@ -46,6 +52,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
   String _renderProgress = '0';
   late bool _isWaterMarkShowing;
   bool _isInstagramShare = false;
+  List<DateTime> _accessedTimes = List.generate(10, (index) => DateTime.now());
 
   @override
   void initState() {
@@ -96,6 +103,8 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                     ),
                 transitionBuilder: Utils.dialogTransitionBuilder,
               );
+            } else {
+              state.proceed();
             }
           }
         },
@@ -145,79 +154,22 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                             child: ListView(
                               scrollDirection: Axis.horizontal,
                               children: [
-                                ShareItem(
-                                  imageAsset: 'assets/images/instagram.png',
-                                  label: 'Instagram',
-                                  onPressed: () {
-                                    setState(() {
-                                      _isInstagramShare = true;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      OpenInstagram(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.instagramStory,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                ShareItem(
-                                  imageAsset: 'assets/images/ig_stories.png',
-                                  label: 'Instagram\nStories',
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isInstagramShare = true;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      ShareOnSocial(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.instagramStory,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                if (true) ...[
-                                  ShareItem(
-                                    imageAsset: 'assets/images/ig_reel.png',
-                                    label: 'Instagram\nReels',
-                                    onPressed: () async {
+                                TimesWidget(
+                                  id: 1,
+                                  lastAccessedAt: _accessedTimes[0],
+                                  child: ShareItem(
+                                    imageAsset: 'assets/images/instagram.png',
+                                    label: 'Instagram',
+                                    onPressed: () {
                                       setState(() {
                                         _isInstagramShare = true;
                                       });
                                       context.read<ShareBloc>().add(
-                                        ShareOnSocial(
+                                        OpenInstagram(
                                           ShareEntity(
                                             schema:
-                                                SocialShareSchema.instagramReel,
+                                                SocialShareSchema
+                                                    .instagramStory,
                                             renderEntity: RenderEntity(
                                               quote: widget.quote,
                                               isLiveBackground:
@@ -236,216 +188,318 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                       );
                                     },
                                   ),
+                                ),
+                                TimesWidget(
+                                  id: 2,
+                                  lastAccessedAt: _accessedTimes[1],
+                                  child: ShareItem(
+                                    imageAsset: 'assets/images/ig_stories.png',
+                                    label: 'Instagram\nStories',
+                                    onPressed: () async {
+                                      setState(() {
+                                        _isInstagramShare = true;
+                                      });
+                                      context.read<ShareBloc>().add(
+                                        ShareOnSocial(
+                                          ShareEntity(
+                                            schema:
+                                                SocialShareSchema
+                                                    .instagramStory,
+                                            renderEntity: RenderEntity(
+                                              quote: widget.quote,
+                                              isLiveBackground:
+                                                  widget.isLiveBackground,
+                                              quoteKey: widget.quoteKey,
+                                              rootKey: widget.exportKey,
+                                              path:
+                                                  App
+                                                      .themeEntity
+                                                      .backgroundEntity
+                                                      .path ??
+                                                  '',
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                if (widget.isLiveBackground) ...[
+                                  TimesWidget(
+                                    id: 3,
+                                    lastAccessedAt: _accessedTimes[2],
+                                    child: ShareItem(
+                                      imageAsset: 'assets/images/ig_reel.png',
+                                      label: 'Instagram\nReels',
+                                      onPressed: () async {
+                                        setState(() {
+                                          _isInstagramShare = true;
+                                        });
+                                        context.read<ShareBloc>().add(
+                                          ShareOnSocial(
+                                            ShareEntity(
+                                              schema:
+                                                  SocialShareSchema
+                                                      .instagramReel,
+                                              renderEntity: RenderEntity(
+                                                quote: widget.quote,
+                                                isLiveBackground:
+                                                    widget.isLiveBackground,
+                                                quoteKey: widget.quoteKey,
+                                                rootKey: widget.exportKey,
+                                                path:
+                                                    App
+                                                        .themeEntity
+                                                        .backgroundEntity
+                                                        .path ??
+                                                    '',
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ],
-                                ShareItem(
-                                  imageAsset: 'assets/images/facebook.png',
-                                  label: 'Facebook',
-                                  onPressed: () {
-                                    setState(() {
-                                      _isInstagramShare = false;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      OpenFacebook(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.instagramStory,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
+                                TimesWidget(
+                                  id: 4,
+                                  lastAccessedAt: _accessedTimes[3],
+                                  child: ShareItem(
+                                    imageAsset: 'assets/images/facebook.png',
+                                    label: 'Facebook',
+                                    onPressed: () {
+                                      setState(() {
+                                        _isInstagramShare = false;
+                                      });
+                                      context.read<ShareBloc>().add(
+                                        OpenFacebook(
+                                          ShareEntity(
+                                            schema:
+                                                SocialShareSchema
+                                                    .instagramStory,
+                                            renderEntity: RenderEntity(
+                                              quote: widget.quote,
+                                              isLiveBackground:
+                                                  widget.isLiveBackground,
+                                              quoteKey: widget.quoteKey,
+                                              rootKey: widget.exportKey,
+                                              path:
+                                                  App
+                                                      .themeEntity
+                                                      .backgroundEntity
+                                                      .path ??
+                                                  '',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                                ShareItem(
-                                  imageAsset: 'assets/images/fb_reel.png',
-                                  label: 'Facebook\nReels',
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isInstagramShare = false;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      ShareOnSocial(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.facebookReel,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
+                                TimesWidget(
+                                  id: 5,
+                                  lastAccessedAt: _accessedTimes[4],
+                                  child: ShareItem(
+                                    imageAsset: 'assets/images/fb_reel.png',
+                                    label: 'Facebook\nReels',
+                                    onPressed: () async {
+                                      setState(() {
+                                        _isInstagramShare = false;
+                                      });
+                                      context.read<ShareBloc>().add(
+                                        ShareOnSocial(
+                                          ShareEntity(
+                                            schema:
+                                                SocialShareSchema.facebookReel,
+                                            renderEntity: RenderEntity(
+                                              quote: widget.quote,
+                                              isLiveBackground:
+                                                  widget.isLiveBackground,
+                                              quoteKey: widget.quoteKey,
+                                              rootKey: widget.exportKey,
+                                              path:
+                                                  App
+                                                      .themeEntity
+                                                      .backgroundEntity
+                                                      .path ??
+                                                  '',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                                ShareItem(
-                                  imageAsset: 'assets/images/fb_stories.png',
-                                  label: 'Facebook\nStories',
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isInstagramShare = false;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      ShareOnSocial(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.facebookStory,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
+                                TimesWidget(
+                                  id: 6,
+                                  lastAccessedAt: _accessedTimes[5],
+                                  child: ShareItem(
+                                    imageAsset: 'assets/images/fb_stories.png',
+                                    label: 'Facebook\nStories',
+                                    onPressed: () async {
+                                      setState(() {
+                                        _isInstagramShare = false;
+                                      });
+                                      context.read<ShareBloc>().add(
+                                        ShareOnSocial(
+                                          ShareEntity(
+                                            schema:
+                                                SocialShareSchema.facebookStory,
+                                            renderEntity: RenderEntity(
+                                              quote: widget.quote,
+                                              isLiveBackground:
+                                                  widget.isLiveBackground,
+                                              quoteKey: widget.quoteKey,
+                                              rootKey: widget.exportKey,
+                                              path:
+                                                  App
+                                                      .themeEntity
+                                                      .backgroundEntity
+                                                      .path ??
+                                                  '',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                                ShareItem(
-                                  imageAsset: 'assets/images/tiktok.png',
-                                  label: 'TikTok',
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isInstagramShare = false;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      OpenTikTok(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.instagramStory,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
+                                TimesWidget(
+                                  id: 7,
+                                  lastAccessedAt: _accessedTimes[6],
+                                  child: ShareItem(
+                                    imageAsset: 'assets/images/tiktok.png',
+                                    label: 'TikTok',
+                                    onPressed: () async {
+                                      setState(() {
+                                        _isInstagramShare = false;
+                                      });
+                                      context.read<ShareBloc>().add(
+                                        OpenTikTok(
+                                          ShareEntity(
+                                            schema:
+                                                SocialShareSchema
+                                                    .instagramStory,
+                                            renderEntity: RenderEntity(
+                                              quote: widget.quote,
+                                              isLiveBackground:
+                                                  widget.isLiveBackground,
+                                              quoteKey: widget.quoteKey,
+                                              rootKey: widget.exportKey,
+                                              path:
+                                                  App
+                                                      .themeEntity
+                                                      .backgroundEntity
+                                                      .path ??
+                                                  '',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                                ShareItem(
-                                  imageAsset: 'assets/images/whatsapp.png',
-                                  label: 'WhatsApp',
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isInstagramShare = false;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      OpenDefaultShare(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.facebookStory,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
+                                TimesWidget(
+                                  id: 8,
+                                  lastAccessedAt: _accessedTimes[7],
+                                  child: ShareItem(
+                                    imageAsset: 'assets/images/whatsapp.png',
+                                    label: 'WhatsApp',
+                                    onPressed: () async {
+                                      setState(() {
+                                        _isInstagramShare = false;
+                                      });
+                                      context.read<ShareBloc>().add(
+                                        OpenDefaultShare(
+                                          ShareEntity(
+                                            schema:
+                                                SocialShareSchema.facebookStory,
+                                            renderEntity: RenderEntity(
+                                              quote: widget.quote,
+                                              isLiveBackground:
+                                                  widget.isLiveBackground,
+                                              quoteKey: widget.quoteKey,
+                                              rootKey: widget.exportKey,
+                                              path:
+                                                  App
+                                                      .themeEntity
+                                                      .backgroundEntity
+                                                      .path ??
+                                                  '',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                                ShareItem(
-                                  imageAsset: 'assets/images/messages.png',
-                                  label: 'Messages',
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isInstagramShare = false;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      OpenMessages(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.facebookStory,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
+                                TimesWidget(
+                                  id: 9,
+                                  lastAccessedAt: _accessedTimes[8],
+                                  child: ShareItem(
+                                    imageAsset: 'assets/images/messages.png',
+                                    label: 'Messages',
+                                    onPressed: () async {
+                                      setState(() {
+                                        _isInstagramShare = false;
+                                      });
+                                      context.read<ShareBloc>().add(
+                                        OpenMessages(
+                                          ShareEntity(
+                                            schema:
+                                                SocialShareSchema.facebookStory,
+                                            renderEntity: RenderEntity(
+                                              quote: widget.quote,
+                                              isLiveBackground:
+                                                  widget.isLiveBackground,
+                                              quoteKey: widget.quoteKey,
+                                              rootKey: widget.exportKey,
+                                              path:
+                                                  App
+                                                      .themeEntity
+                                                      .backgroundEntity
+                                                      .path ??
+                                                  '',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                                ShareItem(
-                                  icon: Icons.ios_share,
-                                  label: 'Share to...',
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isInstagramShare = false;
-                                    });
-                                    context.read<ShareBloc>().add(
-                                      OpenDefaultShare(
-                                        ShareEntity(
-                                          schema:
-                                              SocialShareSchema.facebookStory,
-                                          renderEntity: RenderEntity(
-                                            quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
-                                            quoteKey: widget.quoteKey,
-                                            rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
+                                TimesWidget(
+                                  id: 10,
+                                  lastAccessedAt: _accessedTimes[9],
+                                  child: ShareItem(
+                                    icon: Icons.ios_share,
+                                    label: 'Share to...',
+                                    onPressed: () async {
+                                      setState(() {
+                                        _isInstagramShare = false;
+                                      });
+                                      context.read<ShareBloc>().add(
+                                        OpenDefaultShare(
+                                          ShareEntity(
+                                            schema:
+                                                SocialShareSchema.facebookStory,
+                                            renderEntity: RenderEntity(
+                                              quote: widget.quote,
+                                              isLiveBackground:
+                                                  widget.isLiveBackground,
+                                              quoteKey: widget.quoteKey,
+                                              rootKey: widget.exportKey,
+                                              path:
+                                                  App
+                                                      .themeEntity
+                                                      .backgroundEntity
+                                                      .path ??
+                                                  '',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
                               ],
                             ),
@@ -501,6 +555,30 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                 ShareControlListItem(
                                   icon: Icons.bookmark_border_outlined,
                                   label: 'Add to collection',
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context:
+                                          Navigator.of(
+                                            context,
+                                            rootNavigator: true,
+                                          ).context,
+                                      builder:
+                                          (ctx) =>
+                                              CollectionSelectionBottomSheet(
+                                                quoteId: widget.quoteId,
+
+                                                onHistoryUpdated: (
+                                                  _,
+                                                  collectionsOfHistory,
+                                                ) {
+                                                  Navigator.of(ctx).pop();
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                      isScrollControlled: true,
+                                      useSafeArea: true,
+                                    );
+                                  },
                                 ),
                                 ShareControlListItem(
                                   icon: Icons.volume_up_outlined,
@@ -531,10 +609,24 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                 ShareControlListItem(
                                   icon: Icons.thumb_down_off_alt_rounded,
                                   label: 'Dislike',
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    Utils.showCustomSnackBar(
+                                      context,
+                                      DislikedSnackbar(),
+                                    );
+                                  },
                                 ),
                                 ShareControlListItem(
                                   icon: Icons.flag_outlined,
                                   label: 'Report',
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    Utils.showCustomSnackBar(
+                                      context,
+                                      ReportedSnackbar(),
+                                    );
+                                  },
                                 ),
                               ],
                             ),

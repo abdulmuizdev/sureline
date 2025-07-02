@@ -98,30 +98,26 @@ class _VoteOnNextFeatureBottomSheetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: Utils.bottomSheetDecoration(),
+      padding: const EdgeInsets.only(left: 18, right: 18),
+      decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
       child: Stack(
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: EdgeInsets.only(left: 18, top: 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SurelineBackButton(title: 'Settings'),
-                    SizedBox(height: 27),
-                    Text(
-                      'Vote on next feature',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Vote on next feature',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryColor,
                     ),
-                    SizedBox(height: 10),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 10),
+                ],
               ),
               Expanded(child: WebViewWidget(controller: _controller)),
             ],

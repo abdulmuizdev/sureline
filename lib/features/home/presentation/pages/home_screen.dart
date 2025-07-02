@@ -64,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool _showLikeProgress = false;
   bool _showWaterMark = true;
   int _likeCount = 0;
+  int _currentIndex = 0;
 
   final ScreenshotCallback screenshotCallback = ScreenshotCallback();
 
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       screenshotCallback.addListener(() {
-        _openShareDialog();
+        _showShareBottomSheet(_currentIndex);
       });
       await Future.delayed(Duration(seconds: 1));
 
@@ -218,6 +219,11 @@ class _HomeScreenState extends State<HomeScreen>
                             controller: _pageController,
                             scrollDirection: Axis.vertical,
                             onPageChanged: (int pageIndex) {
+                              // Update current index
+                              setState(() {
+                                _currentIndex = pageIndex;
+                              });
+
                               if (_quotes.isNotEmpty) {
                                 context.read<HomeBloc>().add(
                                   MarkQuoteAsShown(_quotes[pageIndex].id),
@@ -467,6 +473,7 @@ class _HomeScreenState extends State<HomeScreen>
         useSafeArea: true,
         builder:
             (context) => ShareControlsBottomSheet(
+              quoteId: _quotes[index].id,
               isWaterMarkShowing: _showWaterMark,
               onHideWaterMarkPressed: _hideWaterMark,
               quoteKey: _quotes[index].quoteKey,

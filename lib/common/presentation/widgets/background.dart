@@ -10,8 +10,17 @@ class Background extends StatefulWidget {
   final ThemeBackgroundEntity? entity;
   final bool? mute;
   final bool? isPreview;
+  final double? width;
+  final double? height;
 
-  const Background({super.key, this.entity, this.mute, this.isPreview});
+  const Background({
+    super.key,
+    this.entity,
+    this.mute,
+    this.isPreview,
+    this.width,
+    this.height,
+  });
 
   @override
   State<Background> createState() => _BackgroundState();
@@ -86,30 +95,36 @@ class _BackgroundState extends State<Background> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth =
+        widget.width ?? MediaQuery.of(context).size.width;
+    final double screenHeight =
+        widget.height ?? MediaQuery.of(context).size.height;
+
     if (_color != null) {
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        color: _color,
-      );
+      return Container(width: screenWidth, height: screenHeight, color: _color);
     }
     if ((widget.isPreview ?? false) && _previewImage != null) {
-      return CachedNetworkImage(imageUrl: _previewImage!, fit: BoxFit.cover);
+      return CachedNetworkImage(
+        imageUrl: _previewImage!,
+        fit: BoxFit.cover,
+        width: screenWidth,
+        height: screenHeight,
+      );
     }
 
     if (_isLocallyStored ?? false) {
       return Image.file(
         File(_path!),
         fit: BoxFit.cover,
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
+        width: screenWidth,
+        height: screenHeight,
       );
     }
 
     if (_isLiveBackground ?? false) {
       return SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
+        width: screenWidth,
+        height: screenHeight,
         child: VideoPlayer(_backgroundVideoController!),
       );
     }
@@ -118,14 +133,14 @@ class _BackgroundState extends State<Background> {
         ? Image.network(
           _path!,
           fit: BoxFit.cover,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+          width: screenWidth,
+          height: screenHeight,
         )
         : Image.asset(
           _path!,
           fit: BoxFit.cover,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+          width: screenWidth,
+          height: screenHeight,
         );
   }
 }

@@ -110,6 +110,7 @@ class Utils {
   }
 
   static void showCustomSnackBar(BuildContext context, Widget widget) {
+    HapticFeedback.lightImpact();
     final overlay = Overlay.of(context);
     late OverlayEntry entry;
 

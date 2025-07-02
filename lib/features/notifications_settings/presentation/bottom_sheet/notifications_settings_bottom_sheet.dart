@@ -66,13 +66,11 @@ class _NotificationsSettingsBottomSheetState
         child: BlocBuilder<NotificationSettingBloc, NotificationSettingState>(
           builder: (context, state) {
             return Container(
-              padding: const EdgeInsets.only(left: 18, right: 18, top: 18),
-              decoration: Utils.bottomSheetDecoration(),
+              padding: const EdgeInsets.only(left: 18, right: 18),
+              decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SurelineBackButton(title: 'Sureline'),
-                  SizedBox(height: 27),
                   Text(
                     'Notifications',
                     style: TextStyle(

@@ -27,7 +27,9 @@ class _SoundBottomSheetState extends State<SoundBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => locator<SoundBloc>()..add(GetVolume()))],
+      providers: [
+        BlocProvider(create: (_) => locator<SoundBloc>()..add(GetVolume())),
+      ],
       child: BlocListener<SoundBloc, SoundState>(
         listener: (context, state) {
           if (state is GotVolume) {
@@ -37,13 +39,11 @@ class _SoundBottomSheetState extends State<SoundBottomSheet> {
         child: BlocBuilder<SoundBloc, SoundState>(
           builder: (context, state) {
             return Container(
-              padding: const EdgeInsets.all(18),
-              decoration: Utils.bottomSheetDecoration(),
+              padding: const EdgeInsets.only(left: 18, right: 18),
+              decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SurelineBackButton(title: 'Settings'),
-                  SizedBox(height: 27),
                   Text(
                     'Sound',
                     style: TextStyle(
@@ -78,7 +78,7 @@ class _SoundBottomSheetState extends State<SoundBottomSheet> {
                         _sliderValue = val;
                       });
                     },
-                    onChangeEnd: (val){
+                    onChangeEnd: (val) {
                       context.read<SoundBloc>().add(SetVolume(val));
                     },
                   ),

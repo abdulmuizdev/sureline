@@ -44,6 +44,7 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
   ) : super(Initial()) {
     on<OpenInstagram>((event, emit) async {
       _renderPost(event, (url) {
+        print('ig post is rendered');
         DirectSocialShare.shareOnInstagram(
           url,
           !event.entity.renderEntity.isLiveBackground,

@@ -38,6 +38,9 @@ class ThemeSelectorBloc extends Bloc<ThemeSelectorEvent, ThemeSelectorState> {
     on<ChangeTheme>((event, emit) async {
       emit(ChangingTheme());
       HapticFeedback.lightImpact();
+      print(
+        'change theme is called in bloc with font size ${event.entity.textDecorEntity.fontSize}',
+      );
       final result = await _changeThemeUseCase.execute(event.entity);
       result.fold((left) {}, (right) {
         emit(ChangedTheme());

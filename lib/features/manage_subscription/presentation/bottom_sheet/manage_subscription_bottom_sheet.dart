@@ -40,13 +40,11 @@ class _ManageSubscriptionBottomSheetState
         child: BlocBuilder<SubscriptionRecordBloc, SubscriptionRecordState>(
           builder: (context, state) {
             return Container(
-              padding: const EdgeInsets.only(left: 18, top: 18, right: 18),
-              decoration: Utils.bottomSheetDecoration(),
+              padding: const EdgeInsets.only(left: 18, right: 18),
+              decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SurelineBackButton(title: 'Sureline'),
-                  const SizedBox(height: 27),
                   Text(
                     'Manage Subscription',
                     style: TextStyle(

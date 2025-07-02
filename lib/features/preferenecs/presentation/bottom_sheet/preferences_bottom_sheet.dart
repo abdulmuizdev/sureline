@@ -1,32 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:sureline/common/domain/entities/streak_display_entity.dart';
-import 'package:sureline/common/domain/use_cases/convert_widget_to_png_use_case.dart';
-import 'package:sureline/common/presentation/dialog/streak/widget/streak_container.dart';
-import 'package:sureline/common/presentation/widgets/heading.dart';
-import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/app_icon_selection/presentation/bottom_sheet/app_icon_setting_bottom_sheet.dart';
-import 'package:sureline/features/collections/presentation/pages/default/collections_bottom_sheet.dart';
-import 'package:sureline/features/favourites/presentation/pages/favourites_bottom_sheet.dart';
-import 'package:sureline/features/general_settings/default/presentation/pages/general_settings_bottom_sheet.dart';
-import 'package:sureline/features/history/presentation/pages/history_bottom_sheet.dart';
-
-import 'package:sureline/features/home_widget/presentation/bottom_sheet/home_widget_bottom_sheet.dart';
-import 'package:sureline/features/notifications_settings/presentation/bottom_sheet/notifications_settings_bottom_sheet.dart';
-import 'package:sureline/common/presentation/widgets/settings_list_item.dart';
-import 'package:sureline/features/own_quotes/presentation/pages/own_quotes_bottom_sheet.dart';
-import 'package:sureline/features/practice/presentation/bottom_sheets/practice_bottom_sheet.dart';
-import 'package:sureline/features/practice/presentation/dialogs/practice_appreciation_dialog.dart';
-import 'package:sureline/features/practice/presentation/dialogs/practice_dialog.dart';
-import 'package:sureline/features/preferenecs/presentation/bloc/preferences_bloc.dart';
-import 'package:sureline/features/preferenecs/presentation/bloc/preferences_event.dart';
-import 'package:sureline/features/preferenecs/presentation/bloc/preferences_state.dart';
-import 'package:sureline/features/search/presentation/pages/search_bottom_sheet.dart';
-import 'package:sureline/features/watch/presentation/bottom_sheet/watch_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/presentation/bottom_sheet/sub_pages/preferences_main_page.dart';
 
 class PreferencesBottomSheet extends StatefulWidget {
   const PreferencesBottomSheet({super.key});
@@ -36,323 +11,73 @@ class PreferencesBottomSheet extends StatefulWidget {
 }
 
 class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
-  List<StreakDisplayEntity> _streakData = [];
-  bool _isShareEnabled = true;
-  bool _showStreak = true;
-  int _favouritesCount = 0;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  String _appBarTitle = 'Done';
+
+  @override
+  void initState() {
+    super.initState();
+    _navigatorKey.currentState?.setState(() {});
+  }
+
+  void _handleBack() {
+    if (_navigatorKey.currentState?.canPop() ?? false) {
+      setState(() {
+        _appBarTitle = 'Done';
+      });
+      _navigatorKey.currentState?.pop();
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create:
-              (_) =>
-                  locator<PreferencesBloc>()
-                    ..add(GetLastSevenDaysStreakData())
-                    ..add(GetStreakStatus())
-                    ..add(GetFavouritesCount()),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(30),
+          topLeft: Radius.circular(30),
         ),
-      ],
-      child: BlocListener<PreferencesBloc, PreferencesState>(
-        listener: (context, state) {
-          if (state is GotRandomQuotes) {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              useSafeArea: true,
-              context: context,
-              builder:
-                  (context) => PracticeBottomSheet(
-                    quotes: state.result,
-                    perQuoteDuration: state.perQuoteDuration,
+        color: AppColors.white,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 18, left: 18, right: 18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _handleBack();
+                  },
+                  child: Text(
+                    _appBarTitle,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      color: AppColors.primaryColor,
+                    ),
                   ),
-            ).then((showAppreciationDialog) {
-              if (!showAppreciationDialog) {
-                return;
-              }
-              if (!context.mounted) return;
-              showGeneralDialog(
-                context: context,
-                barrierDismissible: true,
-                barrierLabel: '',
-                transitionDuration: const Duration(milliseconds: 500),
-                pageBuilder:
-                    (context, animation, secondaryAnimation) => Center(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 20),
-                        child: PracticeAppreciationDialog(),
-                      ),
-                    ),
-                transitionBuilder: Utils.dialogTransitionBuilder,
-              );
-            });
-          }
-          if (state is GotStreakStatus) {
-            _showStreak = state.isEnabled;
-          }
-          if (state is GotLastSevenDaysStreakData) {
-            _streakData = state.result;
-          }
-          if (state is RenderingStreakPost) {
-            _isShareEnabled = false;
-          }
-          if (state is RenderedStreakPost) {
-            _isShareEnabled = true;
-          }
-          if (state is GotFavouritesCount) {
-            _favouritesCount = state.count;
-          }
-        },
-        child: BlocBuilder<PreferencesBloc, PreferencesState>(
-          builder: (context, state) {
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(30),
-                  topLeft: Radius.circular(30),
                 ),
-                color: AppColors.white,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 18, left: 18, right: 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(
-                        'Done',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 27),
-                    Text(
-                      'Sureline',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 16),
-                            if (_streakData.isNotEmpty && _showStreak) ...[
-                              StreakContainer(
-                                hideText: true,
-                                increaseOpacity: true,
-                                entities: _streakData,
-                                showShare: true,
-                                isShareEnabled: _isShareEnabled,
-                                onSharePressed: () {
-                                  debugPrint('share is pressed');
-                                  context.read<PreferencesBloc>().add(
-                                    OnShareStreakPressed(
-                                      screenWidth:
-                                          MediaQuery.of(context).size.width,
-                                      screenHeight:
-                                          MediaQuery.of(context).size.height,
-                                    ),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 22),
-                            ],
-
-                            Heading(text: 'SETTINGS'),
-
-                            SizedBox(height: 15),
-
-                            SettingsListItem(
-                              title: 'General',
-                              isFirst: true,
-                              icon: CupertinoIcons.settings,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder:
-                                      (context) => GeneralSettingsBottomSheet(),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'App icon',
-                              icon: Icons.menu_rounded,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder:
-                                      (context) => AppIconSettingBottomSheet(),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'Reminders',
-                              icon: CupertinoIcons.alarm,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder:
-                                      (context) =>
-                                          NotificationsSettingsBottomSheet(),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'Home Screen widgets',
-                              icon: CupertinoIcons.heart,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder: (context) => HomeWidgetBottomSheet(),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'Watch',
-                              icon: Icons.watch_rounded,
-                              isLast: true,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder: (context) => WatchBottomSheet(),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 22),
-                            Heading(text: 'YOUR QUOTES'),
-                            SizedBox(height: 15),
-                            SettingsListItem(
-                              title: 'Collections',
-                              icon: CupertinoIcons.bookmark,
-                              isFirst: true,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder:
-                                      (context) => CollectionsBottomSheet(),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'Your own quotes',
-                              icon: CupertinoIcons.heart,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder: (context) => OwnQuotesBottomSheet(),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'Practice',
-                              icon: CupertinoIcons.play,
-                              onPressed: () async {
-                                final int? option =
-                                    await showGeneralDialog<int>(
-                                      context: context,
-                                      barrierDismissible: true,
-                                      barrierLabel: '',
-                                      transitionDuration: const Duration(
-                                        milliseconds: 500,
-                                      ),
-
-                                      pageBuilder:
-                                          (
-                                            context,
-                                            animation,
-                                            secondaryAnimation,
-                                          ) => Center(
-                                            child: Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 20,
-                                                  ),
-                                              child: PracticeDialog(),
-                                            ),
-                                          ),
-                                      transitionBuilder:
-                                          Utils.dialogTransitionBuilder,
-                                    );
-                                if (!context.mounted || option == null) return;
-                                context.read<PreferencesBloc>().add(
-                                  GetRandomQuotes(option),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'Search',
-                              icon: CupertinoIcons.search,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder: (context) => SearchBottomSheet(),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'History',
-                              icon: CupertinoIcons.hourglass_bottomhalf_fill,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder: (context) => HistoryBottomSheet(),
-                                );
-                              },
-                            ),
-                            SettingsListItem(
-                              title: 'Favourites ($_favouritesCount)',
-                              icon: CupertinoIcons.heart,
-                              isLast: true,
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  useSafeArea: true,
-                                  context: context,
-                                  builder: (context) => FavouritesBottomSheet(),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 15),
-                            SizedBox(height: 22),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+                SizedBox(height: 27),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Navigator(
+              key: _navigatorKey,
+              onGenerateRoute: (settings) {
+                return CupertinoPageRoute(
+                  builder: (context) => PreferencesMainPage(),
+                  settings: settings,
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

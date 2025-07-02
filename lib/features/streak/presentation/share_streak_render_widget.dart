@@ -6,7 +6,15 @@ import 'package:sureline/common/presentation/widgets/watermark.dart';
 
 class ShareStreakRenderWidget extends StatelessWidget {
   final String streakScore;
-  const ShareStreakRenderWidget({super.key, required this.streakScore});
+  final double? width;
+  final double? height;
+
+  const ShareStreakRenderWidget({
+    super.key,
+    required this.streakScore,
+    this.width,
+    this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +24,7 @@ class ShareStreakRenderWidget extends StatelessWidget {
         color: AppColors.pureWhite,
         child: Stack(
           children: [
-            Positioned.fill(child: Background()),
+            Positioned.fill(child: Background(width: width, height: height)),
             Transform.scale(
               scale: 1,
               child: Center(

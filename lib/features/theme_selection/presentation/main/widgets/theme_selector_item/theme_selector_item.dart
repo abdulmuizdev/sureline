@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
 import 'package:sureline/common/presentation/widgets/playable.dart';
+import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bottom_sheets/create_and_edit_theme_bottom_sheet.dart';
 import 'package:sureline/features/theme_selection/presentation/main/widgets/theme_selector_item/widget/edit_button.dart';
@@ -144,10 +146,13 @@ class _ThemeSelectorItemState extends State<ThemeSelectorItem> {
                   Center(
                     child: Text(
                       'Sureline',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: widget.entity.textDecorEntity.textColor,
+                      style: GoogleFonts.getFont(
+                        widget.entity.textDecorEntity.fontFamily,
+                        textStyle: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: widget.entity.textDecorEntity.textColor,
+                        ),
                       ),
                     ),
                   ),

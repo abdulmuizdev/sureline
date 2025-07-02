@@ -8,6 +8,7 @@ import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
+import 'package:sureline/core/utils/utils.dart';
 import 'package:sureline/features/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 import 'package:sureline/features/search/domain/entity/search_entity.dart';
@@ -49,15 +50,9 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
           builder: (context, state) {
             return Portal(
               child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(30),
-                    topLeft: Radius.circular(30),
-                  ),
-                  color: AppColors.white,
-                ),
+                decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
                 child: Padding(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.only(left: 18, right: 18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

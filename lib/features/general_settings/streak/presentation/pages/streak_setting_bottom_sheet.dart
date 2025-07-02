@@ -43,14 +43,11 @@ class _StreakSettingBottomSheetState extends State<StreakSettingBottomSheet> {
         child: BlocBuilder<StreakBloc, StreakState>(
           builder: (context, state) {
             return Container(
-              padding: const EdgeInsets.all(18),
-              decoration: Utils.bottomSheetDecoration(),
+              padding: const EdgeInsets.only(left: 18, right: 18),
+              decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
               child: Column(
-                // mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SurelineBackButton(title: 'Settings'),
-                  SizedBox(height: 27),
                   Text(
                     'Streak',
                     style: TextStyle(

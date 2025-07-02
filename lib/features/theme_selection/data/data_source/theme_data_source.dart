@@ -26,13 +26,14 @@ class ThemeDataSourceImpl extends ThemeDataSource {
   @override
   Future<Either<Failure, List<ThemeModel>>> getThemes() async {
     List<ThemeModel> spThemes = _getThemesFromSP();
-    if (spThemes.isEmpty) {
+    if (spThemes.isEmpty || spThemes != SurelineThemes.values) {
+      debugPrint('Initializing themes');
       await _initializeThemesInSP();
       spThemes = _getThemesFromSP();
     }
 
     if (spThemes.isEmpty) {
-      debugPrint('themes not found in sp, initializing');
+      debugPrint('Themes not found in sp after initialization');
       return Left(UnknownFailure());
     }
 
@@ -54,9 +55,16 @@ class ThemeDataSourceImpl extends ThemeDataSource {
   @override
   Future<Either<Failure, void>> changeTheme(ThemeModel newModel) async {
     try {
+      print(
+        'change theme is called with font size ${newModel.textDecorModel.fontSize}',
+      );
       List<ThemeModel> spThemes = _getThemesFromSP();
-      debugPrint('debug starts');
-      debugPrint(newModel.backgroundModel.previewImage);
+
+      debugPrint('new model id: ${newModel.id}');
+      for (int i = 0; i < spThemes.length; i++) {
+        debugPrint('Theme ${i}: ${spThemes[i].id}');
+      }
+
       int foundIndex = spThemes.indexWhere((model) {
         return model.id == newModel.id;
       });
@@ -129,11 +137,16 @@ class ThemeDataSourceImpl extends ThemeDataSource {
     // App.homeActionColor = model.actionButtonColor;
     // App.homeButtonColor = model.buttonColor;
 
-    App.themeEntity = ThemeEntity(
-      textDecorEntity: ThemeTextDecorEntity.fromModel(model.textDecorModel),
-      backgroundEntity: ThemeBackgroundEntity.fromModel(model.backgroundModel),
-      previewQuote: model.previewQuote,
-      lastAccessed: DateTime.now(),
+    // App.themeEntity = ThemeEntity(
+    //   textDecorEntity: ThemeTextDecorEntity.fromModel(model.textDecorModel),
+    //   backgroundEntity: ThemeBackgroundEntity.fromModel(model.backgroundModel),
+    //   previewQuote: model.previewQuote,
+    //   lastAccessed: DateTime.now(),
+    // );
+    print('font size model check is this ${model.textDecorModel.fontSize}');
+    App.themeEntity = ThemeEntity.fromModel(model);
+    print(
+      'font size app check is this ${App.themeEntity.textDecorEntity.fontSize}',
     );
   }
 
@@ -167,6 +180,12 @@ class ThemeDataSourceImpl extends ThemeDataSource {
         SurelineThemes.values
             .map((entity) => ThemeModel.fromEntity(entity).toJson())
             .toList();
+
+    debugPrint('themes: ${themes.length}');
+    for (int i = 0; i < themes.length; i++) {
+      debugPrint('Theme ${i}: ${themes[i]['id']}');
+    }
+
     await prefs.setString(SP.themes, json.encode(themes));
   }
 }

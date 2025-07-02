@@ -24,7 +24,7 @@ class DirectSocialShare {
             'isImage': isImage ?? false,
           })
           .then((result) {
-            debugPrint(result);
+            print(result);
           });
     } catch (e) {
       debugPrint('${e}');

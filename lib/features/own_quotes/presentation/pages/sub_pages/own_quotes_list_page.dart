@@ -55,7 +55,7 @@ class _OwnQuotesListPageState extends State<OwnQuotesListPage> {
             if (_ownQuotes.isEmpty) {
               return Container(
                 color: AppColors.white,
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.only(left: 18, right: 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

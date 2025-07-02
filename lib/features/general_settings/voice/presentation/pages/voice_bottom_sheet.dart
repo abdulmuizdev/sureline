@@ -40,14 +40,11 @@ class _VoiceBottomSheetState extends State<VoiceBottomSheet> {
         child: BlocBuilder<VoiceBloc, VoiceState>(
           builder: (context, state) {
             return Container(
-              padding: const EdgeInsets.all(18),
-              decoration: Utils.bottomSheetDecoration(),
+              padding: const EdgeInsets.only(left: 18, right: 18),
+              decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
               child: Column(
-                // mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SurelineBackButton(title: 'Settings'),
-                  SizedBox(height: 27),
                   Text(
                     'Voice',
                     style: TextStyle(
@@ -68,7 +65,9 @@ class _VoiceBottomSheetState extends State<VoiceBottomSheet> {
                           isLast: index == _voices.length - 1,
                           isSelected: _selectedIndex == index,
                           onPressed: () async {
-                            context.read<VoiceBloc>().add(OnVoiceItemPressed(_voices[index]));
+                            context.read<VoiceBloc>().add(
+                              OnVoiceItemPressed(_voices[index]),
+                            );
                             setState(() {
                               _selectedIndex = index;
                             });

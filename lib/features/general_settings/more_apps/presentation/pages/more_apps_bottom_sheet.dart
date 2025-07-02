@@ -11,14 +11,11 @@ class MoreAppsBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: Utils.bottomSheetDecoration(),
+      padding: const EdgeInsets.only(left: 18, right: 18),
+      decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
       child: Column(
-        // mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SurelineBackButton(title: 'Settings'),
-          SizedBox(height: 27),
           Text(
             'Abdul Muiz',
             style: TextStyle(
@@ -43,8 +40,8 @@ class MoreAppsBottomSheet extends StatelessWidget {
             itemBuilder: (context, index) {
               return AppListItem(
                 isFirst: index == 0,
-                isLast: index == 1-1,
-                onPressed: (){
+                isLast: index == 1 - 1,
+                onPressed: () {
                   _openInAppBrowser();
                 },
               );
@@ -54,8 +51,11 @@ class MoreAppsBottomSheet extends StatelessWidget {
       ),
     );
   }
+
   void _openInAppBrowser() async {
-    final Uri url = Uri.parse('https://apps.apple.com/us/app/carma-ai/id6741025552');
+    final Uri url = Uri.parse(
+      'https://apps.apple.com/us/app/carma-ai/id6741025552',
+    );
     if (await canLaunchUrl(url)) {
       await launchUrl(
         url,

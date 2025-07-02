@@ -4,7 +4,7 @@ import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/
 import 'package:uuid/uuid.dart';
 
 class ThemeEntity extends Equatable {
-  final String id;
+  final String? id;
   final DateTime lastAccessed;
   final String? previewQuote;
   final ThemeBackgroundEntity backgroundEntity;
@@ -12,13 +12,14 @@ class ThemeEntity extends Equatable {
   final bool isActive;
 
   ThemeEntity({
-    String? id,
+    required this.id,
     required this.lastAccessed,
     required this.textDecorEntity,
     required this.backgroundEntity,
     required this.previewQuote,
     this.isActive = false,
-  }) : id = id ?? const Uuid().v4();
+  });
+  // : id = id ?? const Uuid().v4();
 
   @override
   List<Object?> get props => [previewQuote, backgroundEntity, textDecorEntity];
@@ -30,6 +31,7 @@ class ThemeEntity extends Equatable {
       backgroundEntity: ThemeBackgroundEntity.fromModel(model.backgroundModel),
       previewQuote: model.previewQuote,
       isActive: model.isActive,
+      id: model.id,
     );
   }
 }

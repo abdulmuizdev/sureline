@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/common/presentation/widgets/bottom_sheet_app_bar.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
+import 'package:sureline/core/utils/utils.dart';
 import 'package:sureline/features/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/collections/presentation/bloc/collections_bloc.dart';
 import 'package:sureline/features/collections/presentation/bloc/collections_event.dart';
@@ -76,60 +77,53 @@ class _CollectionsBottomSheetState extends State<CollectionsBottomSheet> {
               (context) => locator<CollectionsBloc>()..add(GetCollections()),
         ),
       ],
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(30),
-          topLeft: Radius.circular(30),
-        ),
-        child: Container(
-          color: AppColors.white,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(18),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      color: AppColors.white,
-                      child: BottomSheetAppBar(
-                        title: _appBarTitle,
-                        onBack: _handleBack,
-                      ),
+      child: Container(
+        decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 18, right: 18),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    color: AppColors.white,
+                    child: BottomSheetAppBar(
+                      title: _appBarTitle,
+                      onBack: _handleBack,
                     ),
-                    if (_isAddNewVisible)
-                      GestureDetector(
-                        onTap: _handleAddNew,
-                        child: const Text(
-                          'Add new',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.normal,
-                          ),
+                  ),
+                  if (_isAddNewVisible)
+                    GestureDetector(
+                      onTap: _handleAddNew,
+                      child: const Text(
+                        'Add new',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
-              Expanded(
-                child: Navigator(
-                  key: _navigatorKey,
-                  onGenerateRoute: (settings) {
-                    return CupertinoPageRoute(
-                      builder:
-                          (context) => CollectionListPage(
-                            onDetail:
-                                () => _updateAppBarTitle('My collections'),
-                            onNext: () => _updateAppBarTitle('Back'),
-                            shouldRefreshCollections: _shouldRefreshCollections,
-                          ),
-                      settings: settings,
-                    );
-                  },
-                ),
+            ),
+            Expanded(
+              child: Navigator(
+                key: _navigatorKey,
+                onGenerateRoute: (settings) {
+                  return CupertinoPageRoute(
+                    builder:
+                        (context) => CollectionListPage(
+                          onDetail: () => _updateAppBarTitle('My collections'),
+                          onNext: () => _updateAppBarTitle('Back'),
+                          shouldRefreshCollections: _shouldRefreshCollections,
+                        ),
+                    settings: settings,
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -43,100 +43,87 @@ class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
         },
         child: BlocBuilder<MutedContentBloc, MutedContentState>(
           builder: (context, state) {
-            return Scaffold(
-              backgroundColor: Colors.transparent,
-              body: SafeArea(
-                bottom: false,
-                child: Container(
-                  decoration: Utils.bottomSheetDecoration(),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 18, top: 18, right: 18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SurelineBackButton(title: 'Settings'),
-                            SizedBox(height: 27),
-                            Text(
-                              'Muted Content',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.primaryColor,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 18),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'When you mute content, you won\'t see it in your feed, notifications, or widgets',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppColors.primaryColor.withOpacity(
-                                    0.7,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              Expanded(
-                                child: GridView.builder(
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
-                                        childAspectRatio: 170 / 85,
-                                        mainAxisSpacing: 18,
-                                        crossAxisSpacing: 18,
-                                      ),
-                                  itemCount: 2,
-                                  itemBuilder: (context, index) {
-                                    return MutedContentGridItem(
-                                      title:
-                                          index == 0
-                                              ? 'With Author'
-                                              : 'Without Author',
-                                      isSelected:
-                                          index == 0
-                                              ? _mutedContent.isWithAuthorMuted
-                                              : _mutedContent
-                                                  .isWithoutAuthorMuted,
-                                      onPressed: () {
-                                        final newOptions = _mutedContent
-                                            .copyWith(
-                                              isWithAuthorMuted:
-                                                  index == 0
-                                                      ? !_mutedContent
-                                                          .isWithAuthorMuted
-                                                      : false,
-                                              isWithoutAuthorMuted:
-                                                  index == 1
-                                                      ? !_mutedContent
-                                                          .isWithoutAuthorMuted
-                                                      : false,
-                                            );
-
-                                        context.read<MutedContentBloc>().add(
-                                          OnMutedContentPressed([newOptions]),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
+            return Container(
+              decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(left: 18, right: 18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Muted Content',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryColor,
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 10),
+                      ],
+                    ),
                   ),
-                ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'When you mute content, you won\'t see it in your feed, notifications, or widgets',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.primaryColor.withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Expanded(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    childAspectRatio: 170 / 85,
+                                    mainAxisSpacing: 18,
+                                    crossAxisSpacing: 18,
+                                  ),
+                              itemCount: 2,
+                              itemBuilder: (context, index) {
+                                return MutedContentGridItem(
+                                  title:
+                                      index == 0
+                                          ? 'With Author'
+                                          : 'Without Author',
+                                  isSelected:
+                                      index == 0
+                                          ? _mutedContent.isWithAuthorMuted
+                                          : _mutedContent.isWithoutAuthorMuted,
+                                  onPressed: () {
+                                    final newOptions = _mutedContent.copyWith(
+                                      isWithAuthorMuted:
+                                          index == 0
+                                              ? !_mutedContent.isWithAuthorMuted
+                                              : false,
+                                      isWithoutAuthorMuted:
+                                          index == 1
+                                              ? !_mutedContent
+                                                  .isWithoutAuthorMuted
+                                              : false,
+                                    );
+
+                                    context.read<MutedContentBloc>().add(
+                                      OnMutedContentPressed([newOptions]),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           },

@@ -5,6 +5,7 @@ import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
+import 'package:sureline/core/utils/utils.dart';
 import 'package:sureline/features/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
 import 'package:sureline/features/favourites/domain/entity/favourite_entity.dart';
 import 'package:sureline/features/favourites/presentation/bloc/favourites_bloc.dart';
@@ -51,13 +52,7 @@ class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
                   }
                 },
                 child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(30),
-                      topLeft: Radius.circular(30),
-                    ),
-                    color: AppColors.white,
-                  ),
+                  decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
                   child: Padding(
                     padding: const EdgeInsets.only(
                       top: 18,

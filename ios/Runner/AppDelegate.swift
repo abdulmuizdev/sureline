@@ -20,7 +20,7 @@ import WidgetKit
     private let videoRenderer = VideoRenderer()
     private var eventSink: FlutterEventSink?
     private var request: TikTokShareRequest?
-    
+
     override func application(
         _ app: UIApplication,
         open url: URL,
@@ -31,7 +31,7 @@ import WidgetKit
         }
         return false
     }
-    
+
     override func application(
         _ application: UIApplication,
         continue userActivity: NSUserActivity,
@@ -42,19 +42,19 @@ import WidgetKit
         }
         return false
     }
-    
-    
+
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
-      
-      
-      
+
+
+
       let controller = window?.rootViewController as! FlutterViewController
       channel2 = FlutterMethodChannel(name: "com.abdulmuiz.sureline/render", binaryMessenger: controller.binaryMessenger)
-      
+
       channel = FlutterMethodChannel(name: "com.abdulmuiz.sureline/share", binaryMessenger: controller.binaryMessenger)
       let widgetChannel = FlutterMethodChannel(name: "com.abdulmuiz.sureline.quoteWidget", binaryMessenger: controller.binaryMessenger)
             // Handle the method call to refresh the widget
@@ -98,7 +98,7 @@ import WidgetKit
                           result(FlutterError(code: "INVALID_ARGS", message: "Invalid arguments", details: nil))
                           return
                 }
-        
+
                 self.shareLink(isImage: isImage, targetAppIdentifier: targetAppIdentifier, schema: schema, videoURL: "file://"+path, appID: appID)
                 result(true)
             } else if call.method == "shareMessage" {
@@ -121,7 +121,7 @@ import WidgetKit
                 }
                 let fileURL = URL(fileURLWithPath: path)
                 var placeholderIdentifier: String?
-                
+
                 PHPhotoLibrary.shared().performChanges({
                     let request: PHAssetChangeRequest?;
                     if (isImage) {
@@ -129,18 +129,18 @@ import WidgetKit
                     }else {
                         request = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: fileURL)
                     }
-                    
+
                     placeholderIdentifier = request?.placeholderForCreatedAsset?.localIdentifier
                 }) { success, error in
                     if success, let identifier = placeholderIdentifier {
                         let shareRequest = TikTokShareRequest(localIdentifiers: [identifier],
                                                               mediaType: (isImage) ? .image : .video,
                                                               redirectURI: "")
-                        
+
                         DispatchQueue.main.async {
                             shareRequest.send()
 //                            shareRequest.send { response in
-//                                
+//
 //                                guard let shareResponse = response as? TikTokShareResponse else { return }
 //                                if shareResponse.errorCode == .noError {
 //                                    print("Share succeeded!")
@@ -149,7 +149,7 @@ import WidgetKit
 //                                           print("Error Code: \(shareResponse.errorCode.rawValue)")
 //                                    print("Error Message: \(shareResponse.errorDescription ?? "")")
 //                                    print("Share State: \(shareResponse.shareState)")
-//                                           
+//
 //                                }
 //                            }
                         }
@@ -158,8 +158,8 @@ import WidgetKit
                         print(error)
                     }
                 }
-                
-                
+
+
             } else if call.method == "shareInstagram" {
                 guard let args = call.arguments as? [String: Any],
                       let path = args["path"] as? String,
@@ -169,25 +169,25 @@ import WidgetKit
                           result(FlutterError(code: "INVALID_ARGS", message: "Invalid arguments", details: nil))
                           return
                 }
-                
+
                 self.postToFeed(isImage: isImage, path: path, caption: "from Sureline", bounds: controller.view.bounds, view: controller.view)
-                
+
 
 //                guard FileManager.default.fileExists(atPath: path) else {
 //                    print("File does not exist")
 //                    return
 //                }
 //                let documentController = UIDocumentInteractionController(url: videoURL)
-//                
+//
 //                documentController.uti = "com.instagram.photo"
 //                documentController.delegate = nil
 //                DispatchQueue.main.async {
 //                    documentController.presentOptionsMenu(from: controller.view.bounds, in: controller.view, animated: true)
 //                }
-                
-                
+
+
             }else if call.method == "shareFacebook" {
-                
+
                 guard let args = call.arguments as? [String: Any],
                       let path = args["path"] as? String
                 else
@@ -202,24 +202,24 @@ import WidgetKit
                 let photo = SharePhoto(image: image, isUserGenerated: true)
                 let content = SharePhotoContent()
                 content.photos = [photo]
-                
+
                 content.hashtag = Hashtag("#sureline")
 
             self.dialog(controller: controller, withContent: content).show()
-            
+
 
             }
               else {
               result(FlutterMethodNotImplemented)
             }
           }
-      
+
       channel2?.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
                   if call.method == "addTextOverlay",
                      let args = call.arguments as? [String: Any],
                      let videoPath = args["videoPath"] as? String,
                      let textImageURL = args["textImageURL"] as? String {
-                      
+
                       self.videoRenderer.makeVideoPlayerItem(videoURL: videoPath, textImageURL: textImageURL) { url, progress in
                           if let sink = self.eventSink {
                               if let url = url {
@@ -230,7 +230,7 @@ import WidgetKit
                           }
                       }
                       result(nil) // Acknowledge the method call; responses will be via eventSink
-                  
+
 
                   } else {
                       result(FlutterMethodNotImplemented)
@@ -239,7 +239,7 @@ import WidgetKit
       // Event channel to send progress updates
               let eventChannel = FlutterEventChannel(name: "com.abdulmuiz.sureline/facebook_events", binaryMessenger: controller.binaryMessenger)
               eventChannel.setStreamHandler(self)
-     
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
     func copyImageToAppGroup(path: String) {
@@ -273,7 +273,7 @@ import WidgetKit
         )
     }
     func postToFeed(isImage: Bool, path: String, caption: String, bounds: CGRect, view: UIView) {
-            
+
             PHPhotoLibrary.shared().performChanges({
                 if (!isImage){
                     guard let url = URL(string: "file://"+path) else {
@@ -284,7 +284,7 @@ import WidgetKit
                 }else {
                     PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: URL(string: path)!)
                 }
-                
+
             }, completionHandler: { [weak self] success, error in
                 if success {
                     let fetchOptions = PHFetchOptions()
@@ -295,11 +295,11 @@ import WidgetKit
                     }else {
                         fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
                     }
-                    
+
                     if let lastAsset = fetchResult.firstObject {
                         let localIdentifier = lastAsset.localIdentifier
                         let urlFeed = "instagram://library?LocalIdentifier=" + localIdentifier
-                        
+
                         guard let url = URL(string: urlFeed) else {
                             print("Could not open url")
                             return
@@ -315,7 +315,7 @@ import WidgetKit
                                     UIApplication.shared.openURL(url)
 //                                    self?.delegate?.success()
                                     print("success")
-                                    
+
                                 }
                             } else {
 //                                self?.delegate?.error(message: "Instagram not found")
@@ -333,22 +333,22 @@ import WidgetKit
                 }
             })
         }
-    
+
     func shareLink(isImage: Bool, targetAppIdentifier: String, schema: String, videoURL: String?, appID: String) {
         print(videoURL ?? "videoURL")
         guard let url = URL(string: videoURL!) else { return }
         let data = try? Data.init(contentsOf: url) as Data
-        
+
         let finalSchema: String
-        
+
         if (schema == "instagram-stories") {
             finalSchema = schema+"://share?source_application="+appID;
         }else {
             finalSchema = schema+"://share"
         }
-        
 
-        
+
+
         if let urlSchema = URL(string: finalSchema){
             if UIApplication.shared.canOpenURL(urlSchema) {
                 let pasteboardItems: [[String: Any]]
@@ -373,7 +373,7 @@ import WidgetKit
             }
         }
     }
-    
+
     private func presentMessageCompose(with path: String, from controller: UIViewController, result: @escaping FlutterResult) {
         guard MFMessageComposeViewController.canSendAttachments() else {
             result(FlutterError(code: "UNAVAILABLE", message: "Messages app not available", details: nil))
@@ -382,7 +382,7 @@ import WidgetKit
 
         let messageVC = MFMessageComposeViewController()
         messageVC.messageComposeDelegate = self
-        messageVC.body = "Check this video!"
+        messageVC.body = "Check this quote!"
 
         let videoURL = URL(fileURLWithPath: path)
         if FileManager.default.fileExists(atPath: path) {
@@ -416,7 +416,7 @@ extension AppDelegate: FlutterStreamHandler {
         self.eventSink = events
         return nil
     }
-    
+
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
         self.eventSink = nil
         return nil

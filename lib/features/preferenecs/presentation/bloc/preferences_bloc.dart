@@ -17,7 +17,8 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
   final GetLastSevenDaysStreakDataUseCase _getLastSevenDaysStreakDataUseCase;
   final GetTotalStreakScoreUseCase _getTotalStreakScoreUseCase;
   final GetFavouritesCountUseCase _getFavouritesCountUseCase;
-  final GetQuotesFromRecommendationAlgorithm _getQuotesFromRecommendationAlgorithm;
+  final GetQuotesFromRecommendationAlgorithm
+  _getQuotesFromRecommendationAlgorithm;
   final SharedPreferences prefs;
 
   PreferencesBloc(
@@ -46,7 +47,11 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
       final scoreResult = _getTotalStreakScoreUseCase.execute();
       await scoreResult.fold((left) {}, (right) async {
         final result = await _convertWidgetToPngUseCase.execute(
-          ShareStreakRenderWidget(streakScore: right.toString()),
+          ShareStreakRenderWidget(
+            streakScore: right.toString(),
+            width: event.screenWidth,
+            height: event.screenHeight,
+          ),
           screenHeight: event.screenHeight,
           screenWidth: event.screenWidth,
           pixelRatio: 3,
@@ -62,7 +67,9 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
     on<GetRandomQuotes>((event, emit) async {
       final quotesLength = _getRandomQuotesLength(event.option);
       final perQuoteDuration = _getPerQuoteDuration(event.option);
-      final result = await _getQuotesFromRecommendationAlgorithm.call(quotesLength);
+      final result = await _getQuotesFromRecommendationAlgorithm.call(
+        quotesLength,
+      );
       result.fold((left) {}, (right) {
         emit(GotRandomQuotes(right, perQuoteDuration));
       });

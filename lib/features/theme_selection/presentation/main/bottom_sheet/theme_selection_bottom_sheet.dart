@@ -14,6 +14,7 @@ import 'package:sureline/features/theme_selection/presentation/main/widgets/them
 import 'package:sureline/features/theme_selection/presentation/main/widgets/theme_selector_item/theme_selector_item.dart';
 import 'package:sureline/features/theme_selection/presentation/main/widgets/theme_type_selector_item.dart';
 import 'package:sureline/features/theme_selection/presentation/theme_mixes/bottom_sheet/theme_mixes_bottom_sheet.dart';
+import 'package:uuid/uuid.dart';
 
 class ThemeSelectionBottomSheet extends StatefulWidget {
   final String quote;
@@ -149,6 +150,7 @@ class _ThemeSelectionBottomSheetState extends State<ThemeSelectionBottomSheet> {
                                                               .backgroundEntity,
                                                       previewQuote:
                                                           widget.quote,
+                                                      id: Uuid().v4(),
                                                     ),
                                                   ),
                                         );

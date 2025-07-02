@@ -39,46 +39,36 @@ class _HelpBottomSheetState extends State<HelpBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        bottom: false,
-        child: Container(
-          decoration: Utils.bottomSheetDecoration(),
-          child: Column(
+    return Container(
+      padding: const EdgeInsets.only(left: 18, right: 18),
+      decoration: Utils.bottomSheetDecoration(ignoreCorners: true),
+      child: Column(
+        children: [
+          // Fixed header
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Fixed header
-              Container(
-                padding: EdgeInsets.only(left: 18, top: 18, right: 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SurelineBackButton(title: 'Settings'),
-                    SizedBox(height: 27),
-                    Text(
-                      'Help',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                  ],
+              Text(
+                'Help',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryColor,
                 ),
               ),
-              // Scrollable WebView
-              Expanded(
-                child: Stack(
-                  children: [
-                    WebViewWidget(controller: _controller),
-                    if (_isLoading) Center(child: CircularProgressIndicator()),
-                  ],
-                ),
-              ),
+              SizedBox(height: 10),
             ],
           ),
-        ),
+          // Scrollable WebView
+          Expanded(
+            child: Stack(
+              children: [
+                WebViewWidget(controller: _controller),
+                if (_isLoading) Center(child: CircularProgressIndicator()),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

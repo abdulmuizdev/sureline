@@ -210,6 +210,7 @@ class _CreateAndEditThemeBottomSheetState
                                     previewImage: _previewUrl,
                                   ),
                                   previewQuote: widget.entity.previewQuote,
+                                  id: widget.entity.id,
                                 ),
                               ),
                             );
@@ -496,6 +497,7 @@ class _CreateAndEditThemeBottomSheetState
           isLocallyStored: _isImageLocallyStored,
         ),
         previewQuote: widget.entity.previewQuote,
+        id: widget.entity.id,
       );
 
       if (newEntity == widget.entity) {
