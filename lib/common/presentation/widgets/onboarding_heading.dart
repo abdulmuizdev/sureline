@@ -28,7 +28,7 @@ class OnboardingHeading extends StatelessWidget {
               ),
       child: Column(
         children: [
-          if (!(disableTopMargin ?? false)) ...[SizedBox(height: 50)],
+          if (!(disableTopMargin ?? false)) ...[SizedBox(height: 20)],
           Text(
             title,
             textAlign: TextAlign.center,

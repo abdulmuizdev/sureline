@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/general_settings/author_preferences/data/model/author_pref_model.dart';
-import 'package:sureline/features/general_settings/muted_content/domain/entity/muted_content_entity.dart';
+import 'package:sureline/features/preferenecs/general_settings/author_preferences/data/model/author_pref_model.dart';
+import 'package:sureline/features/preferenecs/general_settings/muted_content/domain/entity/muted_content_entity.dart';
 import 'package:sureline/features/recommendation_algorithm/data/data_source/recommendation_algorithm_data_source.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/repository/recommendation_algorithm_repository.dart';
@@ -18,8 +18,11 @@ class RecommendationAlgorithmRepositoryImpl
   }
 
   @override
-  Future<Either<Failure, List<QuoteEntity>>> getQuotes(int page) async {
-    return dataSource.getQuotes(page);
+  Future<Either<Failure, List<QuoteEntity>>> getQuotes({
+    int? page,
+    int? limit,
+  }) async {
+    return dataSource.getQuotes(page: page, limit: limit);
   }
 
   @override

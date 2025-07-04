@@ -3,9 +3,9 @@ import 'package:sureline/core/db/app_database.dart';
 import 'package:sureline/core/db/tables/author_prefs_table.dart';
 import 'package:sureline/core/db/tables/quotes.dart';
 import 'package:sureline/core/db/tables/favourites.dart';
-import 'package:sureline/features/general_settings/author_preferences/data/model/author_pref_model.dart';
-import 'package:sureline/features/general_settings/author_preferences/domain/entity/author_pref_entity.dart';
-import 'package:sureline/features/general_settings/muted_content/data/model/muted_content_model.dart';
+import 'package:sureline/features/preferenecs/general_settings/author_preferences/data/model/author_pref_model.dart';
+import 'package:sureline/features/preferenecs/general_settings/author_preferences/domain/entity/author_pref_entity.dart';
+import 'package:sureline/features/preferenecs/general_settings/muted_content/data/model/muted_content_model.dart';
 
 part 'author_prefs_table_dao.g.dart';
 

@@ -1,4 +1,4 @@
-import 'package:sureline/features/general_settings/voice/data/model/voice_model.dart';
+import 'package:sureline/features/preferenecs/general_settings/voice/data/model/voice_model.dart';
 
 class SurelineVoices {
   // static final List<VoiceModel> values = [

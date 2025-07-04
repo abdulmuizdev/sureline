@@ -13,7 +13,7 @@ import 'package:shared_preference_app_group/shared_preference_app_group.dart';
 import 'package:sureline/common/domain/entities/streak_display_entity.dart';
 import 'package:sureline/common/presentation/dialog/streak/page/streak_bottom_sheet.dart';
 import 'package:sureline/core/constants/sp.dart';
-import 'package:sureline/features/general_settings/streak/presentation/pages/streak_setting_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/general_settings/streak/presentation/pages/streak_setting_bottom_sheet.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/constants.dart';
@@ -28,7 +28,7 @@ import 'package:sureline/features/home/presentation/dialogs/share_bottom_sheet.d
 import 'package:sureline/features/home/presentation/snackbars/feed_setup_snack_bar.dart';
 import 'package:sureline/features/home/presentation/widgets/home_list_item.dart';
 import 'package:sureline/common/presentation/widgets/watermark.dart';
-import 'package:sureline/features/preferenecs/presentation/bottom_sheet/preferences_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/default/presentation/bottom_sheet/preferences_bottom_sheet.dart';
 import 'package:sureline/features/share/presentation/pages/share_controls_bottom_sheet.dart';
 import 'package:sureline/features/home/presentation/widgets/home_button.dart';
 import 'package:sureline/features/home/presentation/widgets/like_progress.dart';
@@ -154,13 +154,19 @@ class _HomeScreenState extends State<HomeScreen>
             );
           }
           if (state is ShowStreakBottomSheet) {
-            showModalBottomSheet(
-              useSafeArea: true,
-              isScrollControlled: true,
-              context: context,
-              builder:
-                  (context) => StreakBottomSheet(entities: state.streakData),
-            );
+            Future.delayed(Duration(milliseconds: 1000), () {
+              if (mounted && context.mounted) {
+                HapticFeedback.lightImpact();
+                showModalBottomSheet(
+                  useSafeArea: true,
+                  isScrollControlled: true,
+                  context: context,
+                  builder:
+                      (context) =>
+                          StreakBottomSheet(entities: state.streakData),
+                );
+              }
+            });
           }
           if (state is GotQuotes) {
             _quotes.addAll(state.result);

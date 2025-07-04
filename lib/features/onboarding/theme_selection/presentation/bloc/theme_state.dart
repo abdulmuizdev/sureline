@@ -1,4 +1,3 @@
-
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 
 abstract class ThemeState {
@@ -15,5 +14,14 @@ class GettingThemes extends ThemeState {
 
 class GotThemes extends ThemeState {
   final List<ThemeEntity> themes;
-  const GotThemes(this.themes);
+  final int activeIndex;
+  const GotThemes(this.themes, this.activeIndex);
+}
+
+class ChangedTheme extends ThemeState {
+  const ChangedTheme();
+}
+
+class ChangingTheme extends ThemeState {
+  const ChangingTheme();
 }

@@ -1,4 +1,4 @@
-import 'package:sureline/features/general_settings/gender_identity/data/model/gender_identity_model.dart';
+import 'package:sureline/features/preferenecs/general_settings/gender_identity/data/model/gender_identity_model.dart';
 
 class SurelineGenderIdentities {
   static final List<GenderIdentityModel> values = [

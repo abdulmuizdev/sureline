@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:sureline/features/collections/domain/entity/collection_entity.dart';
+import 'package:sureline/features/preferenecs/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/home/data/model/quote_model.dart';
 
 class QuoteEntity {

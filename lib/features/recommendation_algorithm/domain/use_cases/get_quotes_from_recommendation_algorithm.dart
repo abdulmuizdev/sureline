@@ -8,7 +8,10 @@ class GetQuotesFromRecommendationAlgorithm {
 
   GetQuotesFromRecommendationAlgorithm(this.repository);
 
-  Future<Either<Failure, List<QuoteEntity>>> call(int page) async {
-    return repository.getQuotes(page);
+  Future<Either<Failure, List<QuoteEntity>>> call({
+    int? page,
+    int? limit,
+  }) async {
+    return repository.getQuotes(page: page, limit: limit);
   }
 }

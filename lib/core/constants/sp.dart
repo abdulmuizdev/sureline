@@ -26,6 +26,9 @@ class SP {
   static const String name = 'name';
   static const String streakEnable = 'streak_enable';
 
+  static const String hasShownNotificationLimitDialog =
+      'has_shown_notification_limit_dialog';
+
   static const String quotesDataAppGroup = 'quotes_data_app_group';
   static const String textColorAppGroup = 'text_color_app_group';
   static const String textSizeAppGroup = 'text_size_app_group';

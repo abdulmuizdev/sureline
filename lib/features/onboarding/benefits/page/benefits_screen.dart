@@ -15,7 +15,7 @@ class BenefitsScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Background(),
+          Background(isStatic: true),
           SafeArea(
             child: Center(
               child: Column(

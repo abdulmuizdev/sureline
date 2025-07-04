@@ -22,6 +22,7 @@ class IconSelectionScreen extends StatefulWidget {
 class _IconSelectionScreenState extends State<IconSelectionScreen> {
   List<IconEntity> _icons = [];
   int? _selectedIndex;
+  int? _activeIconIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +33,10 @@ class _IconSelectionScreenState extends State<IconSelectionScreen> {
       child: BlocListener<IconBloc, IconState>(
         listener: (context, state) {
           if (state is ChangedIcon) {
-            debugPrint('changed icon');
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => ThemeSelectionScreen()),
-            );
+            _navigateToNextScreen();
           }
           if (state is Initialized) {
+            _activeIconIndex = state.selectedIndex;
             _selectedIndex = state.selectedIndex;
             _icons = state.icons;
           }
@@ -51,7 +50,7 @@ class _IconSelectionScreenState extends State<IconSelectionScreen> {
             return Scaffold(
               body: Stack(
                 children: [
-                  Background(),
+                  Background(isStatic: true),
                   SafeArea(
                     child: Column(
                       children: [
@@ -94,9 +93,13 @@ class _IconSelectionScreenState extends State<IconSelectionScreen> {
                           onPressed:
                               (_selectedIndex != null && _selectedIndex! >= 0)
                                   ? () {
-                                    context.read<IconBloc>().add(
-                                      ChangeIcon(_icons[_selectedIndex!]),
-                                    );
+                                    if (_selectedIndex != _activeIconIndex) {
+                                      context.read<IconBloc>().add(
+                                        ChangeIcon(_icons[_selectedIndex!]),
+                                      );
+                                    } else {
+                                      _navigateToNextScreen();
+                                    }
                                   }
                                   : null,
                         ),
@@ -110,5 +113,11 @@ class _IconSelectionScreenState extends State<IconSelectionScreen> {
         ),
       ),
     );
+  }
+
+  void _navigateToNextScreen() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => ThemeSelectionScreen()));
   }
 }

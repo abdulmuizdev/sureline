@@ -12,6 +12,7 @@ class Background extends StatefulWidget {
   final bool? isPreview;
   final double? width;
   final double? height;
+  final bool? isStatic;
 
   const Background({
     super.key,
@@ -20,6 +21,7 @@ class Background extends StatefulWidget {
     this.isPreview,
     this.width,
     this.height,
+    this.isStatic,
   });
 
   @override
@@ -97,6 +99,15 @@ class _BackgroundState extends State<Background> {
         widget.width ?? MediaQuery.of(context).size.width;
     final double screenHeight =
         widget.height ?? MediaQuery.of(context).size.height;
+
+    if (widget.isStatic ?? false) {
+      return Image.asset(
+        'assets/images/background.png',
+        fit: BoxFit.cover,
+        width: screenWidth,
+        height: screenHeight,
+      );
+    }
 
     if (_color != null) {
       return Container(width: screenWidth, height: screenHeight, color: _color);

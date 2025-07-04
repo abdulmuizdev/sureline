@@ -22,7 +22,7 @@ class ThemeGridItem extends StatefulWidget {
 }
 
 class _ThemeGridItemState extends State<ThemeGridItem> {
-  late VideoPlayerController _controller;
+  // late VideoPlayerController _controller;
   bool _isPressed = false;
 
   @override
@@ -30,15 +30,15 @@ class _ThemeGridItemState extends State<ThemeGridItem> {
     super.initState();
 
     if (widget.entity.backgroundEntity.isLiveBackground) {
-      _controller = VideoPlayerController.asset(
-          widget.entity.backgroundEntity.path!,
-        )
-        ..initialize().then((_) {
-          _controller.setLooping(true);
-          _controller.setVolume(0);
-          _controller.play();
-          setState(() {});
-        });
+      // _controller = VideoPlayerController.asset(
+      //     widget.entity.backgroundEntity.path!,
+      //   )
+      //   ..initialize().then((_) {
+      //     _controller.setLooping(true);
+      //     _controller.setVolume(0);
+      //     _controller.play();
+      //     setState(() {});
+      //   });
     }
   }
 
@@ -52,7 +52,7 @@ class _ThemeGridItemState extends State<ThemeGridItem> {
   @override
   void dispose() {
     super.dispose();
-    _controller.dispose();
+    // _controller.dispose();
   }
 
   @override
@@ -68,17 +68,17 @@ class _ThemeGridItemState extends State<ThemeGridItem> {
           child: Stack(
             children: [
               if (widget.entity.backgroundEntity.isLiveBackground) ...[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: VideoPlayer(_controller),
-                ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.all(7),
-                    child: Playable(),
-                  ),
-                ),
+                // ClipRRect(
+                //   borderRadius: BorderRadius.circular(16),
+                //   child: VideoPlayer(_controller),
+                // ),
+                // Align(
+                //   alignment: Alignment.topLeft,
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(7),
+                //     child: Playable(),
+                //   ),
+                // ),
               ] else ...[
                 Positioned.fill(
                   child: ClipRRect(

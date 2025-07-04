@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sureline/common/domain/use_cases/schedule_up_to_sixty_notifications_use_case.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
+import 'package:sureline/core/constants/constants.dart';
+import 'package:sureline/core/constants/sp.dart';
+import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
+import 'package:sureline/features/notifications_settings/domain/use_cases/initialize_notifications_presets_use_case.dart';
 import 'package:sureline/features/onboarding/icon_selection/presentation/pages/icon_selection_screen.dart';
 import 'package:sureline/features/onboarding/notification/presentation/widgets/notification_selector.dart';
 import 'package:sureline/features/onboarding/notification/presentation/widgets/time_selector.dart';
@@ -93,7 +99,7 @@ class _OnboardingNotificationScreenState
           },
           child: Stack(
             children: [
-              Background(),
+              Background(isStatic: true),
               SafeArea(
                 child: Column(
                   children: [
@@ -111,34 +117,32 @@ class _OnboardingNotificationScreenState
                           scale: _animation,
                           child: Stack(
                             children: [
+                              FadeTransition(
+                                opacity: _animation,
+                                child: Center(
+                                  child: AnimatedBuilder(
+                                    animation: _controller2,
+                                    builder: (context, child) {
+                                      return Container(
+                                        width: _widthAnimation.value,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.pureWhite.withValues(
+                                            alpha: 0.4,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            13,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
                               SlideTransition(
                                 position: _positionAnimation,
                                 child: Image.asset(
                                   'assets/images/notification.png',
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: FadeTransition(
-                                  opacity: _animation,
-                                  child: Center(
-                                    child: AnimatedBuilder(
-                                      animation: _controller2,
-                                      builder: (context, child) {
-                                        return Container(
-                                          width: _widthAnimation.value,
-                                          height: 80,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.pureWhite
-                                                .withValues(alpha: 0.4),
-                                            borderRadius: BorderRadius.circular(
-                                              13,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
                                 ),
                               ),
                             ],
@@ -148,10 +152,55 @@ class _OnboardingNotificationScreenState
                     ),
                     SizedBox(height: 40),
                     NotificationSelector(
-                      onValueChanged: (value) {
+                      onValueChanged: (value) async {
                         setState(() {
                           _notificationCount = value;
                         });
+                        if (value == Constants.headsUpNotificationLimit) {
+                          final prefs = await SharedPreferences.getInstance();
+                          final hasShownDialog =
+                              prefs.getBool(
+                                SP.hasShownNotificationLimitDialog,
+                              ) ??
+                              false;
+
+                          if (hasShownDialog) {
+                            return;
+                          }
+
+                          if (mounted && context.mounted) {
+                            showCupertinoDialog(
+                              context: context,
+                              builder:
+                                  (_) => CupertinoAlertDialog(
+                                    title: Text('Heads up!'),
+                                    content: Text(
+                                      'We can only schedule up to 60 notifications at a time. If you stop getting them, please launch the app and they\'ll be reset.',
+                                    ),
+                                    actions: [
+                                      CupertinoDialogAction(
+                                        child: Text(
+                                          'Done',
+                                          style: TextStyle(
+                                            color: Color(0xFF007AFF),
+
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                            );
+
+                            await prefs.setBool(
+                              SP.hasShownNotificationLimitDialog,
+                              true,
+                            );
+                          }
+                        }
                       },
                     ),
                     SizedBox(height: 10),
@@ -203,16 +252,24 @@ class _OnboardingNotificationScreenState
                             SurelineButton(
                               text: 'Allow and Save',
                               onPressed: () async {
-                                final settings =
-                                    await FlutterLocalNotificationsPlugin()
-                                        .resolvePlatformSpecificImplementation<
-                                          IOSFlutterLocalNotificationsPlugin
-                                        >()
-                                        ?.requestPermissions(
-                                          alert: true,
-                                          badge: true,
-                                          sound: true,
-                                        );
+                                // final settings =
+                                //     await FlutterLocalNotificationsPlugin()
+                                //         .resolvePlatformSpecificImplementation<
+                                //           IOSFlutterLocalNotificationsPlugin
+                                //         >()
+                                //         ?.requestPermissions(
+                                //           alert: true,
+                                //           badge: true,
+                                //           sound: true,
+                                //         );
+                                await locator<
+                                      InitializeNotificationsPresetsUseCase
+                                    >()
+                                    .execute();
+                                await locator<
+                                      ScheduleUpToSixtyNotificationsUseCase
+                                    >()
+                                    .execute();
 
                                 await Future.delayed(Duration(seconds: 1));
                                 await HapticFeedback.lightImpact();

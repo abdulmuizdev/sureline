@@ -6,6 +6,7 @@ import 'package:sureline/features/remote_config/data/model/remote_config_model.d
 
 class Constants {
   static const int quotesPageSize = 20;
+  static const int headsUpNotificationLimit = 15;
   static const String widgetAppGroup =
       'group.com.abdulmuiz.sureline.quoteWidget';
   static const String streakReminderNotificationTitle =
@@ -40,6 +41,7 @@ class Constants {
       QuestionModel(
         title: 'How old are you?',
         subTitle: 'Your age is used to personalize your content',
+        isSkipable: true,
         choices: [
           '13 to 17',
           '18 to 24',
@@ -57,6 +59,7 @@ class Constants {
       QuestionModel(
         title: 'What\'s your Zodiac sign?',
         subTitle: 'This information will be used to personalize your quotes',
+        isSkipable: true,
         choices: [
           'Capricorn',
           'Aquarius',
@@ -76,11 +79,13 @@ class Constants {
         title: 'Are you religious?',
         subTitle:
             'This information will be used to tailor your quotes to your beliefs',
+        isSkipable: true,
         choices: ['Yes', 'No', 'Spiritual but not religious'],
       ),
       QuestionModel(
         title: 'Which of these best describes your beliefs?',
         subTitle: 'This information will be used to personalize your quotes',
+        isSkipable: true,
         choices: [
           'Islam',
           'Judaism',
@@ -93,6 +98,7 @@ class Constants {
       QuestionModel(
         title: 'Get quotes that fit your relationship status',
         subTitle: 'Choose the option that describes it the best',
+        isSkipable: true,
         choices: [
           'It\'s complicated',
           'Single and open to connection',
@@ -128,12 +134,14 @@ class Constants {
       QuestionModel(
         title: 'What\'s making you feel that way?',
         subTitle: 'You can select more than one option',
+        isStay: true,
         choices: ['Health', 'Family', 'Work', 'Friends', 'Love', 'Other'],
       ),
       QuestionModel(
         title: 'What do you want to improve?',
         subTitle:
             'Choose at least one to tailor your content so it resonates with you',
+        isStay: true,
         choices: [
           'Loving myself',
           'Stress & anxiety',

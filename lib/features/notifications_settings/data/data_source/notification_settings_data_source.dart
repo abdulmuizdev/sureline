@@ -107,7 +107,7 @@ class NotificationSettingsDataSourceImpl
               .map((day) => day.dateTime)
               .toList();
       final quotesResult = await _getQuotesFromRecommendationAlgorithm.call(
-        limits[i],
+        limit: limits[i],
       );
       await quotesResult.fold((left) {}, (right) async {
         await scheduleNotifications(
@@ -212,7 +212,7 @@ class NotificationSettingsDataSourceImpl
     try {
       await setupTimezone();
       await initializeNotifications();
-      debugPrint('enable notification preset is called');
+      debugPrint('Enabling notification preset: ${model.id} ${model.title}');
       await _enableNotificationPreset(model);
       return Right(unit);
     } catch (e) {
@@ -232,7 +232,7 @@ class NotificationSettingsDataSourceImpl
 
     int limit = await _getAvailableNotificationScheduleLimit();
     final quotesResult = await _getQuotesFromRecommendationAlgorithm.call(
-      limit,
+      limit: limit,
     );
     await quotesResult.fold((left) {}, (right) async {
       await scheduleNotifications(
@@ -527,15 +527,7 @@ class NotificationSettingsDataSourceImpl
           list.map((json) => NotificationPresetModel.fromJson(json)).toList();
       return Right(result);
     } else {
-      debugPrint('saving presets first time: ');
-      await prefs.setString(
-        SP.notificationPresets,
-        jsonEncode(
-          SurelineNotificationPresets.values
-              .map((model) => model.toJson())
-              .toList(),
-        ),
-      );
+      await _initializeNotificationPresetsInSP();
       final raw2 = prefs.getString(SP.notificationPresets);
       if (raw2 == null) {
         debugPrint('it should not be null');
@@ -565,5 +557,17 @@ class NotificationSettingsDataSourceImpl
       });
     }
     return Right(unit);
+  }
+
+  Future<void> _initializeNotificationPresetsInSP() async {
+    debugPrint('Initializing notification presets');
+    await prefs.setString(
+      SP.notificationPresets,
+      jsonEncode(
+        SurelineNotificationPresets.values
+            .map((model) => model.toJson())
+            .toList(),
+      ),
+    );
   }
 }

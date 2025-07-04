@@ -23,7 +23,7 @@ class ThemeSelectionScreen extends StatefulWidget {
 
 class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
   List<ThemeEntity> _themes = [];
-  int _selectedIndex = 0;
+  int _selectedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +35,8 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
         listener: (context, state) {
           if (state is GotThemes) {
             _themes = state.themes;
+            _selectedIndex = state.activeIndex;
+            print('selected index is $_selectedIndex');
           }
         },
         child: BlocBuilder<ThemeBloc, ThemeState>(
@@ -42,7 +44,7 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
             return Scaffold(
               body: Stack(
                 children: [
-                  Background(),
+                  Background(isStatic: true),
                   SafeArea(
                     child: Column(
                       children: [
@@ -65,14 +67,15 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
                                     mainAxisSpacing: 4,
                                   ),
                               itemCount: _themes.length,
+                              // (_themes.length > 6) ? 6 : _themes.length,
                               itemBuilder: (context, index) {
                                 return ThemeGridItem(
                                   entity: _themes[index],
                                   isSelected: _selectedIndex == index,
                                   onPressed: () {
-                                    setState(() {
-                                      _selectedIndex = index;
-                                    });
+                                    context.read<ThemeBloc>().add(
+                                      ChangeTheme(_themes[index]),
+                                    );
                                   },
                                 );
                               },

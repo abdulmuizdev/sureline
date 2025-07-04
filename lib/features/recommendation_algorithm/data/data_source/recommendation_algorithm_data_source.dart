@@ -14,8 +14,8 @@ import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/db/app_database.dart';
 import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/general_settings/author_preferences/data/model/author_pref_model.dart';
-import 'package:sureline/features/general_settings/muted_content/data/model/muted_content_model.dart';
+import 'package:sureline/features/preferenecs/general_settings/author_preferences/data/model/author_pref_model.dart';
+import 'package:sureline/features/preferenecs/general_settings/muted_content/data/model/muted_content_model.dart';
 import 'package:sureline/features/recommendation_algorithm/data/database/dao/author_prefs_table_dao.dart';
 import 'package:sureline/features/recommendation_algorithm/data/database/dao/muted_content_table_dao.dart';
 import 'package:sureline/features/recommendation_algorithm/data/database/dao/quotes_dao.dart';
@@ -23,7 +23,7 @@ import 'package:sureline/features/recommendation_algorithm/data/model/quote_mode
 
 abstract class RecommendationAlgorithmDataSource {
   Future<Either<Failure, void>> initialize();
-  Future<Either<Failure, List<QuoteModel>>> getQuotes(int page);
+  Future<Either<Failure, List<QuoteModel>>> getQuotes({int? page, int? limit});
   Future<Either<Failure, void>> markQuoteAsShown(int id);
   Future<Either<Failure, List<QuoteModel>>> getShownQuotes();
 
@@ -95,64 +95,80 @@ class RecommendationAlgorithmDataSourceImpl
   }
 
   @override
-  Future<Either<Failure, List<QuoteModel>>> getQuotes(int page) async {
+  Future<Either<Failure, List<QuoteModel>>> getQuotes({
+    int? page,
+    int? limit,
+  }) async {
     try {
-      final now = DateTime.now();
-      final offset = page * Constants.quotesPageSize;
-      final newQuotes = await quotesDao.getAllNewQuotes();
-      // If we have enough new quotes for this page, return them
-      if (offset <= newQuotes.length &&
-          newQuotes.length >= (offset + Constants.quotesPageSize)) {
-        final startIndex = offset;
-        final endIndex = (offset + Constants.quotesPageSize).clamp(
-          0,
-          newQuotes.length,
-        );
-        final pageQuotes = newQuotes.sublist(startIndex, endIndex);
-
+      if (limit != null) {
+        final quotes = await quotesDao.getAllQuotesWithLimit(limit);
         final quoteModels =
-            pageQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList();
+            quotes.map((quote) => QuoteModel.fromQuote(quote)).toList();
         return Right(quoteModels);
-      }
+      } else if (page != null) {
+        final now = DateTime.now();
+        final offset = page * Constants.quotesPageSize;
+        final newQuotes = await quotesDao.getAllNewQuotes();
+        // If we have enough new quotes for this page, return them
+        if (offset <= newQuotes.length &&
+            newQuotes.length >= (offset + Constants.quotesPageSize)) {
+          final startIndex = offset;
+          final endIndex = (offset + Constants.quotesPageSize).clamp(
+            0,
+            newQuotes.length,
+          );
+          final pageQuotes = newQuotes.sublist(startIndex, endIndex);
 
-      // If we don't have enough new quotes, check if we have any remaining
-      final remainingNewQuotes = newQuotes.length - offset;
-
-      // If we don't have enough new quotes for a full page, recycle all quotes
-      if (remainingNewQuotes < Constants.quotesPageSize) {
-        // Store remaining new quotes in temp variable
-        final remainingQuotes =
-            remainingNewQuotes > 0 ? newQuotes.sublist(offset) : <Quote>[];
-
-        await _shuffleAndRefreshQuotes();
-
-        // Calculate how many more quotes we need to reach page size
-        final quotesNeeded = Constants.quotesPageSize - remainingQuotes.length;
-
-        // Get the additional quotes needed from the newly shuffled database
-        final additionalQuotes = await quotesDao.getAllNewQuotes();
-        final additionalQuotesNeeded =
-            additionalQuotes.take(quotesNeeded).toList();
-
-        // Combine remaining quotes with additional quotes
-        final finalQuotes = [
-          ...remainingQuotes.map((quote) => QuoteModel.fromQuote(quote)),
-          ...additionalQuotesNeeded.map((quote) => QuoteModel.fromQuote(quote)),
-        ];
-
-        if (finalQuotes.length != Constants.quotesPageSize) {
-          print('Final quotes length is not equal to page size');
+          final quoteModels =
+              pageQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList();
+          return Right(quoteModels);
         }
 
-        return Right(finalQuotes);
-      }
+        // If we don't have enough new quotes, check if we have any remaining
+        final remainingNewQuotes = newQuotes.length - offset;
 
-      // If no new quotes remaining, return all quotes as fallback
-      print('falling back');
-      final fallbackQuotes = await quotesDao.getAllQuotes();
-      return Right(
-        fallbackQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList(),
-      );
+        // If we don't have enough new quotes for a full page, recycle all quotes
+        if (remainingNewQuotes < Constants.quotesPageSize) {
+          // Store remaining new quotes in temp variable
+          final remainingQuotes =
+              remainingNewQuotes > 0 ? newQuotes.sublist(offset) : <Quote>[];
+
+          await _shuffleAndRefreshQuotes();
+
+          // Calculate how many more quotes we need to reach page size
+          final quotesNeeded =
+              Constants.quotesPageSize - remainingQuotes.length;
+
+          // Get the additional quotes needed from the newly shuffled database
+          final additionalQuotes = await quotesDao.getAllNewQuotes();
+          final additionalQuotesNeeded =
+              additionalQuotes.take(quotesNeeded).toList();
+
+          // Combine remaining quotes with additional quotes
+          final finalQuotes = [
+            ...remainingQuotes.map((quote) => QuoteModel.fromQuote(quote)),
+            ...additionalQuotesNeeded.map(
+              (quote) => QuoteModel.fromQuote(quote),
+            ),
+          ];
+
+          if (finalQuotes.length != Constants.quotesPageSize) {
+            print('Final quotes length is not equal to page size');
+          }
+
+          return Right(finalQuotes);
+        }
+
+        // If no new quotes remaining, return all quotes as fallback
+        print('falling back');
+        final fallbackQuotes = await quotesDao.getAllQuotes();
+        return Right(
+          fallbackQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList(),
+        );
+      } else {
+        debugPrint('Both parameters cannot be null');
+        return Left(UnknownFailure());
+      }
     } catch (e) {
       debugPrint(e.toString());
       return Left(UnknownFailure());

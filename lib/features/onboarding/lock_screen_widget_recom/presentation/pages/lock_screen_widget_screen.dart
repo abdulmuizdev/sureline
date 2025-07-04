@@ -12,7 +12,7 @@ class LockScreenWidgetScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Background(),
+          Background(isStatic: true),
           SafeArea(
             child: Column(
               children: [

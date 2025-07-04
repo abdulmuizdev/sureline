@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sureline/common/domain/entities/question_entity.dart';
+import 'package:sureline/common/presentation/dialog/streak/widget/sureline_back_button.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
+import 'package:sureline/common/presentation/widgets/skip_button.dart';
+import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/features/onboarding/survey/presentation/widgets/survey_selector.dart';
 
 class SurveyScreen extends StatefulWidget {
@@ -23,6 +26,7 @@ class SurveyScreen extends StatefulWidget {
 
 class _SurveyScreenState extends State<SurveyScreen> {
   int? _selectedIndex;
+  bool _selectionMade = false;
 
   void _goToNextPage() {
     if (widget.pageNumber < widget.entities.length - 1) {
@@ -45,31 +49,61 @@ class _SurveyScreenState extends State<SurveyScreen> {
   }
 
   Widget fragment(QuestionEntity entity) {
-    return Column(
+    return Stack(
       children: [
-        OnboardingHeading(title: entity.title, subTitle: entity.subTitle),
-        Expanded(
-          child: ListView.builder(
-            itemCount: entity.choices.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () async {
-                  debugPrint('clicked');
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                  HapticFeedback.lightImpact();
-                  await Future.delayed(Duration(milliseconds: 1000), () {
-                    _goToNextPage();
-                  });
+        Column(
+          children: [
+            SizedBox(
+              height: 35,
+              child:
+                  (widget.entities[widget.pageNumber].isSkipable)
+                      ? SkipButton(onTap: _goToNextPage)
+                      : Container(),
+            ),
+
+            OnboardingHeading(title: entity.title, subTitle: entity.subTitle),
+            Expanded(
+              child: ListView.builder(
+                itemCount: entity.choices.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () async {
+                      if (_selectionMade && !entity.isStay) {
+                        return;
+                      }
+                      setState(() {
+                        _selectedIndex = index;
+                        _selectionMade = true;
+                      });
+                      if (entity.isStay) {
+                        return;
+                      }
+                      HapticFeedback.lightImpact();
+                      await Future.delayed(Duration(milliseconds: 1000), () {
+                        _goToNextPage();
+                      });
+                    },
+                    child: SurveySelector(
+                      isChecked: _selectedIndex == index,
+                      text: entity.choices[index],
+                    ),
+                  );
                 },
-                child: SurveySelector(
-                  isChecked: _selectedIndex == index,
-                  text: entity.choices[index],
+              ),
+            ),
+            if (widget.entities[widget.pageNumber].isStay) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 30),
+                child: SurelineButton(
+                  text: 'Continue',
+                  disableVerticalPadding: true,
+                  onPressed: () {
+                    _goToNextPage();
+                  },
                 ),
-              );
-            },
-          ),
+              ),
+            ],
+          ],
         ),
       ],
     );
@@ -82,8 +116,11 @@ class _SurveyScreenState extends State<SurveyScreen> {
       child: Scaffold(
         body: Stack(
           children: [
-            Background(),
-            SafeArea(child: fragment(widget.entities[widget.pageNumber])),
+            Background(isStatic: true),
+            SafeArea(
+              bottom: false,
+              child: fragment(widget.entities[widget.pageNumber]),
+            ),
           ],
         ),
       ),

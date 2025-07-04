@@ -107,9 +107,11 @@ class _NotificationsSettingsBottomSheetState
                           isSelected: _presets[index].isSelected,
                           onPressed: () async {
                             await _showNotificationDetails(_presets[index]);
-                            context.read<NotificationSettingBloc>().add(
-                              RefreshNotificationPresets(),
-                            );
+                            if (mounted && context.mounted) {
+                              context.read<NotificationSettingBloc>().add(
+                                RefreshNotificationPresets(),
+                              );
+                            }
                           },
                           onCheckChanged: (value) {
                             context.read<NotificationSettingBloc>().add(

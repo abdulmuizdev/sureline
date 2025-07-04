@@ -10,9 +10,9 @@ import 'package:sureline/common/domain/use_cases/streak/get_last_seven_days_stre
 import 'package:sureline/common/domain/use_cases/streak/is_streak_broken_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/log_streak_entry_use_case.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/favourites/domain/use_cases/add_favourite_use_case.dart';
-import 'package:sureline/features/favourites/domain/use_cases/get_favourites_count_use_case.dart';
-import 'package:sureline/features/favourites/domain/use_cases/remove_favourite_use_case.dart';
+import 'package:sureline/features/preferenecs/favourites/domain/use_cases/add_favourite_use_case.dart';
+import 'package:sureline/features/preferenecs/favourites/domain/use_cases/get_favourites_count_use_case.dart';
+import 'package:sureline/features/preferenecs/favourites/domain/use_cases/remove_favourite_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/feed/is_feed_setup_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/like/guide/is_like_guide_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/share/is_share_guide_shown_use_case.dart';
@@ -91,7 +91,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) : super(Initial()) {
     on<GetQuotes>((event, emit) async {
       final result = await _getQuotesFromRecommendationAlgorithm.call(
-        event.page,
+        page: event.page,
       );
       result.fold(
         (left) {

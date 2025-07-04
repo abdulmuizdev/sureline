@@ -52,7 +52,7 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Background(),
+          Background(isStatic: true),
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

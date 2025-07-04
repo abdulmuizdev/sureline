@@ -58,7 +58,7 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
     return Scaffold(
       body: Stack(
         children: [
-          Background(),
+          Background(isStatic: true),
           SafeArea(
             child: Column(
               children: [

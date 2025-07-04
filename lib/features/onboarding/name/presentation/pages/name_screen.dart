@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
+import 'package:sureline/common/presentation/widgets/skip_button.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/common/presentation/widgets/sureline_text_field.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/di/injection.dart';
+import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/onboarding/benefits/page/benefits_screen.dart';
 import 'package:sureline/features/onboarding/name/presentation/bloc/onboarding_name_bloc.dart';
 import 'package:sureline/features/onboarding/name/presentation/bloc/onboarding_name_event.dart';
@@ -22,19 +24,6 @@ class NameScreen extends StatefulWidget {
 
 class _NameScreenState extends State<NameScreen> {
   final TextEditingController _nameController = TextEditingController();
-  bool _isContinueButtonDisabled = true;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _nameController.addListener(() {
-        setState(() {
-          _isContinueButtonDisabled = _nameController.text.isEmpty;
-        });
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,15 +40,7 @@ class _NameScreenState extends State<NameScreen> {
           }
           if (state is NameSaved) {
             HapticFeedback.lightImpact();
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder:
-                    (context) => SurveyScreen(
-                      entities: App.remoteConfigEntity.survey2,
-                      navigateTo: BenefitsScreen(),
-                    ),
-              ),
-            );
+            _proceed();
           }
         },
         child: BlocBuilder<OnboardingNameBloc, OnboardingNameState>(
@@ -69,38 +50,47 @@ class _NameScreenState extends State<NameScreen> {
               child: Scaffold(
                 body: Stack(
                   children: [
-                    Positioned.fill(child: Background()),
+                    Positioned.fill(child: Background(isStatic: true)),
+
                     SafeArea(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Stack(
                         children: [
                           Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              OnboardingHeading(
-                                title: 'What do you want to be called?',
-                                subTitle:
-                                    'Your name will appear in your quotes',
-                                reduceMargins: true,
+                              Column(
+                                children: [
+                                  SkipButton(onTap: _proceed),
+                                  OnboardingHeading(
+                                    title: 'What do you want to be called?',
+                                    subTitle:
+                                        'Your name will appear in your quotes',
+                                    reduceMargins: true,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                    ),
+                                    child: SurelineTextField(
+                                      isNameInput: true,
+                                      controller: _nameController,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                ),
-                                child: SurelineTextField(
-                                  isNameInput: true,
-                                  controller: _nameController,
-                                ),
+                              SurelineButton(
+                                text: 'Continue',
+                                onPressed: () {
+                                  if (_nameController.text.isNotEmpty) {
+                                    context.read<OnboardingNameBloc>().add(
+                                      OnContinuePressed(_nameController.text),
+                                    );
+                                  } else {
+                                    _proceed();
+                                  }
+                                },
                               ),
                             ],
-                          ),
-                          SurelineButton(
-                            text: 'Continue',
-                            isDisabled: _isContinueButtonDisabled,
-                            onPressed: () {
-                              context.read<OnboardingNameBloc>().add(
-                                OnContinuePressed(_nameController.text),
-                              );
-                            },
                           ),
                         ],
                       ),
@@ -111,6 +101,18 @@ class _NameScreenState extends State<NameScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  void _proceed() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) => SurveyScreen(
+              entities: App.remoteConfigEntity.survey2,
+              navigateTo: BenefitsScreen(),
+            ),
       ),
     );
   }

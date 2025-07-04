@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
+import 'package:sureline/common/presentation/widgets/skip_button.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/di/injection.dart';
@@ -44,11 +45,17 @@ class _InterestedCategoriesScreenState
             return Scaffold(
               body: Stack(
                 children: [
-                  Background(),
+                  Background(isStatic: true),
+
                   SafeArea(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        SkipButton(
+                          onTap: () {
+                            _goToNextPage();
+                          },
+                        ),
                         OnboardingHeading(
                           title: 'Which categories are you interested in?',
                           subTitle:
@@ -83,15 +90,7 @@ class _InterestedCategoriesScreenState
                         SurelineButton(
                           text: 'Continue',
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => SurveyScreen(
-                                      entities: App.remoteConfigEntity.survey6,
-                                      navigateTo: LockScreenWidgetScreen(),
-                                    ),
-                              ),
-                            );
+                            _goToNextPage();
                           },
                         ),
                       ],
@@ -102,6 +101,18 @@ class _InterestedCategoriesScreenState
             );
           },
         ),
+      ),
+    );
+  }
+
+  void _goToNextPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) => SurveyScreen(
+              entities: App.remoteConfigEntity.survey6,
+              navigateTo: LockScreenWidgetScreen(),
+            ),
       ),
     );
   }

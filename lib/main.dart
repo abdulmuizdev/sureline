@@ -7,8 +7,8 @@ import 'package:sureline/common/domain/use_cases/schedule_up_to_sixty_notificati
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/general_settings/sound/domain/use_cases/get_volume_use_case.dart';
-import 'package:sureline/features/general_settings/voice/data/model/voice_model.dart';
+import 'package:sureline/features/preferenecs/general_settings/sound/domain/use_cases/get_volume_use_case.dart';
+import 'package:sureline/features/preferenecs/general_settings/voice/data/model/voice_model.dart';
 import 'package:sureline/features/home/domain/use_cases/save_all_quotes_to_app_group_use_case.dart';
 import 'package:sureline/features/home/presentation/pages/home_screen.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/initialize_notifications_presets_use_case.dart';
@@ -20,8 +20,6 @@ import 'package:sureline/features/theme_selection/domain/use_case/set_theme_use_
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
-
-  
 
   await locator<InitializeRecommendationAlgorithm>().call();
   await locator<PrepareRemoteConfigUseCase>().execute();

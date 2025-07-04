@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sureline/common/presentation/widgets/share_item.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/libraries/direct_social_share/direct_social_share_schemas.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
 import 'package:sureline/features/share/domain/entity/render_entity.dart';
 import 'package:sureline/features/share/domain/entity/share_entity.dart';
 import 'package:sureline/features/share/presentation/bloc/share_bloc.dart';
@@ -53,17 +54,383 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
   late bool _isWaterMarkShowing;
   bool _isInstagramShare = false;
   List<DateTime> _accessedTimes = List.generate(10, (index) => DateTime.now());
+  List<TimesWidget>? _sortedTimesWidgets; // Cache the sorted widgets
 
   @override
   void initState() {
     super.initState();
     _isWaterMarkShowing = widget.isWaterMarkShowing;
+    _loadLastAccessedTimes();
+  }
+
+  Future<void> _loadLastAccessedTimes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<DateTime> loadedTimes = [];
+
+    for (int i = 0; i < 10; i++) {
+      final timestamp = prefs.getInt('share_option_${i + 1}_last_accessed');
+      if (timestamp != null) {
+        loadedTimes.add(DateTime.fromMillisecondsSinceEpoch(timestamp));
+      } else {
+        // If no timestamp found, use current time minus some offset to prioritize new options
+        loadedTimes.add(DateTime.now().subtract(Duration(days: i)));
+      }
+    }
+
+    setState(() {
+      _accessedTimes = loadedTimes;
+      _sortedTimesWidgets = null; // Reset cache to rebuild with new times
+    });
+  }
+
+  Future<void> _updateLastAccessedTime(int optionId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentTime = DateTime.now();
+
+    // Update the timestamp in memory (but don't rebuild the sorted list)
+    _accessedTimes[optionId - 1] = currentTime;
+
+    // Save to SharedPreferences
+    await prefs.setInt(
+      'share_option_${optionId}_last_accessed',
+      currentTime.millisecondsSinceEpoch,
+    );
+
+    // Don't trigger rebuild - order stays the same for current session
+  }
+
+  List<TimesWidget> _buildSortedTimesWidgets(BuildContext context) {
+    // Return cached widgets if available
+    if (_sortedTimesWidgets != null) {
+      return _sortedTimesWidgets!;
+    }
+
+    // Create a list of data with ID and timestamp for sorting
+    final List<Map<String, dynamic>> timesData = [
+      {'id': 1, 'timestamp': _accessedTimes[0]},
+      {'id': 2, 'timestamp': _accessedTimes[1]},
+      if (widget.isLiveBackground) {'id': 3, 'timestamp': _accessedTimes[2]},
+      {'id': 4, 'timestamp': _accessedTimes[3]},
+      {'id': 5, 'timestamp': _accessedTimes[4]},
+      {'id': 6, 'timestamp': _accessedTimes[5]},
+      {'id': 7, 'timestamp': _accessedTimes[6]},
+      {'id': 8, 'timestamp': _accessedTimes[7]},
+      {'id': 9, 'timestamp': _accessedTimes[8]},
+      {'id': 10, 'timestamp': _accessedTimes[9]},
+    ];
+
+    // Sort by timestamp in descending order (most recent first)
+    timesData.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+
+    // Build TimesWidget list from sorted data
+    _sortedTimesWidgets =
+        timesData.map((data) {
+          final int id = data['id'] as int;
+          final DateTime timestamp = data['timestamp'] as DateTime;
+
+          switch (id) {
+            case 1:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/instagram.png',
+                  label: 'Instagram',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = true;
+                    });
+                    context.read<ShareBloc>().add(
+                      OpenInstagram(
+                        ShareEntity(
+                          schema: SocialShareSchema.instagramStory,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 2:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/ig_stories.png',
+                  label: 'Instagram\nStories',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = true;
+                    });
+                    context.read<ShareBloc>().add(
+                      ShareOnSocial(
+                        ShareEntity(
+                          schema: SocialShareSchema.instagramStory,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 3:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/ig_reel.png',
+                  label: 'Instagram\nReels',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = true;
+                    });
+                    context.read<ShareBloc>().add(
+                      ShareOnSocial(
+                        ShareEntity(
+                          schema: SocialShareSchema.instagramReel,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 4:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/facebook.png',
+                  label: 'Facebook',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = false;
+                    });
+                    context.read<ShareBloc>().add(
+                      OpenFacebook(
+                        ShareEntity(
+                          schema: SocialShareSchema.instagramStory,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 5:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/fb_reel.png',
+                  label: 'Facebook\nReels',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = false;
+                    });
+                    context.read<ShareBloc>().add(
+                      ShareOnSocial(
+                        ShareEntity(
+                          schema: SocialShareSchema.facebookReel,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 6:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/fb_stories.png',
+                  label: 'Facebook\nStories',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = false;
+                    });
+                    context.read<ShareBloc>().add(
+                      ShareOnSocial(
+                        ShareEntity(
+                          schema: SocialShareSchema.facebookStory,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 7:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/tiktok.png',
+                  label: 'TikTok',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = false;
+                    });
+                    context.read<ShareBloc>().add(
+                      OpenTikTok(
+                        ShareEntity(
+                          schema: SocialShareSchema.instagramStory,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 8:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/whatsapp.png',
+                  label: 'WhatsApp',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = false;
+                    });
+                    context.read<ShareBloc>().add(
+                      OpenDefaultShare(
+                        ShareEntity(
+                          schema: SocialShareSchema.facebookStory,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 9:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  imageAsset: 'assets/images/messages.png',
+                  label: 'Messages',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = false;
+                    });
+                    context.read<ShareBloc>().add(
+                      OpenMessages(
+                        ShareEntity(
+                          schema: SocialShareSchema.facebookStory,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            case 10:
+              return TimesWidget(
+                id: id,
+                lastAccessedAt: timestamp,
+                child: ShareItem(
+                  icon: Icons.ios_share,
+                  label: 'Share to...',
+                  onPressed: () async {
+                    await _updateLastAccessedTime(id);
+                    setState(() {
+                      _isInstagramShare = false;
+                    });
+                    context.read<ShareBloc>().add(
+                      OpenDefaultShare(
+                        ShareEntity(
+                          schema: SocialShareSchema.facebookStory,
+                          renderEntity: RenderEntity(
+                            quote: widget.quote,
+                            isLiveBackground: widget.isLiveBackground,
+                            quoteKey: widget.quoteKey,
+                            rootKey: widget.exportKey,
+                            path: App.themeEntity.backgroundEntity.path ?? '',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            default:
+              throw Exception('Unknown ID: $id');
+          }
+        }).toList();
+
+    return _sortedTimesWidgets!;
   }
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => locator<ShareBloc>())],
+    return BlocProvider(
+      create: (_) => locator<ShareBloc>(),
       child: BlocListener<ShareBloc, ShareState>(
         listener: (context, state) async {
           if (state is Rendering) {
@@ -153,355 +520,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                             height: 90,
                             child: ListView(
                               scrollDirection: Axis.horizontal,
-                              children: [
-                                TimesWidget(
-                                  id: 1,
-                                  lastAccessedAt: _accessedTimes[0],
-                                  child: ShareItem(
-                                    imageAsset: 'assets/images/instagram.png',
-                                    label: 'Instagram',
-                                    onPressed: () {
-                                      setState(() {
-                                        _isInstagramShare = true;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        OpenInstagram(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema
-                                                    .instagramStory,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                TimesWidget(
-                                  id: 2,
-                                  lastAccessedAt: _accessedTimes[1],
-                                  child: ShareItem(
-                                    imageAsset: 'assets/images/ig_stories.png',
-                                    label: 'Instagram\nStories',
-                                    onPressed: () async {
-                                      setState(() {
-                                        _isInstagramShare = true;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        ShareOnSocial(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema
-                                                    .instagramStory,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                if (widget.isLiveBackground) ...[
-                                  TimesWidget(
-                                    id: 3,
-                                    lastAccessedAt: _accessedTimes[2],
-                                    child: ShareItem(
-                                      imageAsset: 'assets/images/ig_reel.png',
-                                      label: 'Instagram\nReels',
-                                      onPressed: () async {
-                                        setState(() {
-                                          _isInstagramShare = true;
-                                        });
-                                        context.read<ShareBloc>().add(
-                                          ShareOnSocial(
-                                            ShareEntity(
-                                              schema:
-                                                  SocialShareSchema
-                                                      .instagramReel,
-                                              renderEntity: RenderEntity(
-                                                quote: widget.quote,
-                                                isLiveBackground:
-                                                    widget.isLiveBackground,
-                                                quoteKey: widget.quoteKey,
-                                                rootKey: widget.exportKey,
-                                                path:
-                                                    App
-                                                        .themeEntity
-                                                        .backgroundEntity
-                                                        .path ??
-                                                    '',
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                                TimesWidget(
-                                  id: 4,
-                                  lastAccessedAt: _accessedTimes[3],
-                                  child: ShareItem(
-                                    imageAsset: 'assets/images/facebook.png',
-                                    label: 'Facebook',
-                                    onPressed: () {
-                                      setState(() {
-                                        _isInstagramShare = false;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        OpenFacebook(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema
-                                                    .instagramStory,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                TimesWidget(
-                                  id: 5,
-                                  lastAccessedAt: _accessedTimes[4],
-                                  child: ShareItem(
-                                    imageAsset: 'assets/images/fb_reel.png',
-                                    label: 'Facebook\nReels',
-                                    onPressed: () async {
-                                      setState(() {
-                                        _isInstagramShare = false;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        ShareOnSocial(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema.facebookReel,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                TimesWidget(
-                                  id: 6,
-                                  lastAccessedAt: _accessedTimes[5],
-                                  child: ShareItem(
-                                    imageAsset: 'assets/images/fb_stories.png',
-                                    label: 'Facebook\nStories',
-                                    onPressed: () async {
-                                      setState(() {
-                                        _isInstagramShare = false;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        ShareOnSocial(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema.facebookStory,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                TimesWidget(
-                                  id: 7,
-                                  lastAccessedAt: _accessedTimes[6],
-                                  child: ShareItem(
-                                    imageAsset: 'assets/images/tiktok.png',
-                                    label: 'TikTok',
-                                    onPressed: () async {
-                                      setState(() {
-                                        _isInstagramShare = false;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        OpenTikTok(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema
-                                                    .instagramStory,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                TimesWidget(
-                                  id: 8,
-                                  lastAccessedAt: _accessedTimes[7],
-                                  child: ShareItem(
-                                    imageAsset: 'assets/images/whatsapp.png',
-                                    label: 'WhatsApp',
-                                    onPressed: () async {
-                                      setState(() {
-                                        _isInstagramShare = false;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        OpenDefaultShare(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema.facebookStory,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                TimesWidget(
-                                  id: 9,
-                                  lastAccessedAt: _accessedTimes[8],
-                                  child: ShareItem(
-                                    imageAsset: 'assets/images/messages.png',
-                                    label: 'Messages',
-                                    onPressed: () async {
-                                      setState(() {
-                                        _isInstagramShare = false;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        OpenMessages(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema.facebookStory,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                TimesWidget(
-                                  id: 10,
-                                  lastAccessedAt: _accessedTimes[9],
-                                  child: ShareItem(
-                                    icon: Icons.ios_share,
-                                    label: 'Share to...',
-                                    onPressed: () async {
-                                      setState(() {
-                                        _isInstagramShare = false;
-                                      });
-                                      context.read<ShareBloc>().add(
-                                        OpenDefaultShare(
-                                          ShareEntity(
-                                            schema:
-                                                SocialShareSchema.facebookStory,
-                                            renderEntity: RenderEntity(
-                                              quote: widget.quote,
-                                              isLiveBackground:
-                                                  widget.isLiveBackground,
-                                              quoteKey: widget.quoteKey,
-                                              rootKey: widget.exportKey,
-                                              path:
-                                                  App
-                                                      .themeEntity
-                                                      .backgroundEntity
-                                                      .path ??
-                                                  '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
+                              children: _buildSortedTimesWidgets(context),
                             ),
                           ),
                           SizedBox(height: 27),

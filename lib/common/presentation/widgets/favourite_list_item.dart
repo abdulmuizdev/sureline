@@ -4,10 +4,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sureline/common/presentation/widgets/sureline_overlay.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/favourites/domain/entity/favourite_entity.dart';
-import 'package:sureline/features/history/domain/entity/history_entity.dart';
-import 'package:sureline/features/own_quotes/domain/entity/own_quote_entity.dart';
-import 'package:sureline/features/search/domain/entity/search_entity.dart';
+import 'package:sureline/features/preferenecs/favourites/domain/entity/favourite_entity.dart';
+import 'package:sureline/features/preferenecs/history/domain/entity/history_entity.dart';
+import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
+import 'package:sureline/features/preferenecs/search/domain/entity/search_entity.dart';
 
 class FavouriteListItem extends StatefulWidget {
   final bool isOverlayVisible;

@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/collections/data/model/collection_model.dart';
+import 'package:sureline/features/preferenecs/collections/data/model/collection_model.dart';
 import 'package:sureline/features/recommendation_algorithm/data/model/quote_model.dart';
 
 abstract class QuoteDataSource {
