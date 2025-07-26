@@ -30,5 +30,5 @@ lib/core/constants/secrets.dart
 .flutter-plugins-dependencies
 
 #docs
-/docs/
+/docs/DEVELOPER_QUICK_START.md
 LINTING_GUIDE.md
