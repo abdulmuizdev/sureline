@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sureline/common/domain/entities/collections/collection_entity.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/common/presentation/widgets/sureline_text_field.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/preferenecs/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_event.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_state.dart';
@@ -25,9 +25,7 @@ class _CreateCollectionPageState extends State<CreateCollectionPage> {
     return BlocListener<CollectionsBloc, CollectionsState>(
       listener: (context, state) {
         if (state is SavedCollection) {
-          print(
-            'CreateCollectionPage: Received SavedCollection, navigating back',
-          );
+          print('CreateCollectionPage: Received SavedCollection, navigating back');
           // Navigate back to collections list
           context.pop();
         }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 
 class Tick extends StatelessWidget {
-  const Tick({super.key,});
+  const Tick({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class Tick extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(6),
-        child: Icon(Icons.check_outlined, color: AppColors.white, size: 13),
+        child: const Icon(Icons.check_outlined, color: AppColors.white, size: 13),
       ),
     );
   }

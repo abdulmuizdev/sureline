@@ -9,19 +9,13 @@ class Playable extends StatelessWidget {
   Widget build(BuildContext context) {
     return DottedBorder(
       strokeWidth: 1.5,
-      dashPattern: [3,3],
+      dashPattern: [3, 3],
       color: AppColors.white,
       borderType: BorderType.Circle,
-      child: SizedBox(
+      child: const SizedBox(
         width: 18,
         height: 18,
-        child: Center(
-          child: Icon(
-            Icons.play_arrow_rounded,
-            color: AppColors.white,
-            size: 15,
-          ),
-        ),
+        child: Center(child: Icon(Icons.play_arrow_rounded, color: AppColors.white, size: 15)),
       ),
     );
   }

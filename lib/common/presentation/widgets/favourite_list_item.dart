@@ -4,10 +4,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sureline/common/presentation/widgets/sureline_overlay.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/preferenecs/favourites/domain/entity/favourite_entity.dart';
-import 'package:sureline/features/preferenecs/history/domain/entity/history_entity.dart';
-import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
-import 'package:sureline/features/preferenecs/search/domain/entity/search_entity.dart';
+import 'package:sureline/common/domain/entities/collections/favourite_entity.dart';
+import 'package:sureline/common/domain/entities/collections/history_entity.dart';
+import 'package:sureline/common/domain/entities/collections/own_quote_entity.dart';
+import 'package:sureline/common/domain/entities/collections/search_entity.dart';
 
 class FavouriteListItem extends StatefulWidget {
   final bool isOverlayVisible;
@@ -83,17 +83,13 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                 ),
                 if ((widget.isHistory ?? false) == false) ...[
                   SurelineOverlay(
-                    onClose:
-                        () => widget.onOverlayToggled(!widget.isOverlayVisible),
+                    onClose: () => widget.onOverlayToggled(!widget.isOverlayVisible),
 
                     overlay: GestureDetector(
                       onTap: widget.onDeletePressed,
                       child: Container(
                         width: 200,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 12,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                         decoration: BoxDecoration(
                           color: CupertinoColors.systemGrey6,
                           borderRadius: BorderRadius.circular(13),
@@ -109,10 +105,7 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                                 fontWeight: FontWeight.normal,
                               ),
                             ),
-                            Icon(
-                              CupertinoIcons.delete,
-                              color: CupertinoColors.destructiveRed,
-                            ),
+                            Icon(CupertinoIcons.delete, color: CupertinoColors.destructiveRed),
                           ],
                         ),
                       ),
@@ -122,14 +115,8 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                     follower: Alignment.topRight,
                     animateUpwards: true,
                     child: IconButton(
-                      onPressed:
-                          () =>
-                              widget.onOverlayToggled(!widget.isOverlayVisible),
-                      icon: Icon(
-                        Icons.more_vert_rounded,
-                        size: 20,
-                        color: AppColors.primaryColor,
-                      ),
+                      onPressed: () => widget.onOverlayToggled(!widget.isOverlayVisible),
+                      icon: Icon(Icons.more_vert_rounded, size: 20, color: AppColors.primaryColor),
                     ),
                   ),
                 ],
@@ -157,14 +144,10 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                     IconButton(
                       onPressed: widget.onAddToCollectionPressed,
                       icon: Icon(
-                        (widget.favouriteEntity?.collections.isNotEmpty ==
-                                    true ||
-                                widget.ownQuoteEntity?.collections.isNotEmpty ==
-                                    true ||
-                                widget.historyEntity?.collections.isNotEmpty ==
-                                    true ||
-                                widget.searchEntity?.collections.isNotEmpty ==
-                                    true)
+                        (widget.favouriteEntity?.collections.isNotEmpty == true ||
+                                widget.ownQuoteEntity?.collections.isNotEmpty == true ||
+                                widget.historyEntity?.collections.isNotEmpty == true ||
+                                widget.searchEntity?.collections.isNotEmpty == true)
                             ? Icons.bookmark_rounded
                             : Icons.bookmark_border_outlined,
                         color: AppColors.primaryColor,
@@ -176,9 +159,7 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                       IconButton(
                         onPressed: widget.onFavouritePressed,
                         icon: Icon(
-                          widget.isFavourite == true
-                              ? Icons.favorite
-                              : Icons.favorite_border,
+                          widget.isFavourite == true ? Icons.favorite : Icons.favorite_border,
                           color: AppColors.primaryColor,
                         ),
                       ),
@@ -191,15 +172,10 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                             widget.searchEntity?.quoteText ??
                             '';
                         if (quoteText.isNotEmpty) {
-                          SharePlus.instance.share(
-                            ShareParams(text: '"$quoteText"'),
-                          );
+                          SharePlus.instance.share(ShareParams(text: '"$quoteText"'));
                         }
                       },
-                      icon: Icon(
-                        Icons.ios_share_rounded,
-                        color: AppColors.primaryColor,
-                      ),
+                      icon: Icon(Icons.ios_share_rounded, color: AppColors.primaryColor),
                     ),
                   ],
                 ),

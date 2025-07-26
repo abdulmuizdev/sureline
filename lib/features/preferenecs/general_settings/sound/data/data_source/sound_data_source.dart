@@ -6,13 +6,19 @@ import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/error/failures.dart';
 
+/// Abstract class defining the contract for sound data operations.
 abstract class SoundDataSource {
+  /// Retrieves the current volume setting.
   Future<Either<Failure, double>> getVolume();
+
+  /// Sets the volume to the specified value.
   Future<Either<Failure, void>> setVolume(double volume);
 }
 
-class SoundDataSourceImpl extends SoundDataSource {
-  SoundDataSourceImpl();
+/// Implementation of SoundDataSource that handles sound operations.
+class SoundDataSourceImpl implements SoundDataSource {
+  /// Creates a new SoundDataSourceImpl instance.
+  const SoundDataSourceImpl();
 
   @override
   Future<Either<Failure, double>> getVolume() async {
@@ -21,7 +27,7 @@ class SoundDataSourceImpl extends SoundDataSource {
       final volume = prefs.getDouble(SP.volume) ?? Constants.defaultVolume;
       return Right(volume);
     } catch (e) {
-      debugPrint('${e}');
+      debugPrint('$e');
       return Left(UnknownFailure());
     }
   }
@@ -32,9 +38,9 @@ class SoundDataSourceImpl extends SoundDataSource {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble(SP.volume, volume);
       App.volume = volume;
-      return Right(unit);
+      return const Right(null);
     } catch (e) {
-      debugPrint('${e}');
+      debugPrint('$e');
       return Left(UnknownFailure());
     }
   }

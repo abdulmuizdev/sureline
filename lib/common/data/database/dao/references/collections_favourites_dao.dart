@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:sureline/core/db/app_database.dart';
 import 'package:sureline/core/db/tables/collections_table.dart';
-import 'package:sureline/core/db/tables/favourites.dart';
 import 'package:sureline/core/db/tables/references/collections_favourites.dart';
 
 part 'collections_favourites_dao.g.dart';
@@ -15,9 +14,7 @@ class CollectionsFavouritesDao extends DatabaseAccessor<AppDatabase>
     return select(collectionsFavourites).get();
   }
 
-  Future<List<CollectionsTableData>> getCollectionsOfFavourite(
-    int favouriteId,
-  ) {
+  Future<List<CollectionsTableData>> getCollectionsOfFavourite(int favouriteId) {
     return (select(collectionsTable)..where(
       (tbl) => tbl.id.isInQuery(
         selectOnly(collectionsFavourites)
@@ -37,17 +34,13 @@ class CollectionsFavouritesDao extends DatabaseAccessor<AppDatabase>
     )).get();
   }
 
-  Future<void> addCollectionFavourite(
-    CollectionsFavouritesCompanion collectionFavourite,
-  ) {
+  Future<void> addCollectionFavourite(CollectionsFavouritesCompanion collectionFavourite) {
     return into(collectionsFavourites).insert(collectionFavourite);
   }
 
   Future<void> removeCollectionFavourite(int collectionId, int favouriteId) {
     return (delete(collectionsFavourites)..where(
-      (tbl) =>
-          tbl.collectionId.equals(collectionId) &
-          tbl.favouriteId.equals(favouriteId),
+      (tbl) => tbl.collectionId.equals(collectionId) & tbl.favouriteId.equals(favouriteId),
     )).go();
   }
 }

@@ -12,6 +12,19 @@ import 'package:sureline/features/preferenecs/general_settings/voice/presentatio
 import 'package:sureline/features/preferenecs/general_settings/voice/presentation/bloc/voice_state.dart';
 import 'package:sureline/features/preferenecs/general_settings/voice/presentation/widget/voice_list_item.dart';
 
+/// Bottom sheet widget for selecting text-to-speech voices.
+///
+/// This widget provides a clean interface for users to select and
+/// configure text-to-speech voices for reading quotes aloud. It includes
+/// features like:
+/// - List of all available TTS voices on the device
+/// - Visual indication of the currently selected voice
+/// - Real-time voice preview when selecting
+/// - Persistent storage of voice preferences
+/// - Filtering to show only English voices
+///
+/// The widget follows the Clean Architecture pattern by using BlocProvider
+/// for state management and delegating business logic to the VoiceBloc.
 class VoiceBottomSheet extends StatefulWidget {
   const VoiceBottomSheet({super.key});
 
@@ -20,18 +33,25 @@ class VoiceBottomSheet extends StatefulWidget {
 }
 
 class _VoiceBottomSheetState extends State<VoiceBottomSheet> {
+  /// List of available voice entities
   List<VoiceEntity> _voices = [];
+
+  /// Index of the currently selected voice in the list
   int _selectedIndex = -1;
+
+  /// FlutterTts instance for voice preview functionality
   FlutterTts tts = FlutterTts();
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        // Provide the VoiceBloc and trigger initial voice loading
         BlocProvider(create: (_) => locator<VoiceBloc>()..add(GetVoices())),
       ],
       child: BlocListener<VoiceBloc, VoiceState>(
         listener: (context, state) {
+          // Update local state when voices are loaded
           if (state is GotVoices) {
             _voices = state.voices;
             _selectedIndex = state.selectedIndex;
@@ -45,6 +65,7 @@ class _VoiceBottomSheetState extends State<VoiceBottomSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header with title
                   Text(
                     'Voice',
                     style: TextStyle(
@@ -54,6 +75,7 @@ class _VoiceBottomSheetState extends State<VoiceBottomSheet> {
                     ),
                   ),
                   SizedBox(height: 22),
+                  // Scrollable list of available voices
                   Expanded(
                     child: ListView.builder(
                       itemCount: _voices.length,
@@ -65,9 +87,8 @@ class _VoiceBottomSheetState extends State<VoiceBottomSheet> {
                           isLast: index == _voices.length - 1,
                           isSelected: _selectedIndex == index,
                           onPressed: () async {
-                            context.read<VoiceBloc>().add(
-                              OnVoiceItemPressed(_voices[index]),
-                            );
+                            // Update voice selection and trigger change
+                            context.read<VoiceBloc>().add(OnVoiceItemPressed(_voices[index]));
                             setState(() {
                               _selectedIndex = index;
                             });

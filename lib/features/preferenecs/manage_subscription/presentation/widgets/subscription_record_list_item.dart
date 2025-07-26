@@ -2,10 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 
+/// Widget for displaying a subscription record list item.
 class SubscriptionRecordListItem extends StatelessWidget {
+  /// Whether to show a connecting line above the item.
   final bool showLine;
+
+  /// The title text to display.
   final String title;
+
+  /// The date to display.
   final DateTime date;
+
+  /// Creates a new SubscriptionRecordListItem instance.
   const SubscriptionRecordListItem({
     super.key,
     required this.showLine,
@@ -30,13 +38,13 @@ class SubscriptionRecordListItem extends StatelessWidget {
                 ),
               ),
             ],
-            Icon(Icons.check_circle, color: AppColors.primaryColor, size: 24),
+            const Icon(Icons.check_circle, color: AppColors.primaryColor, size: 24),
           ],
         ),
         const SizedBox(width: 12),
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.normal,
             color: AppColors.primaryColor,
@@ -45,7 +53,7 @@ class SubscriptionRecordListItem extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           DateFormat('dd/MM/yyyy').format(date),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.normal,
             color: AppColors.primaryColor,

@@ -45,6 +45,20 @@ PODS:
     - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
+  - purchases_flutter (9.1.0):
+    - Flutter
+    - PurchasesHybridCommon (= 16.0.2)
+  - purchases_ui_flutter (9.1.0):
+    - Flutter
+    - PurchasesHybridCommonUI (= 16.0.2)
+  - PurchasesHybridCommon (16.0.2):
+    - RevenueCat (= 5.33.1)
+  - PurchasesHybridCommonUI (16.0.2):
+    - PurchasesHybridCommon (= 16.0.2)
+    - RevenueCatUI (= 5.33.1)
+  - RevenueCat (5.33.1)
+  - RevenueCatUI (5.33.1):
+    - RevenueCat (= 5.33.1)
   - screenshot_callback (0.0.1):
     - Flutter
   - share_plus (0.0.1):
@@ -111,6 +125,8 @@ DEPENDENCIES:
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - purchases_flutter (from `.symlinks/plugins/purchases_flutter/ios`)
+  - purchases_ui_flutter (from `.symlinks/plugins/purchases_ui_flutter/ios`)
   - screenshot_callback (from `.symlinks/plugins/screenshot_callback/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preference_app_group (from `.symlinks/plugins/shared_preference_app_group/ios`)
@@ -125,6 +141,10 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - OrderedSet
+    - PurchasesHybridCommon
+    - PurchasesHybridCommonUI
+    - RevenueCat
+    - RevenueCatUI
     - sqlite3
 
 EXTERNAL SOURCES:
@@ -168,6 +188,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  purchases_flutter:
+    :path: ".symlinks/plugins/purchases_flutter/ios"
+  purchases_ui_flutter:
+    :path: ".symlinks/plugins/purchases_ui_flutter/ios"
   screenshot_callback:
     :path: ".symlinks/plugins/screenshot_callback/ios"
   share_plus:
@@ -211,6 +235,12 @@ SPEC CHECKSUMS:
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
+  purchases_flutter: 818eabac676b9037ac7692d4bc48a52a10b276be
+  purchases_ui_flutter: bf93f63c042fdcd043c2f3254d340aa2383df10e
+  PurchasesHybridCommon: ae7a0a6e105ecdde3e8816a004e57f0a2a7b9261
+  PurchasesHybridCommonUI: f94430070f5ec1cc9513666402871dc70f42ec36
+  RevenueCat: b0ed01125b05a45b8264a2951ad68acb61942038
+  RevenueCatUI: e6fad6a8bec67d910da78cd171328f1104afea77
   screenshot_callback: 85707df1b45a59407f7de87de2408c2f5312a473
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preference_app_group: 7422922a188e05cf680a656e18e2786dcb5c58b3

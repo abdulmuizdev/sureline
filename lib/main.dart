@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:sureline/common/domain/use_cases/get_voice_use_case.dart';
 import 'package:sureline/common/domain/use_cases/is_onboarding_completed_use_case.dart';
 import 'package:sureline/common/domain/use_cases/schedule_up_to_sixty_notifications_use_case.dart';
 import 'package:sureline/core/app/app.dart';
+import 'package:sureline/core/constants/secrets.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/preferenecs/general_settings/sound/domain/use_cases/get_volume_use_case.dart';
 import 'package:sureline/features/preferenecs/general_settings/voice/data/model/voice_model.dart';
-import 'package:sureline/features/home/domain/use_cases/save_all_quotes_to_app_group_use_case.dart';
 import 'package:sureline/features/home/presentation/pages/home_screen.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/initialize_notifications_presets_use_case.dart';
 import 'package:sureline/features/onboarding/getting_started/getting_started_screen.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/use_cases/initialize_recommendation_algorithm.dart';
 import 'package:sureline/features/remote_config/domain/use_cases/prepare_remote_config_use_case.dart';
 import 'package:sureline/features/theme_selection/domain/use_case/set_theme_use_case.dart';
+import 'package:sureline/core/utils/utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
 
-  await locator<InitializeRecommendationAlgorithm>().call();
+  await initializeRevenueCat();
+
+  // Check premium status before initializing recommendation algorithm
+  final isPremium = await Utils.checkPremiumStatus();
+  await locator<InitializeRecommendationAlgorithm>().call(isPremium: isPremium);
   await locator<PrepareRemoteConfigUseCase>().execute();
   final result = await locator<GetVolumeUseCase>().execute();
   result.fold((left) {}, (right) {
@@ -38,18 +43,24 @@ void main() async {
 
   // await locator<SaveAllQuotesToAppGroupUseCase>().execute();
   _cacheFonts();
-  await (await locator<IsOnboardingCompletedUseCase>().execute()).fold(
-    (left) {},
-    (right) async {
-      if (right) {
-        await locator<InitializeNotificationsPresetsUseCase>().execute();
-        await locator<ScheduleUpToSixtyNotificationsUseCase>().execute();
-        runApp(const MyApp(isOnboarded: true));
-      } else {
-        runApp(const MyApp(isOnboarded: false));
-      }
-    },
-  );
+  print('here');
+  await (await locator<IsOnboardingCompletedUseCase>().execute()).fold((left) {}, (right) async {
+    if (right) {
+      await locator<InitializeNotificationsPresetsUseCase>().execute();
+      await locator<ScheduleUpToSixtyNotificationsUseCase>().execute();
+      runApp(const MyApp(isOnboarded: true));
+    } else {
+      runApp(const MyApp(isOnboarded: false));
+    }
+  });
+}
+
+Future<void> initializeRevenueCat() async {
+  await Purchases.setLogLevel(LogLevel.debug);
+
+  final configuration = PurchasesConfiguration(Secrets.revenueCatApiKey);
+
+  await Purchases.configure(configuration);
 }
 
 void _cacheFonts() {
@@ -172,93 +183,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // fontFamily: Constants.defaultFontFamily,
       ),
-      home: (isOnboarded) ? HomeScreen() : GettingStartedScreen(),
+      home: (isOnboarded) ? HomeScreen() : HomeScreen(),
     );
   }
 }
-
-// import 'dart:typed_data';
-// import 'dart:ui' as ui;
-// import 'package:flutter/material.dart';
-// import 'package:flutter/rendering.dart';
-//
-// void main() => runApp(MaterialApp(home: TextToImageExample()));
-//
-// class TextToImageExample extends StatefulWidget {
-//   @override
-//   _TextToImageExampleState createState() => _TextToImageExampleState();
-// }
-//
-// class _TextToImageExampleState extends State<TextToImageExample> {
-//   final GlobalKey _textKey = GlobalKey();
-//   Uint8List? _textImageBytes;
-//
-//   Future<void> _convertTextToImage() async {
-//     try {
-//       RenderRepaintBoundary boundary = _textKey.currentContext!
-//           .findRenderObject() as RenderRepaintBoundary;
-//
-//       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-//       ByteData? byteData =
-//       await image.toByteData(format: ui.ImageByteFormat.png);
-//
-//       setState(() {
-//         _textImageBytes = byteData!.buffer.asUint8List();
-//       });
-//     } catch (e) {
-//       debugPrint('Error converting text to image: $e');
-//     }
-//   }
-//   double _width = 0;
-//   double _height = 0;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       final temp  =_textKey.currentContext!.findRenderObject() as RenderBox;
-//       final Size size = temp.size;
-//       setState(() {
-//         _width = size.width;
-//         _height = size.height;
-//       });
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text("Text to Image")),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             // This shows the image generated from the text
-//             _textImageBytes != null
-//                 ? SizedBox(width: _width, height: _height, child: Image.memory(_textImageBytes!))
-//                 : SizedBox(height: 100, child: Text('No image yet')),
-//
-//             SizedBox(height: 20),
-//
-//             // This is the text that gets rendered as an image
-//             RepaintBoundary(
-//               key: _textKey,
-//               child: Text(
-//                 'This is a rendered image',
-//                 style: TextStyle(fontSize: 24, color: Colors.amber),
-//               ),
-//             ),
-//
-//             SizedBox(height: 20),
-//
-//             ElevatedButton(
-//               onPressed: _convertTextToImage,
-//               child: Text("Render Text as Image"),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

@@ -17,47 +17,71 @@ import 'package:sureline/features/onboarding/icon_selection/presentation/pages/i
 import 'package:sureline/features/onboarding/notification/presentation/widgets/notification_selector.dart';
 import 'package:sureline/features/onboarding/notification/presentation/widgets/time_selector.dart';
 
+/// Screen for setting up notifications during the onboarding process.
+/// This screen allows users to configure notification frequency and timing,
+/// with animated visual demonstrations and interactive time selection.
+///
+/// The screen includes complex animations, notification limit handling,
+/// and integration with the notification system for quote delivery.
 class OnboardingNotificationScreen extends StatefulWidget {
   const OnboardingNotificationScreen({super.key});
 
   @override
-  _OnboardingNotificationScreenState createState() =>
-      _OnboardingNotificationScreenState();
+  _OnboardingNotificationScreenState createState() => _OnboardingNotificationScreenState();
 }
 
-class _OnboardingNotificationScreenState
-    extends State<OnboardingNotificationScreen>
+class _OnboardingNotificationScreenState extends State<OnboardingNotificationScreen>
     with TickerProviderStateMixin {
+  /// Number of notifications to schedule per day.
+  /// Controlled by the notification selector widget.
   int _notificationCount = 10;
+
+  /// Center coordinates for animation positioning.
   double centerX = 0;
   double centerY = 0;
+
+  /// Whether the first time selector overlay is visible.
+  /// Controls the visibility of the first time picker.
   bool _isFirstOverlayVisible = false;
+
+  /// Whether the second time selector overlay is visible.
+  /// Controls the visibility of the second time picker.
   bool _isSecondOverlayVisible = false;
+
+  /// The first notification time in string format.
+  /// Defaults to '9:00 AM'.
   String _firstTime = '9:00 AM';
+
+  /// The second notification time in string format.
+  /// Defaults to '10:00 AM'.
   String _secondTime = '10:00 AM';
 
+  /// Animation controller for the main notification animation.
   late AnimationController _controller;
+
+  /// Curved animation for smooth transitions.
   late CurvedAnimation _animation;
+
+  /// Position animation for the notification image.
   late Animation<Offset> _positionAnimation;
 
+  /// Second animation controller for width animations.
   late AnimationController _controller2;
+
+  /// Second position animation for additional effects.
   late Animation<Offset> _positionAnimation2;
+
+  /// Width animation for the notification container.
   late Animation<double> _widthAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 1000),
-    );
+    _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 1000));
     _animation = CurvedAnimation(parent: _controller, curve: Curves.linear);
 
-    _controller2 = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 1000),
-    );
+    _controller2 = AnimationController(vsync: this, duration: Duration(milliseconds: 1000));
     _positionAnimation = Tween<Offset>(
       begin: Offset(0, 0),
       end: Offset(0, -(10 / 80)),
@@ -90,12 +114,7 @@ class _OnboardingNotificationScreenState
       child: Scaffold(
         body: GestureDetector(
           onTap: () {
-            if (_isFirstOverlayVisible || _isSecondOverlayVisible) {
-              setState(() {
-                _isFirstOverlayVisible = false;
-                _isSecondOverlayVisible = false;
-              });
-            }
+            _hideOverlays();
           },
           child: Stack(
             children: [
@@ -105,8 +124,7 @@ class _OnboardingNotificationScreenState
                   children: [
                     OnboardingHeading(
                       title: 'Get quotes throughout the day',
-                      subTitle:
-                          'Reading quotes regularly will help you reach your goals',
+                      subTitle: 'Reading quotes regularly will help you reach your goals',
                       reduceMargins: true,
                     ),
                     Padding(
@@ -127,12 +145,8 @@ class _OnboardingNotificationScreenState
                                         width: _widthAnimation.value,
                                         height: 80,
                                         decoration: BoxDecoration(
-                                          color: AppColors.pureWhite.withValues(
-                                            alpha: 0.4,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            13,
-                                          ),
+                                          color: AppColors.pureWhite.withValues(alpha: 0.4),
+                                          borderRadius: BorderRadius.circular(13),
                                         ),
                                       );
                                     },
@@ -141,9 +155,7 @@ class _OnboardingNotificationScreenState
                               ),
                               SlideTransition(
                                 position: _positionAnimation,
-                                child: Image.asset(
-                                  'assets/images/notification.png',
-                                ),
+                                child: Image.asset('assets/images/notification.png'),
                               ),
                             ],
                           ),
@@ -153,54 +165,7 @@ class _OnboardingNotificationScreenState
                     SizedBox(height: 40),
                     NotificationSelector(
                       onValueChanged: (value) async {
-                        setState(() {
-                          _notificationCount = value;
-                        });
-                        if (value == Constants.headsUpNotificationLimit) {
-                          final prefs = await SharedPreferences.getInstance();
-                          final hasShownDialog =
-                              prefs.getBool(
-                                SP.hasShownNotificationLimitDialog,
-                              ) ??
-                              false;
-
-                          if (hasShownDialog) {
-                            return;
-                          }
-
-                          if (mounted && context.mounted) {
-                            showCupertinoDialog(
-                              context: context,
-                              builder:
-                                  (_) => CupertinoAlertDialog(
-                                    title: Text('Heads up!'),
-                                    content: Text(
-                                      'We can only schedule up to 60 notifications at a time. If you stop getting them, please launch the app and they\'ll be reset.',
-                                    ),
-                                    actions: [
-                                      CupertinoDialogAction(
-                                        child: Text(
-                                          'Done',
-                                          style: TextStyle(
-                                            color: Color(0xFF007AFF),
-
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                            );
-
-                            await prefs.setBool(
-                              SP.hasShownNotificationLimitDialog,
-                              true,
-                            );
-                          }
-                        }
+                        _handleNotificationCountChange(value);
                       },
                     ),
                     SizedBox(height: 10),
@@ -215,17 +180,10 @@ class _OnboardingNotificationScreenState
                                 time: _firstTime,
                                 isOverlayVisible: _isFirstOverlayVisible,
                                 onOverlayToggled: (isVisible) {
-                                  setState(() {
-                                    _isFirstOverlayVisible = isVisible;
-                                    if (_isSecondOverlayVisible) {
-                                      _isSecondOverlayVisible = false;
-                                    }
-                                  });
+                                  _handleFirstTimeOverlayToggle(isVisible);
                                 },
                                 onTimeChange: (newTime) {
-                                  setState(() {
-                                    _firstTime = newTime;
-                                  });
+                                  _handleFirstTimeChange(newTime);
                                 },
                               ),
                             SizedBox(height: 1),
@@ -235,53 +193,17 @@ class _OnboardingNotificationScreenState
                                 time: _secondTime,
                                 isOverlayVisible: _isSecondOverlayVisible,
                                 onOverlayToggled: (isVisible) {
-                                  setState(() {
-                                    _isSecondOverlayVisible = isVisible;
-                                    if (_isFirstOverlayVisible) {
-                                      _isFirstOverlayVisible = false;
-                                    }
-                                  });
+                                  _handleSecondTimeOverlayToggle(isVisible);
                                 },
                                 onTimeChange: (newTime) {
-                                  setState(() {
-                                    _secondTime = newTime;
-                                  });
+                                  _handleSecondTimeChange(newTime);
                                 },
                               ),
                             Spacer(),
                             SurelineButton(
                               text: 'Allow and Save',
                               onPressed: () async {
-                                // final settings =
-                                //     await FlutterLocalNotificationsPlugin()
-                                //         .resolvePlatformSpecificImplementation<
-                                //           IOSFlutterLocalNotificationsPlugin
-                                //         >()
-                                //         ?.requestPermissions(
-                                //           alert: true,
-                                //           badge: true,
-                                //           sound: true,
-                                //         );
-                                await locator<
-                                      InitializeNotificationsPresetsUseCase
-                                    >()
-                                    .execute();
-                                await locator<
-                                      ScheduleUpToSixtyNotificationsUseCase
-                                    >()
-                                    .execute();
-
-                                await Future.delayed(Duration(seconds: 1));
-                                await HapticFeedback.lightImpact();
-
-                                if (mounted && context.mounted) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) => IconSelectionScreen(),
-                                    ),
-                                  );
-                                }
+                                await _handleSaveAndContinue();
                               },
                             ),
                           ],
@@ -296,5 +218,131 @@ class _OnboardingNotificationScreenState
         ),
       ),
     );
+  }
+
+  /// Hides all time selector overlays when tapping outside.
+  /// This method ensures only one time picker is visible at a time.
+  void _hideOverlays() {
+    if (_isFirstOverlayVisible || _isSecondOverlayVisible) {
+      setState(() {
+        _isFirstOverlayVisible = false;
+        _isSecondOverlayVisible = false;
+      });
+    }
+  }
+
+  /// Handles changes to the notification count from the selector.
+  /// Shows a dialog when the limit is reached and manages the dialog state.
+  ///
+  /// [value] - The new notification count selected by the user
+  void _handleNotificationCountChange(int value) async {
+    setState(() {
+      _notificationCount = value;
+    });
+
+    if (value == Constants.headsUpNotificationLimit) {
+      final prefs = await SharedPreferences.getInstance();
+      final hasShownDialog = prefs.getBool(SP.hasShownNotificationLimitDialog) ?? false;
+
+      if (hasShownDialog) {
+        return;
+      }
+
+      if (mounted && context.mounted) {
+        _showNotificationLimitDialog();
+        await prefs.setBool(SP.hasShownNotificationLimitDialog, true);
+      }
+    }
+  }
+
+  /// Shows a dialog explaining the notification limit.
+  /// Informs users about the 60 notification limit and what to do if notifications stop.
+  void _showNotificationLimitDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder:
+          (_) => CupertinoAlertDialog(
+            title: Text('Heads up!'),
+            content: Text(
+              'We can only schedule up to 60 notifications at a time. If you stop getting them, please launch the app and they\'ll be reset.',
+            ),
+            actions: [
+              CupertinoDialogAction(
+                child: Text(
+                  'Done',
+                  style: TextStyle(color: Color(0xFF007AFF), fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+    );
+  }
+
+  /// Handles toggle of the first time selector overlay.
+  /// Ensures only one overlay is visible at a time.
+  ///
+  /// [isVisible] - Whether the overlay should be visible
+  void _handleFirstTimeOverlayToggle(bool isVisible) {
+    setState(() {
+      _isFirstOverlayVisible = isVisible;
+      if (_isSecondOverlayVisible) {
+        _isSecondOverlayVisible = false;
+      }
+    });
+  }
+
+  /// Handles toggle of the second time selector overlay.
+  /// Ensures only one overlay is visible at a time.
+  ///
+  /// [isVisible] - Whether the overlay should be visible
+  void _handleSecondTimeOverlayToggle(bool isVisible) {
+    setState(() {
+      _isSecondOverlayVisible = isVisible;
+      if (_isFirstOverlayVisible) {
+        _isFirstOverlayVisible = false;
+      }
+    });
+  }
+
+  /// Updates the first notification time.
+  ///
+  /// [newTime] - The new time string to set
+  void _handleFirstTimeChange(String newTime) {
+    setState(() {
+      _firstTime = newTime;
+    });
+  }
+
+  /// Updates the second notification time.
+  ///
+  /// [newTime] - The new time string to set
+  void _handleSecondTimeChange(String newTime) {
+    setState(() {
+      _secondTime = newTime;
+    });
+  }
+
+  /// Handles the save and continue process.
+  /// Initializes notification presets, schedules notifications,
+  /// and navigates to the next onboarding step.
+  Future<void> _handleSaveAndContinue() async {
+    await locator<InitializeNotificationsPresetsUseCase>().execute();
+    await locator<ScheduleUpToSixtyNotificationsUseCase>().execute();
+
+    await Future.delayed(Duration(seconds: 1));
+    await HapticFeedback.lightImpact();
+
+    if (mounted && context.mounted) {
+      _navigateToIconSelection();
+    }
+  }
+
+  /// Navigates to the icon selection screen.
+  /// This method handles the transition to the next onboarding step.
+  void _navigateToIconSelection() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => IconSelectionScreen()));
   }
 }

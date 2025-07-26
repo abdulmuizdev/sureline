@@ -1,20 +1,32 @@
 import 'package:dartz/dartz.dart';
+import 'package:sureline/common/data/model/collections/history_model.dart';
+import 'package:sureline/common/data/model/collections/own_quote_model.dart';
+import 'package:sureline/common/data/model/collections/search_model.dart';
+import 'package:sureline/common/data/model/quote_model.dart';
+import 'package:sureline/common/domain/entities/collections/favourite_entity.dart';
+import 'package:sureline/common/domain/entities/collections/history_entity.dart';
+import 'package:sureline/common/domain/entities/collections/own_quote_entity.dart';
+import 'package:sureline/common/domain/entities/collections/search_entity.dart';
+import 'package:sureline/common/domain/entities/recommendation_algorithm/quote_entity.dart';
 import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/features/preferenecs/favourites/data/data_source/favourites_data_source.dart';
-import 'package:sureline/features/preferenecs/favourites/domain/entity/favourite_entity.dart';
 import 'package:sureline/features/preferenecs/favourites/domain/repository/favourites_repository.dart';
-import 'package:sureline/features/preferenecs/history/data/model/history_model.dart';
-import 'package:sureline/features/preferenecs/history/domain/entity/history_entity.dart';
-import 'package:sureline/features/preferenecs/own_quotes/data/model/own_quote_model.dart';
-import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
-import 'package:sureline/features/recommendation_algorithm/data/model/quote_model.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
-import 'package:sureline/features/preferenecs/search/data/model/search_model.dart';
-import 'package:sureline/features/preferenecs/search/domain/entity/search_entity.dart';
 
+/// Implementation of FavouritesRepository that handles favourites data operations.
+///
+/// This class implements the FavouritesRepository interface and provides
+/// concrete implementations for all favourites-related operations. It follows
+/// the Clean Architecture pattern by depending on the data source interface
+/// and converting between domain entities and data models.
+///
+/// The repository acts as a mediator between the domain layer and the data
+/// layer, ensuring proper data transformation and error handling.
 class FavouritesRepositoryImpl extends FavouritesRepository {
   final FavouritesDataSource dataSource;
 
+  /// Creates a new FavouritesRepositoryImpl instance.
+  ///
+  /// [dataSource] - The data source for favourites operations
   FavouritesRepositoryImpl(this.dataSource);
 
   @override
@@ -29,18 +41,18 @@ class FavouritesRepositoryImpl extends FavouritesRepository {
     HistoryEntity? history,
     SearchEntity? search,
   }) async {
+    // Convert domain entities to data models and delegate to data source
     if (quote != null) {
       return dataSource.addFavourite(quote: QuoteModel.fromEntity(quote));
     } else if (ownQuote != null) {
-      return dataSource.addFavourite(
-        ownQuote: OwnQuoteModel.fromEntity(ownQuote!),
-      );
+      return dataSource.addFavourite(ownQuote: OwnQuoteModel.fromEntity(ownQuote));
     } else if (search != null) {
-      return dataSource.addFavourite(search: SearchModel.fromEntity(search!));
+      return dataSource.addFavourite(search: SearchModel.fromEntity(search));
+    } else if (history != null) {
+      return dataSource.addFavourite(history: HistoryModel.fromEntity(history));
     } else {
-      return dataSource.addFavourite(
-        history: HistoryModel.fromEntity(history!),
-      );
+      // Return failure if no valid entity is provided
+      return Left(UnknownFailure());
     }
   }
 
@@ -51,6 +63,7 @@ class FavouritesRepositoryImpl extends FavouritesRepository {
     int? historyId,
     int? searchId,
   }) async {
+    // Delegate the removal operation to the data source
     return dataSource.removeFavourite(
       quoteId: quoteId,
       ownQuoteId: ownQuoteId,

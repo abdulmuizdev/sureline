@@ -1,7 +1,12 @@
+/// Custom button widget for home screen actions.
+///
+/// Provides consistent styling for home screen buttons.
+
 import 'package:flutter/material.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 
+/// Custom button widget for home screen interactions.
 class HomeButton extends StatelessWidget {
   final IconData icon;
   const HomeButton({super.key, required this.icon});
@@ -24,7 +29,7 @@ class HomeButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(icon, color: AppColors.primaryColor,),
+        child: Icon(icon, color: AppColors.primaryColor),
       ),
     );
   }

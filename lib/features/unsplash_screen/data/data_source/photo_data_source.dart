@@ -6,19 +6,39 @@ import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/features/unsplash_screen/data/model/photo_model.dart';
 import 'package:http/http.dart' as http;
 
+/// Abstract interface for Unsplash API photo operations.
+///
+/// Defines contract for photo retrieval and search with pagination support.
 abstract class PhotoDataSource {
+  /// Retrieves photos from Unsplash API with pagination.
+  /// [page] - Page number for pagination
+  /// Returns Either<Failure, List<PhotoModel>> - Photos or error
   Future<Either<Failure, List<PhotoModel>>> getPhotos(int page);
-  Future<Either<Failure, List<PhotoModel>>> searchPhotos(
-    String query,
-    int page,
-  );
+
+  /// Searches photos from Unsplash API with query and pagination.
+  /// [query] - Search term for photo filtering
+  /// [page] - Page number for pagination
+  /// Returns Either<Failure, List<PhotoModel>> - Search results or error
+  Future<Either<Failure, List<PhotoModel>>> searchPhotos(String query, int page);
 }
 
+/// Implementation of PhotoDataSource with HTTP client.
+///
+/// Handles Unsplash API integration with proper error handling and JSON parsing.
+/// Manages API authentication and response processing.
 class PhotoDataSourceImpl extends PhotoDataSource {
+  /// HTTP client for API requests
   final http.Client client;
 
+  /// Creates PhotoDataSourceImpl with HTTP client dependency.
+  /// [client] - HTTP client for API requests
   PhotoDataSourceImpl(this.client);
 
+  /// Retrieves photos from Unsplash collections API.
+  /// Handles API response parsing and error handling.
+  ///
+  /// [page] - Page number for pagination
+  /// Returns Either<Failure, List<PhotoModel>> - Photos or error
   @override
   Future<Either<Failure, List<PhotoModel>>> getPhotos(int page) async {
     try {
@@ -28,9 +48,9 @@ class PhotoDataSourceImpl extends PhotoDataSource {
         ),
       );
       if (response.statusCode == 200) {
-        List<dynamic> raw = json.decode(response.body);
+        final raw = json.decode(response.body) as List<dynamic>;
         List<PhotoModel> photos =
-            raw.map((json) => PhotoModel.fromJson(json)).toList();
+            raw.map((json) => PhotoModel.fromJson(json as Map<String, dynamic>)).toList();
         return Right(photos);
       } else {
         return Left(UnknownFailure());
@@ -41,11 +61,14 @@ class PhotoDataSourceImpl extends PhotoDataSource {
     }
   }
 
+  /// Searches photos from Unsplash search API.
+  /// Handles search response parsing and error handling.
+  ///
+  /// [query] - Search term for photo filtering
+  /// [page] - Page number for pagination
+  /// Returns Either<Failure, List<PhotoModel>> - Search results or error
   @override
-  Future<Either<Failure, List<PhotoModel>>> searchPhotos(
-    String query,
-    int page,
-  ) async {
+  Future<Either<Failure, List<PhotoModel>>> searchPhotos(String query, int page) async {
     try {
       final response = await client.get(
         Uri.parse(
@@ -53,9 +76,10 @@ class PhotoDataSourceImpl extends PhotoDataSource {
         ),
       );
       if (response.statusCode == 200) {
-        List<dynamic> raw = json.decode(response.body)['results'];
+        final responseBody = json.decode(response.body) as Map<String, dynamic>;
+        final raw = responseBody['results'] as List<dynamic>;
         List<PhotoModel> photos =
-            raw.map((json) => PhotoModel.fromJson(json)).toList();
+            raw.map((json) => PhotoModel.fromJson(json as Map<String, dynamic>)).toList();
         return Right(photos);
       } else {
         return Left(UnknownFailure());

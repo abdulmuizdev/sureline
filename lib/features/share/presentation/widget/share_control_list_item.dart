@@ -7,19 +7,14 @@ class ShareControlListItem extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
 
-  const ShareControlListItem({
-    super.key,
-    required this.icon,
-    required this.label,
-    this.onPressed,
-  });
+  const ShareControlListItem({super.key, required this.icon, required this.label, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: GestureDetector(
-        onTap: (){
+        onTap: () {
           HapticFeedback.lightImpact();
           if (onPressed != null) {
             onPressed!();
@@ -37,14 +32,14 @@ class ShareControlListItem extends StatelessWidget {
                   color: AppColors.pureWhite,
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: Icon(icon, size: 20,),
+                child: Icon(icon, size: 20),
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               Expanded(
                 child: Text(
                   label,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
                     decoration: TextDecoration.none,

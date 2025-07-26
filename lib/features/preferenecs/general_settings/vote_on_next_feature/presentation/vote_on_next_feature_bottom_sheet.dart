@@ -3,6 +3,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:sureline/common/presentation/dialog/streak/widget/sureline_back_button.dart';
 import 'package:sureline/core/theme/app_colors.dart';
+import 'package:sureline/core/constants/secrets.dart';
 import 'package:sureline/core/utils/utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -10,12 +11,10 @@ class VoteOnNextFeatureBottomSheet extends StatefulWidget {
   const VoteOnNextFeatureBottomSheet({super.key});
 
   @override
-  State<VoteOnNextFeatureBottomSheet> createState() =>
-      _VoteOnNextFeatureBottomSheetState();
+  State<VoteOnNextFeatureBottomSheet> createState() => _VoteOnNextFeatureBottomSheetState();
 }
 
-class _VoteOnNextFeatureBottomSheetState
-    extends State<VoteOnNextFeatureBottomSheet> {
+class _VoteOnNextFeatureBottomSheetState extends State<VoteOnNextFeatureBottomSheet> {
   WebViewController _controller = WebViewController();
   bool _isLoading = true;
 
@@ -38,7 +37,7 @@ class _VoteOnNextFeatureBottomSheetState
           )
           ..loadRequest(
             Uri.parse(
-              'https://webview.canny.io?boardToken=eec871a0-9aa7-bc62-1ada-c03e2c47076e&ssoToken=${_generateCannyToken()}',
+              'https://webview.canny.io?boardToken=${Secrets.cannyBoardToken}&ssoToken=${_generateCannyToken()}',
             ),
           );
   }
@@ -47,13 +46,13 @@ class _VoteOnNextFeatureBottomSheetState
     // User data for Canny token generation
     final Map<String, dynamic> userData = {
       'avatarURL': null, // optional, but preferred
-      'email': 'abdulmuiz.social@gmail.com',
+      'email': Secrets.defaultUserEmail,
       'id': '1',
       'name': 'Abdul Muiz',
     };
 
     // Private key for JWT signing
-    const String privateKey = '4f876493-9a17-ce3f-c171-d5de700eb3a4';
+    const String privateKey = Secrets.cannyPrivateKey;
 
     try {
       // Create JWT payload
@@ -68,12 +67,8 @@ class _VoteOnNextFeatureBottomSheetState
       final Map<String, dynamic> header = {'alg': 'HS256', 'typ': 'JWT'};
 
       // Encode header and payload to base64url
-      final String encodedHeader = _base64UrlEncode(
-        utf8.encode(json.encode(header)),
-      );
-      final String encodedPayload = _base64UrlEncode(
-        utf8.encode(json.encode(payload)),
-      );
+      final String encodedHeader = _base64UrlEncode(utf8.encode(json.encode(header)));
+      final String encodedPayload = _base64UrlEncode(utf8.encode(json.encode(payload)));
 
       // Create signature input
       final String signatureInput = '$encodedHeader.$encodedPayload';

@@ -4,17 +4,13 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/features/home/presentation/pages/home_screen.dart';
 import 'package:sureline/features/home/presentation/bloc/home_bloc.dart';
-import 'package:sureline/features/home/presentation/bloc/home_event.dart';
-import 'package:sureline/features/home/presentation/bloc/home_state.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
+import 'package:sureline/common/domain/entities/recommendation_algorithm/quote_entity.dart';
 import 'package:sureline/core/di/injection.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('HomeScreen scrolls visually 50 times', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('HomeScreen scrolls visually 50 times', (WidgetTester tester) async {
     // Initialize dependency injection
     await setupLocator();
 
@@ -29,6 +25,7 @@ void main() {
         createdAt: DateTime.now(),
         shownAt: null,
         quoteKey: GlobalKey(),
+        isLiked: false,
       ),
     );
 
@@ -37,12 +34,7 @@ void main() {
 
     // Build the HomeScreen
     await tester.pumpWidget(
-      MaterialApp(
-        home: BlocProvider<HomeBloc>.value(
-          value: homeBloc,
-          child: const HomeScreen(),
-        ),
-      ),
+      MaterialApp(home: BlocProvider<HomeBloc>.value(value: homeBloc, child: const HomeScreen())),
     );
 
     // Wait for initial build
@@ -81,9 +73,7 @@ void main() {
 
       // Print progress every 10 scrolls
       if ((i + 1) % 10 == 0) {
-        print(
-          'Completed ${i + 1} scrolls. Successful: $successfulScrolls, Failed: $failedScrolls',
-        );
+        print('Completed ${i + 1} scrolls. Successful: $successfulScrolls, Failed: $failedScrolls');
       }
     }
 
@@ -107,8 +97,6 @@ void main() {
     print('Total scrolls attempted: $scrollCount');
     print('Successful scrolls: $successfulScrolls');
     print('Failed scrolls: $failedScrolls');
-    print(
-      'Success rate: ${(successfulScrolls / scrollCount * 100).toStringAsFixed(2)}%',
-    );
+    print('Success rate: ${(successfulScrolls / scrollCount * 100).toStringAsFixed(2)}%');
   });
 }

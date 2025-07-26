@@ -8,6 +8,12 @@ import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/home/presentation/pages/home_screen.dart';
 
+/// Screen that guides users through installing Sureline widgets on their Home Screen.
+/// This screen provides step-by-step instructions and handles the app minimization
+/// flow to allow users to access their Home Screen for widget installation.
+///
+/// The screen monitors app lifecycle changes to detect when users return from
+/// the Home Screen, automatically navigating to the main app when they resume.
 class HomeScreenWidgetScreen extends StatefulWidget {
   const HomeScreenWidgetScreen({super.key});
 
@@ -29,26 +35,17 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
     super.dispose();
   }
 
+  /// Handles app lifecycle state changes to detect when users return from Home Screen.
+  /// When the app is resumed, it automatically navigates to the main home screen
+  /// with a fade transition, assuming the user has completed widget installation.
+  ///
+  /// [state] - The new app lifecycle state
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).push(
-          PageRouteBuilder(
-            pageBuilder:
-                (context, animation, secondaryAnimation) => HomeScreen(),
-            transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: Duration(milliseconds: 300),
-          ),
-        );
+        _navigateToHomeScreen();
       });
     }
   }
@@ -69,10 +66,7 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
                   reduceMargins: true,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 25,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 25),
                   child: Image.asset('assets/images/home_screen.png'),
                 ),
                 Spacer(),
@@ -80,38 +74,13 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
                   disableVerticalPadding: true,
                   text: 'Install widget',
                   onPressed: () async {
-                    showCupertinoDialog(
-                      context: context,
-                      builder:
-                          (_) => CupertinoAlertDialog(
-                            title: Text(
-                              '\'Sureline\' would like to open your Home Screen',
-                            ),
-                            content: Text(
-                              'The app will close and your phone\'s Home Screen will open.',
-                            ),
-                            actions: [
-                              CupertinoDialogAction(
-                                child: Text(
-                                  'Open',
-                                  style: TextStyle(
-                                    color: Color(0xFF007AFF),
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                                onPressed: () => FlutterAppMinimizer.minimize(),
-                              ),
-                            ],
-                          ),
-                    );
+                    _showInstallationDialog(context);
                   },
                 ),
                 SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
+                    _navigateToHomeScreen();
                   },
                   child: Text(
                     'Remind me later',
@@ -126,6 +95,52 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Shows a confirmation dialog before minimizing the app to open the Home Screen.
+  /// The dialog explains that the app will close and the Home Screen will open,
+  /// allowing users to proceed with widget installation.
+  ///
+  /// [context] - The build context for showing the dialog
+  void _showInstallationDialog(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder:
+          (_) => CupertinoAlertDialog(
+            title: Text('\'Sureline\' would like to open your Home Screen'),
+            content: Text('The app will close and your phone\'s Home Screen will open.'),
+            actions: [
+              CupertinoDialogAction(
+                child: Text(
+                  'Open',
+                  style: TextStyle(color: Color(0xFF007AFF), fontWeight: FontWeight.normal),
+                ),
+                onPressed: () => _minimizeApp(),
+              ),
+            ],
+          ),
+    );
+  }
+
+  /// Minimizes the Flutter app to allow users to access their Home Screen
+  /// for widget installation. This is the final step in the widget setup process.
+  void _minimizeApp() {
+    FlutterAppMinimizer.minimize();
+  }
+
+  /// Navigates to the main home screen with a fade transition.
+  /// This method is called when users return from the Home Screen or choose
+  /// to skip widget installation.
+  void _navigateToHomeScreen() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => HomeScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        transitionDuration: Duration(milliseconds: 300),
       ),
     );
   }

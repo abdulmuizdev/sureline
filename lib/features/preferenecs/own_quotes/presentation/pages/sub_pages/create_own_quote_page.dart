@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sureline/common/domain/entities/collections/own_quote_entity.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/common/presentation/widgets/sureline_text_field.dart';
-import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
-
 import 'package:sureline/features/preferenecs/own_quotes/presentation/bloc/own_quotes_bloc.dart';
 import 'package:sureline/features/preferenecs/own_quotes/presentation/bloc/own_quotes_event.dart';
 import 'package:sureline/features/preferenecs/own_quotes/presentation/bloc/own_quotes_state.dart';

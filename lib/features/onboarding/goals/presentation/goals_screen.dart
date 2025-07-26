@@ -6,6 +6,12 @@ import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/common/presentation/widgets/sureline_text_field.dart';
 import 'package:sureline/features/onboarding/interested_catag/presentation/interested_categories_screen.dart';
 
+/// Screen for collecting user goals during the onboarding process.
+/// This screen allows users to input their personal goals and aspirations,
+/// which helps personalize their quote experience throughout the app.
+///
+/// The screen includes input validation to ensure users provide meaningful
+/// goals, with options to skip or save based on user preference.
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
 
@@ -14,7 +20,12 @@ class GoalsScreen extends StatefulWidget {
 }
 
 class _GoalsScreenState extends State<GoalsScreen> {
+  /// Controller for managing the goals input field text.
+  /// Handles user input and provides access to the entered goals.
   final TextEditingController _goalsController = TextEditingController();
+
+  /// Whether the save goals button should be disabled.
+  /// This is controlled by whether the user has entered any text.
   bool _isSaveGoalsButtonDisabled = true;
 
   @override
@@ -46,8 +57,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 ),
                 OnboardingHeading(
                   title: 'What are your goals right now?',
-                  subTitle:
-                      'The more you share, the more personalized your quotes will be',
+                  subTitle: 'The more you share, the more personalized your quotes will be',
                   reduceMargins: true,
                 ),
 
@@ -77,9 +87,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
     );
   }
 
+  /// Navigates to the next onboarding step (interested categories screen).
+  /// This method handles the transition to the next step in the onboarding
+  /// flow, regardless of whether goals were saved or skipped.
   void _goToNextPage() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => InterestedCategoriesScreen()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (context) => InterestedCategoriesScreen()));
   }
 }

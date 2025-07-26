@@ -19,10 +19,7 @@ abstract class StreakDataSource {
 
   Either<Failure, List<StreakModel>> getAllStreakData();
 
-  Either<Failure, bool> isStreakBroken(
-    List<StreakModel> streakData, {
-    DateTime? currentDate,
-  });
+  Either<Failure, bool> isStreakBroken(List<StreakModel> streakData, {DateTime? currentDate});
 
   Future<Either<Failure, void>> clearStreakData();
 
@@ -72,7 +69,7 @@ class StreakDataSourceImpl extends StreakDataSource {
     if (raw != null) {
       List<StreakModel> streakData =
           (jsonDecode(raw) as List<dynamic>)
-              .map((json) => StreakModel.fromJson(json))
+              .map((json) => StreakModel.fromJson(json as Map<String, dynamic>))
               .toList();
       if (streakData.length > 7) {
         streakData = streakData.sublist(streakData.length - 7);
@@ -84,13 +81,7 @@ class StreakDataSourceImpl extends StreakDataSource {
 
       List<DateTime> checkInDates =
           streakData
-              .map(
-                (e) => DateTime(
-                  e.timeStamp.year,
-                  e.timeStamp.month,
-                  e.timeStamp.day,
-                ),
-              )
+              .map((e) => DateTime(e.timeStamp.year, e.timeStamp.month, e.timeStamp.day))
               .toList();
 
       if (checkInDates.length < 7 && checkInDates.isNotEmpty) {
@@ -116,11 +107,7 @@ class StreakDataSourceImpl extends StreakDataSource {
         }
       } else {
         for (int i = 6; i >= 0; i--) {
-          final date = DateTime(
-            now.year,
-            now.month,
-            now.day,
-          ).subtract(Duration(days: i));
+          final date = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
           final isChecked = checkInDates.contains(date);
           final dayLabel = Utils.getWeekDayLabel(date.weekday);
 
@@ -145,11 +132,7 @@ class StreakDataSourceImpl extends StreakDataSource {
         if (!data[i].isChecked) continue;
 
         // Look ahead for next checked day within allowed gap
-        for (
-          int j = i + 1;
-          j <= i + allowedOffDays + 1 && j < data.length;
-          j++
-        ) {
+        for (int j = i + 1; j <= i + allowedOffDays + 1 && j < data.length; j++) {
           if (data[j].isChecked) {
             // Found another check-in, mark all days in between as missed
             for (int k = i + 1; k < j; k++) {
@@ -169,10 +152,7 @@ class StreakDataSourceImpl extends StreakDataSource {
   }
 
   @override
-  Either<Failure, bool> isStreakBroken(
-    List<StreakModel> streakData, {
-    DateTime? currentDate,
-  }) {
+  Either<Failure, bool> isStreakBroken(List<StreakModel> streakData, {DateTime? currentDate}) {
     return Right(_isStreakBroken(streakData, currentDate: currentDate));
   }
 
@@ -189,13 +169,7 @@ class StreakDataSourceImpl extends StreakDataSource {
     // Normalize all dates (remove time) and keep unique days only
     final checkInDates =
         streakData
-            .map(
-              (e) => DateTime(
-                e.timeStamp.year,
-                e.timeStamp.month,
-                e.timeStamp.day,
-              ),
-            )
+            .map((e) => DateTime(e.timeStamp.year, e.timeStamp.month, e.timeStamp.day))
             .toList();
 
     if (checkInDates.length < 7) {
@@ -209,19 +183,14 @@ class StreakDataSourceImpl extends StreakDataSource {
         comparisonDays.add(date);
       }
 
-      final missedDays =
-          comparisonDays.where((day) => !checkInDates.contains(day)).length;
+      final missedDays = comparisonDays.where((day) => !checkInDates.contains(day)).length;
       return missedDays > maxMissesAllowed;
     }
 
     // Check last 7 days (including today)
-    final last7Days = List.generate(
-      7,
-      (i) => today.subtract(Duration(days: i)),
-    );
+    final last7Days = List.generate(7, (i) => today.subtract(Duration(days: i)));
 
-    final missedDays =
-        last7Days.where((day) => !checkInDates.contains(day)).length;
+    final missedDays = last7Days.where((day) => !checkInDates.contains(day)).length;
 
     return missedDays > maxMissesAllowed;
   }
@@ -232,7 +201,7 @@ class StreakDataSourceImpl extends StreakDataSource {
     if (raw != null) {
       final List<StreakModel> streakData =
           (jsonDecode(raw) as List<dynamic>)
-              .map((json) => StreakModel.fromJson(json))
+              .map((json) => StreakModel.fromJson(json as Map<String, dynamic>))
               .toList();
       streakData.sort((a, b) => a.timeStamp.compareTo(b.timeStamp));
       return Right(streakData.last);
@@ -248,7 +217,7 @@ class StreakDataSourceImpl extends StreakDataSource {
     final List<StreakModel> streakData =
         (raw != null)
             ? (jsonDecode(raw) as List<dynamic>)
-                .map((json) => StreakModel.fromJson(json))
+                .map((json) => StreakModel.fromJson(json as Map<String, dynamic>))
                 .toList()
             : [];
 
@@ -269,7 +238,7 @@ class StreakDataSourceImpl extends StreakDataSource {
     final List<StreakModel> currentData =
         (raw != null)
             ? (jsonDecode(raw) as List<dynamic>)
-                .map((json) => StreakModel.fromJson(json))
+                .map((json) => StreakModel.fromJson(json as Map<String, dynamic>))
                 .toList()
             : [];
     final archivedStatus = await prefs.setString(
@@ -297,7 +266,7 @@ class StreakDataSourceImpl extends StreakDataSource {
     List<StreakModel> streakData =
         (raw != null)
             ? (jsonDecode(raw) as List<dynamic>)
-                .map((json) => StreakModel.fromJson(json))
+                .map((json) => StreakModel.fromJson(json as Map<String, dynamic>))
                 .toList()
             : [];
 
@@ -319,10 +288,7 @@ class StreakDataSourceImpl extends StreakDataSource {
 
       // Initial layout with no size constraint to measure the widget
       final renderView = RenderView(
-        child: RenderPositionedBox(
-          alignment: Alignment.center,
-          child: repaintBoundary,
-        ),
+        child: RenderPositionedBox(alignment: Alignment.center, child: repaintBoundary),
         configuration: ViewConfiguration(
           physicalConstraints: const BoxConstraints(),
           logicalConstraints: const BoxConstraints(),
@@ -358,10 +324,7 @@ class StreakDataSourceImpl extends StreakDataSource {
       // Now that we have the size, prepare a second render with tight constraints
       final repaintBoundary2 = RenderRepaintBoundary();
       final renderView2 = RenderView(
-        child: RenderPositionedBox(
-          alignment: Alignment.center,
-          child: repaintBoundary2,
-        ),
+        child: RenderPositionedBox(alignment: Alignment.center, child: repaintBoundary2),
         configuration: ViewConfiguration(
           physicalConstraints: BoxConstraints.tight(physicalSize),
           logicalConstraints: BoxConstraints.tight(dynamicSize),
@@ -393,9 +356,7 @@ class StreakDataSourceImpl extends StreakDataSource {
       final pngBytes = byteData!.buffer.asUint8List();
 
       final tempDir = await getTemporaryDirectory();
-      final file = File(
-        '${tempDir.path}/rendered_widget_${DateTime.now().toIso8601String()}.png',
-      );
+      final file = File('${tempDir.path}/rendered_widget_${DateTime.now().toIso8601String()}.png');
       await file.writeAsBytes(pngBytes);
 
       return Right(file.path);
@@ -412,7 +373,7 @@ class StreakDataSourceImpl extends StreakDataSource {
     List<StreakModel> streakData =
         (raw != null)
             ? (jsonDecode(raw) as List<dynamic>)
-                .map((json) => StreakModel.fromJson(json))
+                .map((json) => StreakModel.fromJson(json as Map<String, dynamic>))
                 .toList()
             : [];
     return Right(streakData.length);

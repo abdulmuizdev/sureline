@@ -3,23 +3,22 @@ import 'package:sureline/features/preferenecs/general_settings/author_preference
 class AuthorPrefEntity {
   final String authorName;
   final bool isPreferred;
-  final bool isLocked;
+
+  final bool isPremium;
 
   const AuthorPrefEntity({
     required this.authorName,
     this.isPreferred = false,
-    required this.isLocked,
+
+    this.isPremium = false,
   });
 
-  AuthorPrefEntity copyWith({
-    String? authorName,
-    bool? isPreferred,
-    bool? isLocked,
-  }) {
+  AuthorPrefEntity copyWith({String? authorName, bool? isPreferred, bool? isPremium}) {
     return AuthorPrefEntity(
       authorName: authorName ?? this.authorName,
       isPreferred: isPreferred ?? this.isPreferred,
-      isLocked: isLocked ?? this.isLocked,
+
+      isPremium: isPremium ?? this.isPremium,
     );
   }
 
@@ -27,7 +26,7 @@ class AuthorPrefEntity {
     return AuthorPrefEntity(
       authorName: model.authorName,
       isPreferred: model.isPreferred,
-      isLocked: model.isLocked,
+      isPremium: model.isPremium,
     );
   }
 }

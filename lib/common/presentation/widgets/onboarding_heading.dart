@@ -7,6 +7,7 @@ class OnboardingHeading extends StatelessWidget {
   final bool? reduceMargins;
   final bool? disableMargins;
   final bool? disableTopMargin;
+  final Color? textColor;
 
   const OnboardingHeading({
     super.key,
@@ -15,6 +16,7 @@ class OnboardingHeading extends StatelessWidget {
     this.reduceMargins,
     this.disableMargins,
     this.disableTopMargin,
+    this.textColor,
   });
 
   @override
@@ -35,7 +37,7 @@ class OnboardingHeading extends StatelessWidget {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w500,
-              color: AppColors.primaryColor,
+              color: textColor ?? AppColors.primaryColor,
             ),
           ),
           SizedBox(height: 20),
@@ -50,7 +52,7 @@ class OnboardingHeading extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
-                  color: AppColors.primaryColor,
+                  color: textColor ?? AppColors.primaryColor,
                 ),
               ),
             ),

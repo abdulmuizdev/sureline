@@ -9,10 +9,8 @@ class MutedContentBloc extends Bloc<MutedContentEvent, MutedContentState> {
   final GetMutedContentUseCase _getMutedContentOptionsUseCase;
   final UpdateMutedContentUseCase _updateMutedContentUseCase;
 
-  MutedContentBloc(
-    this._getMutedContentOptionsUseCase,
-    this._updateMutedContentUseCase,
-  ) : super(Initial()) {
+  MutedContentBloc(this._getMutedContentOptionsUseCase, this._updateMutedContentUseCase)
+    : super(Initial()) {
     on<GetMutedContentOptions>((event, emit) async {
       emit(GettingMutedContentOptions());
       final result = await _getMutedContentOptionsUseCase.call();
@@ -22,10 +20,7 @@ class MutedContentBloc extends Bloc<MutedContentEvent, MutedContentState> {
         } else {
           emit(
             GotMutedContentOptions(
-              MutedContentEntity(
-                isWithAuthorMuted: false,
-                isWithoutAuthorMuted: false,
-              ),
+              MutedContentEntity(isWithAuthorMuted: false, isWithoutAuthorMuted: false),
             ),
           );
         }
@@ -36,6 +31,7 @@ class MutedContentBloc extends Bloc<MutedContentEvent, MutedContentState> {
       final result = await _updateMutedContentUseCase.call(
         withoutAuthor: event.mutedContent.first.isWithoutAuthorMuted,
         withAuthor: event.mutedContent.first.isWithAuthorMuted,
+        isPremium: event.isPremium,
       );
       await result.fold((left) {}, (right) async {
         final mutedContentResult = await _getMutedContentOptionsUseCase.call();
@@ -45,10 +41,7 @@ class MutedContentBloc extends Bloc<MutedContentEvent, MutedContentState> {
           } else {
             emit(
               GotMutedContentOptions(
-                MutedContentEntity(
-                  isWithAuthorMuted: false,
-                  isWithoutAuthorMuted: false,
-                ),
+                MutedContentEntity(isWithAuthorMuted: false, isWithoutAuthorMuted: false),
               ),
             );
           }

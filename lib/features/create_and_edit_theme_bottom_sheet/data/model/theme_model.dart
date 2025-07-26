@@ -3,10 +3,12 @@ import 'dart:ui';
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/core/utils/utils.dart';
 
+/// Model class for theme data.
 class ThemeModel extends ThemeEntity {
   final ThemeTextDecorModel textDecorModel;
   final ThemeBackgroundModel backgroundModel;
 
+  /// Creates a new ThemeModel instance.
   ThemeModel({
     required this.textDecorModel,
     required this.backgroundModel,
@@ -19,24 +21,23 @@ class ThemeModel extends ThemeEntity {
     required super.isSeasonal,
     required super.isMostPopular,
     required super.isUserCreated,
-  }) : super(
-         textDecorEntity: textDecorModel,
-         backgroundEntity: backgroundModel,
-       );
+  }) : super(textDecorEntity: textDecorModel, backgroundEntity: backgroundModel);
 
   factory ThemeModel.fromJson(Map<String, dynamic> json) {
     return ThemeModel(
-      textDecorModel: ThemeTextDecorModel.fromJson(json['textDecorEntity']),
-      backgroundModel: ThemeBackgroundModel.fromJson(json['backgroundEntity']),
-      lastAccessed: DateTime.parse(json['lastAccessed']),
-      previewQuote: json['previewQuote'],
-      isActive: json['isActive'] ?? false,
-      id: json['id'],
-      isFree: json['isFree'] ?? false,
-      isNew: json['isNew'] ?? false,
-      isSeasonal: json['isSeasonal'] ?? false,
-      isMostPopular: json['isMostPopular'] ?? false,
-      isUserCreated: json['isUserCreated'] ?? false,
+      textDecorModel: ThemeTextDecorModel.fromJson(json['textDecorEntity'] as Map<String, dynamic>),
+      backgroundModel: ThemeBackgroundModel.fromJson(
+        json['backgroundEntity'] as Map<String, dynamic>,
+      ),
+      lastAccessed: DateTime.parse(json['lastAccessed'] as String),
+      previewQuote: json['previewQuote'] as String?,
+      isActive: json['isActive'] as bool? ?? false,
+      id: json['id'] as String?,
+      isFree: json['isFree'] as bool? ?? false,
+      isNew: json['isNew'] as bool? ?? false,
+      isSeasonal: json['isSeasonal'] as bool? ?? false,
+      isMostPopular: json['isMostPopular'] as bool? ?? false,
+      isUserCreated: json['isUserCreated'] as bool? ?? false,
     );
   }
 
@@ -85,10 +86,8 @@ class ThemeModel extends ThemeEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'textDecorEntity':
-          (ThemeTextDecorModel.fromEntity(textDecorEntity)).toJson(),
-      'backgroundEntity':
-          (ThemeBackgroundModel.fromEntity(backgroundEntity)).toJson(),
+      'textDecorEntity': (ThemeTextDecorModel.fromEntity(textDecorEntity)).toJson(),
+      'backgroundEntity': (ThemeBackgroundModel.fromEntity(backgroundEntity)).toJson(),
       'previewQuote': previewQuote,
       'isActive': isActive,
       'lastAccessed': lastAccessed.toIso8601String(),
@@ -102,6 +101,7 @@ class ThemeModel extends ThemeEntity {
   }
 }
 
+/// Model class for theme background data.
 class ThemeBackgroundModel extends ThemeBackgroundEntity {
   const ThemeBackgroundModel({
     required super.path,
@@ -125,13 +125,12 @@ class ThemeBackgroundModel extends ThemeBackgroundEntity {
 
   factory ThemeBackgroundModel.fromJson(Map<String, dynamic> json) {
     return ThemeBackgroundModel(
-      path: json['path'],
-      solidColor:
-          (json['solidColor'] != null) ? Color(json['solidColor']) : null,
-      isNetwork: json['isNetwork'],
-      isLocallyStored: json['isLocallyStored'],
-      isLiveBackground: json['isLiveBackground'],
-      previewImage: json['previewImage'],
+      path: json['path'] as String?,
+      solidColor: (json['solidColor'] != null) ? Color(json['solidColor'] as int) : null,
+      isNetwork: json['isNetwork'] as bool? ?? false,
+      isLocallyStored: json['isLocallyStored'] as bool? ?? false,
+      isLiveBackground: json['isLiveBackground'] as bool? ?? false,
+      previewImage: json['previewImage'] as String?,
     );
   }
 
@@ -147,6 +146,7 @@ class ThemeBackgroundModel extends ThemeBackgroundEntity {
   }
 }
 
+/// Model class for theme text decoration data.
 class ThemeTextDecorModel extends ThemeTextDecorEntity {
   const ThemeTextDecorModel({
     required super.fontSize,
@@ -172,16 +172,16 @@ class ThemeTextDecorModel extends ThemeTextDecorEntity {
 
   factory ThemeTextDecorModel.fromJson(Map<String, dynamic> json) {
     return ThemeTextDecorModel(
-      fontSize: json['fontSize'],
+      fontSize: (json['fontSize'] as num).toDouble(),
       fontWeight: FontWeight.values.firstWhere(
-        (fw) => fw.value == json['fontWeight'],
+        (fw) => fw.value == json['fontWeight'] as int,
         orElse: () => FontWeight.normal,
       ),
-      fontFamily: json['fontFamily'],
-      textAlign: TextAlign.values[json['textAlign']],
-      textColor: Color(json['textColor']),
-      outlineState: json['outlineState'],
-      textPadding: json['textPadding'],
+      fontFamily: json['fontFamily'] as String,
+      textAlign: TextAlign.values[json['textAlign'] as int],
+      textColor: Color(json['textColor'] as int),
+      outlineState: json['outlineState'] as int,
+      textPadding: (json['textPadding'] as num).toDouble(),
     );
   }
 

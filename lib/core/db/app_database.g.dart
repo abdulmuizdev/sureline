@@ -256,467 +256,6 @@ class CollectionsTableCompanion extends UpdateCompanion<CollectionsTableData> {
   }
 }
 
-class $QuotesTable extends Quotes with TableInfo<$QuotesTable, Quote> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $QuotesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _quoteTextMeta = const VerificationMeta(
-    'quoteText',
-  );
-  @override
-  late final GeneratedColumn<String> quoteText = GeneratedColumn<String>(
-    'quote_text',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _authorMeta = const VerificationMeta('author');
-  @override
-  late final GeneratedColumn<String> author = GeneratedColumn<String>(
-    'author',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _isRestrictedMeta = const VerificationMeta(
-    'isRestricted',
-  );
-  @override
-  late final GeneratedColumn<bool> isRestricted = GeneratedColumn<bool>(
-    'is_restricted',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_restricted" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
-  static const VerificationMeta _orderMeta = const VerificationMeta('order');
-  @override
-  late final GeneratedColumn<int> order = GeneratedColumn<int>(
-    'order',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  static const VerificationMeta _shownAtMeta = const VerificationMeta(
-    'shownAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> shownAt = GeneratedColumn<DateTime>(
-    'shown_at',
-    aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    quoteText,
-    author,
-    isRestricted,
-    order,
-    createdAt,
-    shownAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'quotes';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<Quote> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('quote_text')) {
-      context.handle(
-        _quoteTextMeta,
-        quoteText.isAcceptableOrUnknown(data['quote_text']!, _quoteTextMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_quoteTextMeta);
-    }
-    if (data.containsKey('author')) {
-      context.handle(
-        _authorMeta,
-        author.isAcceptableOrUnknown(data['author']!, _authorMeta),
-      );
-    }
-    if (data.containsKey('is_restricted')) {
-      context.handle(
-        _isRestrictedMeta,
-        isRestricted.isAcceptableOrUnknown(
-          data['is_restricted']!,
-          _isRestrictedMeta,
-        ),
-      );
-    }
-    if (data.containsKey('order')) {
-      context.handle(
-        _orderMeta,
-        order.isAcceptableOrUnknown(data['order']!, _orderMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_orderMeta);
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    }
-    if (data.containsKey('shown_at')) {
-      context.handle(
-        _shownAtMeta,
-        shownAt.isAcceptableOrUnknown(data['shown_at']!, _shownAtMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Quote map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Quote(
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}id'],
-          )!,
-      quoteText:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}quote_text'],
-          )!,
-      author: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}author'],
-      ),
-      isRestricted:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.bool,
-            data['${effectivePrefix}is_restricted'],
-          )!,
-      order:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}order'],
-          )!,
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      shownAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}shown_at'],
-      ),
-    );
-  }
-
-  @override
-  $QuotesTable createAlias(String alias) {
-    return $QuotesTable(attachedDatabase, alias);
-  }
-}
-
-class Quote extends DataClass implements Insertable<Quote> {
-  final int id;
-  final String quoteText;
-  final String? author;
-  final bool isRestricted;
-  final int order;
-  final DateTime createdAt;
-  final DateTime? shownAt;
-  const Quote({
-    required this.id,
-    required this.quoteText,
-    this.author,
-    required this.isRestricted,
-    required this.order,
-    required this.createdAt,
-    this.shownAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['quote_text'] = Variable<String>(quoteText);
-    if (!nullToAbsent || author != null) {
-      map['author'] = Variable<String>(author);
-    }
-    map['is_restricted'] = Variable<bool>(isRestricted);
-    map['order'] = Variable<int>(order);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    if (!nullToAbsent || shownAt != null) {
-      map['shown_at'] = Variable<DateTime>(shownAt);
-    }
-    return map;
-  }
-
-  QuotesCompanion toCompanion(bool nullToAbsent) {
-    return QuotesCompanion(
-      id: Value(id),
-      quoteText: Value(quoteText),
-      author:
-          author == null && nullToAbsent ? const Value.absent() : Value(author),
-      isRestricted: Value(isRestricted),
-      order: Value(order),
-      createdAt: Value(createdAt),
-      shownAt:
-          shownAt == null && nullToAbsent
-              ? const Value.absent()
-              : Value(shownAt),
-    );
-  }
-
-  factory Quote.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Quote(
-      id: serializer.fromJson<int>(json['id']),
-      quoteText: serializer.fromJson<String>(json['quoteText']),
-      author: serializer.fromJson<String?>(json['author']),
-      isRestricted: serializer.fromJson<bool>(json['isRestricted']),
-      order: serializer.fromJson<int>(json['order']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      shownAt: serializer.fromJson<DateTime?>(json['shownAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'quoteText': serializer.toJson<String>(quoteText),
-      'author': serializer.toJson<String?>(author),
-      'isRestricted': serializer.toJson<bool>(isRestricted),
-      'order': serializer.toJson<int>(order),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'shownAt': serializer.toJson<DateTime?>(shownAt),
-    };
-  }
-
-  Quote copyWith({
-    int? id,
-    String? quoteText,
-    Value<String?> author = const Value.absent(),
-    bool? isRestricted,
-    int? order,
-    DateTime? createdAt,
-    Value<DateTime?> shownAt = const Value.absent(),
-  }) => Quote(
-    id: id ?? this.id,
-    quoteText: quoteText ?? this.quoteText,
-    author: author.present ? author.value : this.author,
-    isRestricted: isRestricted ?? this.isRestricted,
-    order: order ?? this.order,
-    createdAt: createdAt ?? this.createdAt,
-    shownAt: shownAt.present ? shownAt.value : this.shownAt,
-  );
-  Quote copyWithCompanion(QuotesCompanion data) {
-    return Quote(
-      id: data.id.present ? data.id.value : this.id,
-      quoteText: data.quoteText.present ? data.quoteText.value : this.quoteText,
-      author: data.author.present ? data.author.value : this.author,
-      isRestricted:
-          data.isRestricted.present
-              ? data.isRestricted.value
-              : this.isRestricted,
-      order: data.order.present ? data.order.value : this.order,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      shownAt: data.shownAt.present ? data.shownAt.value : this.shownAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Quote(')
-          ..write('id: $id, ')
-          ..write('quoteText: $quoteText, ')
-          ..write('author: $author, ')
-          ..write('isRestricted: $isRestricted, ')
-          ..write('order: $order, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('shownAt: $shownAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    quoteText,
-    author,
-    isRestricted,
-    order,
-    createdAt,
-    shownAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Quote &&
-          other.id == this.id &&
-          other.quoteText == this.quoteText &&
-          other.author == this.author &&
-          other.isRestricted == this.isRestricted &&
-          other.order == this.order &&
-          other.createdAt == this.createdAt &&
-          other.shownAt == this.shownAt);
-}
-
-class QuotesCompanion extends UpdateCompanion<Quote> {
-  final Value<int> id;
-  final Value<String> quoteText;
-  final Value<String?> author;
-  final Value<bool> isRestricted;
-  final Value<int> order;
-  final Value<DateTime> createdAt;
-  final Value<DateTime?> shownAt;
-  const QuotesCompanion({
-    this.id = const Value.absent(),
-    this.quoteText = const Value.absent(),
-    this.author = const Value.absent(),
-    this.isRestricted = const Value.absent(),
-    this.order = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.shownAt = const Value.absent(),
-  });
-  QuotesCompanion.insert({
-    this.id = const Value.absent(),
-    required String quoteText,
-    this.author = const Value.absent(),
-    this.isRestricted = const Value.absent(),
-    required int order,
-    this.createdAt = const Value.absent(),
-    this.shownAt = const Value.absent(),
-  }) : quoteText = Value(quoteText),
-       order = Value(order);
-  static Insertable<Quote> custom({
-    Expression<int>? id,
-    Expression<String>? quoteText,
-    Expression<String>? author,
-    Expression<bool>? isRestricted,
-    Expression<int>? order,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? shownAt,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (quoteText != null) 'quote_text': quoteText,
-      if (author != null) 'author': author,
-      if (isRestricted != null) 'is_restricted': isRestricted,
-      if (order != null) 'order': order,
-      if (createdAt != null) 'created_at': createdAt,
-      if (shownAt != null) 'shown_at': shownAt,
-    });
-  }
-
-  QuotesCompanion copyWith({
-    Value<int>? id,
-    Value<String>? quoteText,
-    Value<String?>? author,
-    Value<bool>? isRestricted,
-    Value<int>? order,
-    Value<DateTime>? createdAt,
-    Value<DateTime?>? shownAt,
-  }) {
-    return QuotesCompanion(
-      id: id ?? this.id,
-      quoteText: quoteText ?? this.quoteText,
-      author: author ?? this.author,
-      isRestricted: isRestricted ?? this.isRestricted,
-      order: order ?? this.order,
-      createdAt: createdAt ?? this.createdAt,
-      shownAt: shownAt ?? this.shownAt,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (quoteText.present) {
-      map['quote_text'] = Variable<String>(quoteText.value);
-    }
-    if (author.present) {
-      map['author'] = Variable<String>(author.value);
-    }
-    if (isRestricted.present) {
-      map['is_restricted'] = Variable<bool>(isRestricted.value);
-    }
-    if (order.present) {
-      map['order'] = Variable<int>(order.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (shownAt.present) {
-      map['shown_at'] = Variable<DateTime>(shownAt.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('QuotesCompanion(')
-          ..write('id: $id, ')
-          ..write('quoteText: $quoteText, ')
-          ..write('author: $author, ')
-          ..write('isRestricted: $isRestricted, ')
-          ..write('order: $order, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('shownAt: $shownAt')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $FavouritesTable extends Favourites
     with TableInfo<$FavouritesTable, Favourite> {
   @override
@@ -1454,6 +993,517 @@ class CollectionsFavouritesCompanion
           ..write('id: $id, ')
           ..write('collectionId: $collectionId, ')
           ..write('favouriteId: $favouriteId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $QuotesTable extends Quotes with TableInfo<$QuotesTable, Quote> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QuotesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _quoteTextMeta = const VerificationMeta(
+    'quoteText',
+  );
+  @override
+  late final GeneratedColumn<String> quoteText = GeneratedColumn<String>(
+    'quote_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _authorMeta = const VerificationMeta('author');
+  @override
+  late final GeneratedColumn<String> author = GeneratedColumn<String>(
+    'author',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isRestrictedMeta = const VerificationMeta(
+    'isRestricted',
+  );
+  @override
+  late final GeneratedColumn<bool> isRestricted = GeneratedColumn<bool>(
+    'is_restricted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_restricted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _isPremiumMeta = const VerificationMeta(
+    'isPremium',
+  );
+  @override
+  late final GeneratedColumn<bool> isPremium = GeneratedColumn<bool>(
+    'is_premium',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_premium" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _orderMeta = const VerificationMeta('order');
+  @override
+  late final GeneratedColumn<int> order = GeneratedColumn<int>(
+    'order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _shownAtMeta = const VerificationMeta(
+    'shownAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> shownAt = GeneratedColumn<DateTime>(
+    'shown_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    quoteText,
+    author,
+    isRestricted,
+    isPremium,
+    order,
+    createdAt,
+    shownAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'quotes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Quote> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('quote_text')) {
+      context.handle(
+        _quoteTextMeta,
+        quoteText.isAcceptableOrUnknown(data['quote_text']!, _quoteTextMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_quoteTextMeta);
+    }
+    if (data.containsKey('author')) {
+      context.handle(
+        _authorMeta,
+        author.isAcceptableOrUnknown(data['author']!, _authorMeta),
+      );
+    }
+    if (data.containsKey('is_restricted')) {
+      context.handle(
+        _isRestrictedMeta,
+        isRestricted.isAcceptableOrUnknown(
+          data['is_restricted']!,
+          _isRestrictedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_premium')) {
+      context.handle(
+        _isPremiumMeta,
+        isPremium.isAcceptableOrUnknown(data['is_premium']!, _isPremiumMeta),
+      );
+    }
+    if (data.containsKey('order')) {
+      context.handle(
+        _orderMeta,
+        order.isAcceptableOrUnknown(data['order']!, _orderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_orderMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('shown_at')) {
+      context.handle(
+        _shownAtMeta,
+        shownAt.isAcceptableOrUnknown(data['shown_at']!, _shownAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Quote map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Quote(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      quoteText:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}quote_text'],
+          )!,
+      author: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}author'],
+      ),
+      isRestricted:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_restricted'],
+          )!,
+      isPremium:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_premium'],
+          )!,
+      order:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}order'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      shownAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}shown_at'],
+      ),
+    );
+  }
+
+  @override
+  $QuotesTable createAlias(String alias) {
+    return $QuotesTable(attachedDatabase, alias);
+  }
+}
+
+class Quote extends DataClass implements Insertable<Quote> {
+  final int id;
+  final String quoteText;
+  final String? author;
+  final bool isRestricted;
+  final bool isPremium;
+  final int order;
+  final DateTime createdAt;
+  final DateTime? shownAt;
+  const Quote({
+    required this.id,
+    required this.quoteText,
+    this.author,
+    required this.isRestricted,
+    required this.isPremium,
+    required this.order,
+    required this.createdAt,
+    this.shownAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['quote_text'] = Variable<String>(quoteText);
+    if (!nullToAbsent || author != null) {
+      map['author'] = Variable<String>(author);
+    }
+    map['is_restricted'] = Variable<bool>(isRestricted);
+    map['is_premium'] = Variable<bool>(isPremium);
+    map['order'] = Variable<int>(order);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || shownAt != null) {
+      map['shown_at'] = Variable<DateTime>(shownAt);
+    }
+    return map;
+  }
+
+  QuotesCompanion toCompanion(bool nullToAbsent) {
+    return QuotesCompanion(
+      id: Value(id),
+      quoteText: Value(quoteText),
+      author:
+          author == null && nullToAbsent ? const Value.absent() : Value(author),
+      isRestricted: Value(isRestricted),
+      isPremium: Value(isPremium),
+      order: Value(order),
+      createdAt: Value(createdAt),
+      shownAt:
+          shownAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(shownAt),
+    );
+  }
+
+  factory Quote.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Quote(
+      id: serializer.fromJson<int>(json['id']),
+      quoteText: serializer.fromJson<String>(json['quoteText']),
+      author: serializer.fromJson<String?>(json['author']),
+      isRestricted: serializer.fromJson<bool>(json['isRestricted']),
+      isPremium: serializer.fromJson<bool>(json['isPremium']),
+      order: serializer.fromJson<int>(json['order']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      shownAt: serializer.fromJson<DateTime?>(json['shownAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'quoteText': serializer.toJson<String>(quoteText),
+      'author': serializer.toJson<String?>(author),
+      'isRestricted': serializer.toJson<bool>(isRestricted),
+      'isPremium': serializer.toJson<bool>(isPremium),
+      'order': serializer.toJson<int>(order),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'shownAt': serializer.toJson<DateTime?>(shownAt),
+    };
+  }
+
+  Quote copyWith({
+    int? id,
+    String? quoteText,
+    Value<String?> author = const Value.absent(),
+    bool? isRestricted,
+    bool? isPremium,
+    int? order,
+    DateTime? createdAt,
+    Value<DateTime?> shownAt = const Value.absent(),
+  }) => Quote(
+    id: id ?? this.id,
+    quoteText: quoteText ?? this.quoteText,
+    author: author.present ? author.value : this.author,
+    isRestricted: isRestricted ?? this.isRestricted,
+    isPremium: isPremium ?? this.isPremium,
+    order: order ?? this.order,
+    createdAt: createdAt ?? this.createdAt,
+    shownAt: shownAt.present ? shownAt.value : this.shownAt,
+  );
+  Quote copyWithCompanion(QuotesCompanion data) {
+    return Quote(
+      id: data.id.present ? data.id.value : this.id,
+      quoteText: data.quoteText.present ? data.quoteText.value : this.quoteText,
+      author: data.author.present ? data.author.value : this.author,
+      isRestricted:
+          data.isRestricted.present
+              ? data.isRestricted.value
+              : this.isRestricted,
+      isPremium: data.isPremium.present ? data.isPremium.value : this.isPremium,
+      order: data.order.present ? data.order.value : this.order,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      shownAt: data.shownAt.present ? data.shownAt.value : this.shownAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Quote(')
+          ..write('id: $id, ')
+          ..write('quoteText: $quoteText, ')
+          ..write('author: $author, ')
+          ..write('isRestricted: $isRestricted, ')
+          ..write('isPremium: $isPremium, ')
+          ..write('order: $order, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('shownAt: $shownAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    quoteText,
+    author,
+    isRestricted,
+    isPremium,
+    order,
+    createdAt,
+    shownAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Quote &&
+          other.id == this.id &&
+          other.quoteText == this.quoteText &&
+          other.author == this.author &&
+          other.isRestricted == this.isRestricted &&
+          other.isPremium == this.isPremium &&
+          other.order == this.order &&
+          other.createdAt == this.createdAt &&
+          other.shownAt == this.shownAt);
+}
+
+class QuotesCompanion extends UpdateCompanion<Quote> {
+  final Value<int> id;
+  final Value<String> quoteText;
+  final Value<String?> author;
+  final Value<bool> isRestricted;
+  final Value<bool> isPremium;
+  final Value<int> order;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> shownAt;
+  const QuotesCompanion({
+    this.id = const Value.absent(),
+    this.quoteText = const Value.absent(),
+    this.author = const Value.absent(),
+    this.isRestricted = const Value.absent(),
+    this.isPremium = const Value.absent(),
+    this.order = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.shownAt = const Value.absent(),
+  });
+  QuotesCompanion.insert({
+    this.id = const Value.absent(),
+    required String quoteText,
+    this.author = const Value.absent(),
+    this.isRestricted = const Value.absent(),
+    this.isPremium = const Value.absent(),
+    required int order,
+    this.createdAt = const Value.absent(),
+    this.shownAt = const Value.absent(),
+  }) : quoteText = Value(quoteText),
+       order = Value(order);
+  static Insertable<Quote> custom({
+    Expression<int>? id,
+    Expression<String>? quoteText,
+    Expression<String>? author,
+    Expression<bool>? isRestricted,
+    Expression<bool>? isPremium,
+    Expression<int>? order,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? shownAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (quoteText != null) 'quote_text': quoteText,
+      if (author != null) 'author': author,
+      if (isRestricted != null) 'is_restricted': isRestricted,
+      if (isPremium != null) 'is_premium': isPremium,
+      if (order != null) 'order': order,
+      if (createdAt != null) 'created_at': createdAt,
+      if (shownAt != null) 'shown_at': shownAt,
+    });
+  }
+
+  QuotesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? quoteText,
+    Value<String?>? author,
+    Value<bool>? isRestricted,
+    Value<bool>? isPremium,
+    Value<int>? order,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? shownAt,
+  }) {
+    return QuotesCompanion(
+      id: id ?? this.id,
+      quoteText: quoteText ?? this.quoteText,
+      author: author ?? this.author,
+      isRestricted: isRestricted ?? this.isRestricted,
+      isPremium: isPremium ?? this.isPremium,
+      order: order ?? this.order,
+      createdAt: createdAt ?? this.createdAt,
+      shownAt: shownAt ?? this.shownAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (quoteText.present) {
+      map['quote_text'] = Variable<String>(quoteText.value);
+    }
+    if (author.present) {
+      map['author'] = Variable<String>(author.value);
+    }
+    if (isRestricted.present) {
+      map['is_restricted'] = Variable<bool>(isRestricted.value);
+    }
+    if (isPremium.present) {
+      map['is_premium'] = Variable<bool>(isPremium.value);
+    }
+    if (order.present) {
+      map['order'] = Variable<int>(order.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (shownAt.present) {
+      map['shown_at'] = Variable<DateTime>(shownAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QuotesCompanion(')
+          ..write('id: $id, ')
+          ..write('quoteText: $quoteText, ')
+          ..write('author: $author, ')
+          ..write('isRestricted: $isRestricted, ')
+          ..write('isPremium: $isPremium, ')
+          ..write('order: $order, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('shownAt: $shownAt')
           ..write(')'))
         .toString();
   }
@@ -2578,8 +2628,28 @@ class $AuthorPrefsTableTable extends AuthorPrefsTable
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _isPremiumMeta = const VerificationMeta(
+    'isPremium',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, authorName, isPreferred];
+  late final GeneratedColumn<bool> isPremium = GeneratedColumn<bool>(
+    'is_premium',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_premium" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    authorName,
+    isPreferred,
+    isPremium,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2612,6 +2682,12 @@ class $AuthorPrefsTableTable extends AuthorPrefsTable
         ),
       );
     }
+    if (data.containsKey('is_premium')) {
+      context.handle(
+        _isPremiumMeta,
+        isPremium.isAcceptableOrUnknown(data['is_premium']!, _isPremiumMeta),
+      );
+    }
     return context;
   }
 
@@ -2636,6 +2712,11 @@ class $AuthorPrefsTableTable extends AuthorPrefsTable
             DriftSqlType.bool,
             data['${effectivePrefix}is_preferred'],
           )!,
+      isPremium:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_premium'],
+          )!,
     );
   }
 
@@ -2650,10 +2731,12 @@ class AuthorPrefsTableData extends DataClass
   final int id;
   final String authorName;
   final bool isPreferred;
+  final bool isPremium;
   const AuthorPrefsTableData({
     required this.id,
     required this.authorName,
     required this.isPreferred,
+    required this.isPremium,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2661,6 +2744,7 @@ class AuthorPrefsTableData extends DataClass
     map['id'] = Variable<int>(id);
     map['author_name'] = Variable<String>(authorName);
     map['is_preferred'] = Variable<bool>(isPreferred);
+    map['is_premium'] = Variable<bool>(isPremium);
     return map;
   }
 
@@ -2669,6 +2753,7 @@ class AuthorPrefsTableData extends DataClass
       id: Value(id),
       authorName: Value(authorName),
       isPreferred: Value(isPreferred),
+      isPremium: Value(isPremium),
     );
   }
 
@@ -2681,6 +2766,7 @@ class AuthorPrefsTableData extends DataClass
       id: serializer.fromJson<int>(json['id']),
       authorName: serializer.fromJson<String>(json['authorName']),
       isPreferred: serializer.fromJson<bool>(json['isPreferred']),
+      isPremium: serializer.fromJson<bool>(json['isPremium']),
     );
   }
   @override
@@ -2690,6 +2776,7 @@ class AuthorPrefsTableData extends DataClass
       'id': serializer.toJson<int>(id),
       'authorName': serializer.toJson<String>(authorName),
       'isPreferred': serializer.toJson<bool>(isPreferred),
+      'isPremium': serializer.toJson<bool>(isPremium),
     };
   }
 
@@ -2697,10 +2784,12 @@ class AuthorPrefsTableData extends DataClass
     int? id,
     String? authorName,
     bool? isPreferred,
+    bool? isPremium,
   }) => AuthorPrefsTableData(
     id: id ?? this.id,
     authorName: authorName ?? this.authorName,
     isPreferred: isPreferred ?? this.isPreferred,
+    isPremium: isPremium ?? this.isPremium,
   );
   AuthorPrefsTableData copyWithCompanion(AuthorPrefsTableCompanion data) {
     return AuthorPrefsTableData(
@@ -2709,6 +2798,7 @@ class AuthorPrefsTableData extends DataClass
           data.authorName.present ? data.authorName.value : this.authorName,
       isPreferred:
           data.isPreferred.present ? data.isPreferred.value : this.isPreferred,
+      isPremium: data.isPremium.present ? data.isPremium.value : this.isPremium,
     );
   }
 
@@ -2717,45 +2807,52 @@ class AuthorPrefsTableData extends DataClass
     return (StringBuffer('AuthorPrefsTableData(')
           ..write('id: $id, ')
           ..write('authorName: $authorName, ')
-          ..write('isPreferred: $isPreferred')
+          ..write('isPreferred: $isPreferred, ')
+          ..write('isPremium: $isPremium')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, authorName, isPreferred);
+  int get hashCode => Object.hash(id, authorName, isPreferred, isPremium);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is AuthorPrefsTableData &&
           other.id == this.id &&
           other.authorName == this.authorName &&
-          other.isPreferred == this.isPreferred);
+          other.isPreferred == this.isPreferred &&
+          other.isPremium == this.isPremium);
 }
 
 class AuthorPrefsTableCompanion extends UpdateCompanion<AuthorPrefsTableData> {
   final Value<int> id;
   final Value<String> authorName;
   final Value<bool> isPreferred;
+  final Value<bool> isPremium;
   const AuthorPrefsTableCompanion({
     this.id = const Value.absent(),
     this.authorName = const Value.absent(),
     this.isPreferred = const Value.absent(),
+    this.isPremium = const Value.absent(),
   });
   AuthorPrefsTableCompanion.insert({
     this.id = const Value.absent(),
     required String authorName,
     this.isPreferred = const Value.absent(),
+    this.isPremium = const Value.absent(),
   }) : authorName = Value(authorName);
   static Insertable<AuthorPrefsTableData> custom({
     Expression<int>? id,
     Expression<String>? authorName,
     Expression<bool>? isPreferred,
+    Expression<bool>? isPremium,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (authorName != null) 'author_name': authorName,
       if (isPreferred != null) 'is_preferred': isPreferred,
+      if (isPremium != null) 'is_premium': isPremium,
     });
   }
 
@@ -2763,11 +2860,13 @@ class AuthorPrefsTableCompanion extends UpdateCompanion<AuthorPrefsTableData> {
     Value<int>? id,
     Value<String>? authorName,
     Value<bool>? isPreferred,
+    Value<bool>? isPremium,
   }) {
     return AuthorPrefsTableCompanion(
       id: id ?? this.id,
       authorName: authorName ?? this.authorName,
       isPreferred: isPreferred ?? this.isPreferred,
+      isPremium: isPremium ?? this.isPremium,
     );
   }
 
@@ -2783,6 +2882,9 @@ class AuthorPrefsTableCompanion extends UpdateCompanion<AuthorPrefsTableData> {
     if (isPreferred.present) {
       map['is_preferred'] = Variable<bool>(isPreferred.value);
     }
+    if (isPremium.present) {
+      map['is_premium'] = Variable<bool>(isPremium.value);
+    }
     return map;
   }
 
@@ -2791,7 +2893,8 @@ class AuthorPrefsTableCompanion extends UpdateCompanion<AuthorPrefsTableData> {
     return (StringBuffer('AuthorPrefsTableCompanion(')
           ..write('id: $id, ')
           ..write('authorName: $authorName, ')
-          ..write('isPreferred: $isPreferred')
+          ..write('isPreferred: $isPreferred, ')
+          ..write('isPremium: $isPremium')
           ..write(')'))
         .toString();
   }
@@ -3085,10 +3188,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CollectionsTableTable collectionsTable = $CollectionsTableTable(
     this,
   );
-  late final $QuotesTable quotes = $QuotesTable(this);
   late final $FavouritesTable favourites = $FavouritesTable(this);
   late final $CollectionsFavouritesTable collectionsFavourites =
       $CollectionsFavouritesTable(this);
+  late final $QuotesTable quotes = $QuotesTable(this);
   late final $OwnQuotesTableTable ownQuotesTable = $OwnQuotesTableTable(this);
   late final $CollectionsOwnQuotesTableTable collectionsOwnQuotesTable =
       $CollectionsOwnQuotesTableTable(this);
@@ -3107,9 +3210,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     collectionsTable,
-    quotes,
     favourites,
     collectionsFavourites,
+    quotes,
     ownQuotesTable,
     collectionsOwnQuotesTable,
     collectionsHistoryQuotes,
@@ -3299,475 +3402,6 @@ typedef $$CollectionsTableTableProcessedTableManager =
       CollectionsTableData,
       PrefetchHooks Function()
     >;
-typedef $$QuotesTableCreateCompanionBuilder =
-    QuotesCompanion Function({
-      Value<int> id,
-      required String quoteText,
-      Value<String?> author,
-      Value<bool> isRestricted,
-      required int order,
-      Value<DateTime> createdAt,
-      Value<DateTime?> shownAt,
-    });
-typedef $$QuotesTableUpdateCompanionBuilder =
-    QuotesCompanion Function({
-      Value<int> id,
-      Value<String> quoteText,
-      Value<String?> author,
-      Value<bool> isRestricted,
-      Value<int> order,
-      Value<DateTime> createdAt,
-      Value<DateTime?> shownAt,
-    });
-
-final class $$QuotesTableReferences
-    extends BaseReferences<_$AppDatabase, $QuotesTable, Quote> {
-  $$QuotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<
-    $CollectionsHistoryQuotesTable,
-    List<CollectionsHistoryQuote>
-  >
-  _collectionsHistoryQuotesRefsTable(_$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.collectionsHistoryQuotes,
-        aliasName: $_aliasNameGenerator(
-          db.quotes.id,
-          db.collectionsHistoryQuotes.quoteId,
-        ),
-      );
-
-  $$CollectionsHistoryQuotesTableProcessedTableManager
-  get collectionsHistoryQuotesRefs {
-    final manager = $$CollectionsHistoryQuotesTableTableManager(
-      $_db,
-      $_db.collectionsHistoryQuotes,
-    ).filter((f) => f.quoteId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _collectionsHistoryQuotesRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<
-    $CollectionsSearchQuotesTable,
-    List<CollectionsSearchQuote>
-  >
-  _collectionsSearchQuotesRefsTable(_$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.collectionsSearchQuotes,
-        aliasName: $_aliasNameGenerator(
-          db.quotes.id,
-          db.collectionsSearchQuotes.quoteId,
-        ),
-      );
-
-  $$CollectionsSearchQuotesTableProcessedTableManager
-  get collectionsSearchQuotesRefs {
-    final manager = $$CollectionsSearchQuotesTableTableManager(
-      $_db,
-      $_db.collectionsSearchQuotes,
-    ).filter((f) => f.quoteId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _collectionsSearchQuotesRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$QuotesTableFilterComposer
-    extends Composer<_$AppDatabase, $QuotesTable> {
-  $$QuotesTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get quoteText => $composableBuilder(
-    column: $table.quoteText,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get author => $composableBuilder(
-    column: $table.author,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get isRestricted => $composableBuilder(
-    column: $table.isRestricted,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get order => $composableBuilder(
-    column: $table.order,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get shownAt => $composableBuilder(
-    column: $table.shownAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  Expression<bool> collectionsHistoryQuotesRefs(
-    Expression<bool> Function($$CollectionsHistoryQuotesTableFilterComposer f)
-    f,
-  ) {
-    final $$CollectionsHistoryQuotesTableFilterComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.collectionsHistoryQuotes,
-          getReferencedColumn: (t) => t.quoteId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$CollectionsHistoryQuotesTableFilterComposer(
-                $db: $db,
-                $table: $db.collectionsHistoryQuotes,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<bool> collectionsSearchQuotesRefs(
-    Expression<bool> Function($$CollectionsSearchQuotesTableFilterComposer f) f,
-  ) {
-    final $$CollectionsSearchQuotesTableFilterComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.collectionsSearchQuotes,
-          getReferencedColumn: (t) => t.quoteId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$CollectionsSearchQuotesTableFilterComposer(
-                $db: $db,
-                $table: $db.collectionsSearchQuotes,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-}
-
-class $$QuotesTableOrderingComposer
-    extends Composer<_$AppDatabase, $QuotesTable> {
-  $$QuotesTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get quoteText => $composableBuilder(
-    column: $table.quoteText,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get author => $composableBuilder(
-    column: $table.author,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get isRestricted => $composableBuilder(
-    column: $table.isRestricted,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get order => $composableBuilder(
-    column: $table.order,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get shownAt => $composableBuilder(
-    column: $table.shownAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$QuotesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $QuotesTable> {
-  $$QuotesTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get quoteText =>
-      $composableBuilder(column: $table.quoteText, builder: (column) => column);
-
-  GeneratedColumn<String> get author =>
-      $composableBuilder(column: $table.author, builder: (column) => column);
-
-  GeneratedColumn<bool> get isRestricted => $composableBuilder(
-    column: $table.isRestricted,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get order =>
-      $composableBuilder(column: $table.order, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get shownAt =>
-      $composableBuilder(column: $table.shownAt, builder: (column) => column);
-
-  Expression<T> collectionsHistoryQuotesRefs<T extends Object>(
-    Expression<T> Function($$CollectionsHistoryQuotesTableAnnotationComposer a)
-    f,
-  ) {
-    final $$CollectionsHistoryQuotesTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.collectionsHistoryQuotes,
-          getReferencedColumn: (t) => t.quoteId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$CollectionsHistoryQuotesTableAnnotationComposer(
-                $db: $db,
-                $table: $db.collectionsHistoryQuotes,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<T> collectionsSearchQuotesRefs<T extends Object>(
-    Expression<T> Function($$CollectionsSearchQuotesTableAnnotationComposer a)
-    f,
-  ) {
-    final $$CollectionsSearchQuotesTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.collectionsSearchQuotes,
-          getReferencedColumn: (t) => t.quoteId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$CollectionsSearchQuotesTableAnnotationComposer(
-                $db: $db,
-                $table: $db.collectionsSearchQuotes,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-}
-
-class $$QuotesTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $QuotesTable,
-          Quote,
-          $$QuotesTableFilterComposer,
-          $$QuotesTableOrderingComposer,
-          $$QuotesTableAnnotationComposer,
-          $$QuotesTableCreateCompanionBuilder,
-          $$QuotesTableUpdateCompanionBuilder,
-          (Quote, $$QuotesTableReferences),
-          Quote,
-          PrefetchHooks Function({
-            bool collectionsHistoryQuotesRefs,
-            bool collectionsSearchQuotesRefs,
-          })
-        > {
-  $$QuotesTableTableManager(_$AppDatabase db, $QuotesTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer:
-              () => $$QuotesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () => $$QuotesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$QuotesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> quoteText = const Value.absent(),
-                Value<String?> author = const Value.absent(),
-                Value<bool> isRestricted = const Value.absent(),
-                Value<int> order = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime?> shownAt = const Value.absent(),
-              }) => QuotesCompanion(
-                id: id,
-                quoteText: quoteText,
-                author: author,
-                isRestricted: isRestricted,
-                order: order,
-                createdAt: createdAt,
-                shownAt: shownAt,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String quoteText,
-                Value<String?> author = const Value.absent(),
-                Value<bool> isRestricted = const Value.absent(),
-                required int order,
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime?> shownAt = const Value.absent(),
-              }) => QuotesCompanion.insert(
-                id: id,
-                quoteText: quoteText,
-                author: author,
-                isRestricted: isRestricted,
-                order: order,
-                createdAt: createdAt,
-                shownAt: shownAt,
-              ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          $$QuotesTableReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
-          prefetchHooksCallback: ({
-            collectionsHistoryQuotesRefs = false,
-            collectionsSearchQuotesRefs = false,
-          }) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (collectionsHistoryQuotesRefs) db.collectionsHistoryQuotes,
-                if (collectionsSearchQuotesRefs) db.collectionsSearchQuotes,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (collectionsHistoryQuotesRefs)
-                    await $_getPrefetchedData<
-                      Quote,
-                      $QuotesTable,
-                      CollectionsHistoryQuote
-                    >(
-                      currentTable: table,
-                      referencedTable: $$QuotesTableReferences
-                          ._collectionsHistoryQuotesRefsTable(db),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$QuotesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).collectionsHistoryQuotesRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) => referencedItems.where(
-                            (e) => e.quoteId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                  if (collectionsSearchQuotesRefs)
-                    await $_getPrefetchedData<
-                      Quote,
-                      $QuotesTable,
-                      CollectionsSearchQuote
-                    >(
-                      currentTable: table,
-                      referencedTable: $$QuotesTableReferences
-                          ._collectionsSearchQuotesRefsTable(db),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$QuotesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).collectionsSearchQuotesRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) => referencedItems.where(
-                            (e) => e.quoteId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$QuotesTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $QuotesTable,
-      Quote,
-      $$QuotesTableFilterComposer,
-      $$QuotesTableOrderingComposer,
-      $$QuotesTableAnnotationComposer,
-      $$QuotesTableCreateCompanionBuilder,
-      $$QuotesTableUpdateCompanionBuilder,
-      (Quote, $$QuotesTableReferences),
-      Quote,
-      PrefetchHooks Function({
-        bool collectionsHistoryQuotesRefs,
-        bool collectionsSearchQuotesRefs,
-      })
-    >;
 typedef $$FavouritesTableCreateCompanionBuilder =
     FavouritesCompanion Function({
       Value<int> id,
@@ -3792,59 +3426,6 @@ typedef $$FavouritesTableUpdateCompanionBuilder =
 final class $$FavouritesTableReferences
     extends BaseReferences<_$AppDatabase, $FavouritesTable, Favourite> {
   $$FavouritesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $QuotesTable _quoteIdTable(_$AppDatabase db) => db.quotes.createAlias(
-    $_aliasNameGenerator(db.favourites.quoteId, db.quotes.id),
-  );
-
-  $$QuotesTableProcessedTableManager? get quoteId {
-    final $_column = $_itemColumn<int>('quote_id');
-    if ($_column == null) return null;
-    final manager = $$QuotesTableTableManager(
-      $_db,
-      $_db.quotes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_quoteIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $QuotesTable _historyIdTable(_$AppDatabase db) => db.quotes
-      .createAlias($_aliasNameGenerator(db.favourites.historyId, db.quotes.id));
-
-  $$QuotesTableProcessedTableManager? get historyId {
-    final $_column = $_itemColumn<int>('history_id');
-    if ($_column == null) return null;
-    final manager = $$QuotesTableTableManager(
-      $_db,
-      $_db.quotes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_historyIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $QuotesTable _searchIdTable(_$AppDatabase db) => db.quotes.createAlias(
-    $_aliasNameGenerator(db.favourites.searchId, db.quotes.id),
-  );
-
-  $$QuotesTableProcessedTableManager? get searchId {
-    final $_column = $_itemColumn<int>('search_id');
-    if ($_column == null) return null;
-    final manager = $$QuotesTableTableManager(
-      $_db,
-      $_db.quotes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_searchIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
 
   static MultiTypedResultKey<
     $CollectionsFavouritesTable,
@@ -3894,8 +3475,23 @@ class $$FavouritesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get quoteId => $composableBuilder(
+    column: $table.quoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get ownQuoteId => $composableBuilder(
     column: $table.ownQuoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get historyId => $composableBuilder(
+    column: $table.historyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get searchId => $composableBuilder(
+    column: $table.searchId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3903,75 +3499,6 @@ class $$FavouritesTableFilterComposer
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$QuotesTableFilterComposer get quoteId {
-    final $$QuotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.quoteId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableFilterComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$QuotesTableFilterComposer get historyId {
-    final $$QuotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.historyId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableFilterComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$QuotesTableFilterComposer get searchId {
-    final $$QuotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.searchId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableFilterComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 
   Expression<bool> collectionsFavouritesRefs(
     Expression<bool> Function($$CollectionsFavouritesTableFilterComposer f) f,
@@ -4019,8 +3546,23 @@ class $$FavouritesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get quoteId => $composableBuilder(
+    column: $table.quoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get ownQuoteId => $composableBuilder(
     column: $table.ownQuoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get historyId => $composableBuilder(
+    column: $table.historyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get searchId => $composableBuilder(
+    column: $table.searchId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4028,75 +3570,6 @@ class $$FavouritesTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$QuotesTableOrderingComposer get quoteId {
-    final $$QuotesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.quoteId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableOrderingComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$QuotesTableOrderingComposer get historyId {
-    final $$QuotesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.historyId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableOrderingComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$QuotesTableOrderingComposer get searchId {
-    final $$QuotesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.searchId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableOrderingComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$FavouritesTableAnnotationComposer
@@ -4114,82 +3587,22 @@ class $$FavouritesTableAnnotationComposer
   GeneratedColumn<String> get quote =>
       $composableBuilder(column: $table.quote, builder: (column) => column);
 
+  GeneratedColumn<int> get quoteId =>
+      $composableBuilder(column: $table.quoteId, builder: (column) => column);
+
   GeneratedColumn<int> get ownQuoteId => $composableBuilder(
     column: $table.ownQuoteId,
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get historyId =>
+      $composableBuilder(column: $table.historyId, builder: (column) => column);
+
+  GeneratedColumn<int> get searchId =>
+      $composableBuilder(column: $table.searchId, builder: (column) => column);
+
   GeneratedColumn<String> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  $$QuotesTableAnnotationComposer get quoteId {
-    final $$QuotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.quoteId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$QuotesTableAnnotationComposer get historyId {
-    final $$QuotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.historyId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$QuotesTableAnnotationComposer get searchId {
-    final $$QuotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.searchId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 
   Expression<T> collectionsFavouritesRefs<T extends Object>(
     Expression<T> Function($$CollectionsFavouritesTableAnnotationComposer a) f,
@@ -4231,12 +3644,7 @@ class $$FavouritesTableTableManager
           $$FavouritesTableUpdateCompanionBuilder,
           (Favourite, $$FavouritesTableReferences),
           Favourite,
-          PrefetchHooks Function({
-            bool quoteId,
-            bool historyId,
-            bool searchId,
-            bool collectionsFavouritesRefs,
-          })
+          PrefetchHooks Function({bool collectionsFavouritesRefs})
         > {
   $$FavouritesTableTableManager(_$AppDatabase db, $FavouritesTable table)
     : super(
@@ -4295,77 +3703,13 @@ class $$FavouritesTableTableManager
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({
-            quoteId = false,
-            historyId = false,
-            searchId = false,
-            collectionsFavouritesRefs = false,
-          }) {
+          prefetchHooksCallback: ({collectionsFavouritesRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (collectionsFavouritesRefs) db.collectionsFavourites,
               ],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (quoteId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.quoteId,
-                            referencedTable: $$FavouritesTableReferences
-                                ._quoteIdTable(db),
-                            referencedColumn:
-                                $$FavouritesTableReferences
-                                    ._quoteIdTable(db)
-                                    .id,
-                          )
-                          as T;
-                }
-                if (historyId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.historyId,
-                            referencedTable: $$FavouritesTableReferences
-                                ._historyIdTable(db),
-                            referencedColumn:
-                                $$FavouritesTableReferences
-                                    ._historyIdTable(db)
-                                    .id,
-                          )
-                          as T;
-                }
-                if (searchId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.searchId,
-                            referencedTable: $$FavouritesTableReferences
-                                ._searchIdTable(db),
-                            referencedColumn:
-                                $$FavouritesTableReferences
-                                    ._searchIdTable(db)
-                                    .id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
+              addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (collectionsFavouritesRefs)
@@ -4410,12 +3754,7 @@ typedef $$FavouritesTableProcessedTableManager =
       $$FavouritesTableUpdateCompanionBuilder,
       (Favourite, $$FavouritesTableReferences),
       Favourite,
-      PrefetchHooks Function({
-        bool quoteId,
-        bool historyId,
-        bool searchId,
-        bool collectionsFavouritesRefs,
-      })
+      PrefetchHooks Function({bool collectionsFavouritesRefs})
     >;
 typedef $$CollectionsFavouritesTableCreateCompanionBuilder =
     CollectionsFavouritesCompanion Function({
@@ -4719,6 +4058,494 @@ typedef $$CollectionsFavouritesTableProcessedTableManager =
       (CollectionsFavourite, $$CollectionsFavouritesTableReferences),
       CollectionsFavourite,
       PrefetchHooks Function({bool favouriteId})
+    >;
+typedef $$QuotesTableCreateCompanionBuilder =
+    QuotesCompanion Function({
+      Value<int> id,
+      required String quoteText,
+      Value<String?> author,
+      Value<bool> isRestricted,
+      Value<bool> isPremium,
+      required int order,
+      Value<DateTime> createdAt,
+      Value<DateTime?> shownAt,
+    });
+typedef $$QuotesTableUpdateCompanionBuilder =
+    QuotesCompanion Function({
+      Value<int> id,
+      Value<String> quoteText,
+      Value<String?> author,
+      Value<bool> isRestricted,
+      Value<bool> isPremium,
+      Value<int> order,
+      Value<DateTime> createdAt,
+      Value<DateTime?> shownAt,
+    });
+
+final class $$QuotesTableReferences
+    extends BaseReferences<_$AppDatabase, $QuotesTable, Quote> {
+  $$QuotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<
+    $CollectionsHistoryQuotesTable,
+    List<CollectionsHistoryQuote>
+  >
+  _collectionsHistoryQuotesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.collectionsHistoryQuotes,
+        aliasName: $_aliasNameGenerator(
+          db.quotes.id,
+          db.collectionsHistoryQuotes.quoteId,
+        ),
+      );
+
+  $$CollectionsHistoryQuotesTableProcessedTableManager
+  get collectionsHistoryQuotesRefs {
+    final manager = $$CollectionsHistoryQuotesTableTableManager(
+      $_db,
+      $_db.collectionsHistoryQuotes,
+    ).filter((f) => f.quoteId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _collectionsHistoryQuotesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CollectionsSearchQuotesTable,
+    List<CollectionsSearchQuote>
+  >
+  _collectionsSearchQuotesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.collectionsSearchQuotes,
+        aliasName: $_aliasNameGenerator(
+          db.quotes.id,
+          db.collectionsSearchQuotes.quoteId,
+        ),
+      );
+
+  $$CollectionsSearchQuotesTableProcessedTableManager
+  get collectionsSearchQuotesRefs {
+    final manager = $$CollectionsSearchQuotesTableTableManager(
+      $_db,
+      $_db.collectionsSearchQuotes,
+    ).filter((f) => f.quoteId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _collectionsSearchQuotesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$QuotesTableFilterComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
+  $$QuotesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get quoteText => $composableBuilder(
+    column: $table.quoteText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get author => $composableBuilder(
+    column: $table.author,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isRestricted => $composableBuilder(
+    column: $table.isRestricted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isPremium => $composableBuilder(
+    column: $table.isPremium,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get order => $composableBuilder(
+    column: $table.order,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get shownAt => $composableBuilder(
+    column: $table.shownAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> collectionsHistoryQuotesRefs(
+    Expression<bool> Function($$CollectionsHistoryQuotesTableFilterComposer f)
+    f,
+  ) {
+    final $$CollectionsHistoryQuotesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.collectionsHistoryQuotes,
+          getReferencedColumn: (t) => t.quoteId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CollectionsHistoryQuotesTableFilterComposer(
+                $db: $db,
+                $table: $db.collectionsHistoryQuotes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> collectionsSearchQuotesRefs(
+    Expression<bool> Function($$CollectionsSearchQuotesTableFilterComposer f) f,
+  ) {
+    final $$CollectionsSearchQuotesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.collectionsSearchQuotes,
+          getReferencedColumn: (t) => t.quoteId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CollectionsSearchQuotesTableFilterComposer(
+                $db: $db,
+                $table: $db.collectionsSearchQuotes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$QuotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
+  $$QuotesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get quoteText => $composableBuilder(
+    column: $table.quoteText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get author => $composableBuilder(
+    column: $table.author,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isRestricted => $composableBuilder(
+    column: $table.isRestricted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isPremium => $composableBuilder(
+    column: $table.isPremium,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get order => $composableBuilder(
+    column: $table.order,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get shownAt => $composableBuilder(
+    column: $table.shownAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$QuotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
+  $$QuotesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get quoteText =>
+      $composableBuilder(column: $table.quoteText, builder: (column) => column);
+
+  GeneratedColumn<String> get author =>
+      $composableBuilder(column: $table.author, builder: (column) => column);
+
+  GeneratedColumn<bool> get isRestricted => $composableBuilder(
+    column: $table.isRestricted,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isPremium =>
+      $composableBuilder(column: $table.isPremium, builder: (column) => column);
+
+  GeneratedColumn<int> get order =>
+      $composableBuilder(column: $table.order, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get shownAt =>
+      $composableBuilder(column: $table.shownAt, builder: (column) => column);
+
+  Expression<T> collectionsHistoryQuotesRefs<T extends Object>(
+    Expression<T> Function($$CollectionsHistoryQuotesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$CollectionsHistoryQuotesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.collectionsHistoryQuotes,
+          getReferencedColumn: (t) => t.quoteId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CollectionsHistoryQuotesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.collectionsHistoryQuotes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> collectionsSearchQuotesRefs<T extends Object>(
+    Expression<T> Function($$CollectionsSearchQuotesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$CollectionsSearchQuotesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.collectionsSearchQuotes,
+          getReferencedColumn: (t) => t.quoteId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CollectionsSearchQuotesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.collectionsSearchQuotes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$QuotesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $QuotesTable,
+          Quote,
+          $$QuotesTableFilterComposer,
+          $$QuotesTableOrderingComposer,
+          $$QuotesTableAnnotationComposer,
+          $$QuotesTableCreateCompanionBuilder,
+          $$QuotesTableUpdateCompanionBuilder,
+          (Quote, $$QuotesTableReferences),
+          Quote,
+          PrefetchHooks Function({
+            bool collectionsHistoryQuotesRefs,
+            bool collectionsSearchQuotesRefs,
+          })
+        > {
+  $$QuotesTableTableManager(_$AppDatabase db, $QuotesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$QuotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$QuotesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$QuotesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> quoteText = const Value.absent(),
+                Value<String?> author = const Value.absent(),
+                Value<bool> isRestricted = const Value.absent(),
+                Value<bool> isPremium = const Value.absent(),
+                Value<int> order = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> shownAt = const Value.absent(),
+              }) => QuotesCompanion(
+                id: id,
+                quoteText: quoteText,
+                author: author,
+                isRestricted: isRestricted,
+                isPremium: isPremium,
+                order: order,
+                createdAt: createdAt,
+                shownAt: shownAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String quoteText,
+                Value<String?> author = const Value.absent(),
+                Value<bool> isRestricted = const Value.absent(),
+                Value<bool> isPremium = const Value.absent(),
+                required int order,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> shownAt = const Value.absent(),
+              }) => QuotesCompanion.insert(
+                id: id,
+                quoteText: quoteText,
+                author: author,
+                isRestricted: isRestricted,
+                isPremium: isPremium,
+                order: order,
+                createdAt: createdAt,
+                shownAt: shownAt,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          $$QuotesTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            collectionsHistoryQuotesRefs = false,
+            collectionsSearchQuotesRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (collectionsHistoryQuotesRefs) db.collectionsHistoryQuotes,
+                if (collectionsSearchQuotesRefs) db.collectionsSearchQuotes,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (collectionsHistoryQuotesRefs)
+                    await $_getPrefetchedData<
+                      Quote,
+                      $QuotesTable,
+                      CollectionsHistoryQuote
+                    >(
+                      currentTable: table,
+                      referencedTable: $$QuotesTableReferences
+                          ._collectionsHistoryQuotesRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$QuotesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).collectionsHistoryQuotesRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.quoteId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (collectionsSearchQuotesRefs)
+                    await $_getPrefetchedData<
+                      Quote,
+                      $QuotesTable,
+                      CollectionsSearchQuote
+                    >(
+                      currentTable: table,
+                      referencedTable: $$QuotesTableReferences
+                          ._collectionsSearchQuotesRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$QuotesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).collectionsSearchQuotesRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.quoteId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$QuotesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $QuotesTable,
+      Quote,
+      $$QuotesTableFilterComposer,
+      $$QuotesTableOrderingComposer,
+      $$QuotesTableAnnotationComposer,
+      $$QuotesTableCreateCompanionBuilder,
+      $$QuotesTableUpdateCompanionBuilder,
+      (Quote, $$QuotesTableReferences),
+      Quote,
+      PrefetchHooks Function({
+        bool collectionsHistoryQuotesRefs,
+        bool collectionsSearchQuotesRefs,
+      })
     >;
 typedef $$OwnQuotesTableTableCreateCompanionBuilder =
     OwnQuotesTableCompanion Function({
@@ -5690,12 +5517,14 @@ typedef $$AuthorPrefsTableTableCreateCompanionBuilder =
       Value<int> id,
       required String authorName,
       Value<bool> isPreferred,
+      Value<bool> isPremium,
     });
 typedef $$AuthorPrefsTableTableUpdateCompanionBuilder =
     AuthorPrefsTableCompanion Function({
       Value<int> id,
       Value<String> authorName,
       Value<bool> isPreferred,
+      Value<bool> isPremium,
     });
 
 class $$AuthorPrefsTableTableFilterComposer
@@ -5719,6 +5548,11 @@ class $$AuthorPrefsTableTableFilterComposer
 
   ColumnFilters<bool> get isPreferred => $composableBuilder(
     column: $table.isPreferred,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isPremium => $composableBuilder(
+    column: $table.isPremium,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5746,6 +5580,11 @@ class $$AuthorPrefsTableTableOrderingComposer
     column: $table.isPreferred,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isPremium => $composableBuilder(
+    column: $table.isPremium,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AuthorPrefsTableTableAnnotationComposer
@@ -5769,6 +5608,9 @@ class $$AuthorPrefsTableTableAnnotationComposer
     column: $table.isPreferred,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get isPremium =>
+      $composableBuilder(column: $table.isPremium, builder: (column) => column);
 }
 
 class $$AuthorPrefsTableTableTableManager
@@ -5818,20 +5660,24 @@ class $$AuthorPrefsTableTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> authorName = const Value.absent(),
                 Value<bool> isPreferred = const Value.absent(),
+                Value<bool> isPremium = const Value.absent(),
               }) => AuthorPrefsTableCompanion(
                 id: id,
                 authorName: authorName,
                 isPreferred: isPreferred,
+                isPremium: isPremium,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String authorName,
                 Value<bool> isPreferred = const Value.absent(),
+                Value<bool> isPremium = const Value.absent(),
               }) => AuthorPrefsTableCompanion.insert(
                 id: id,
                 authorName: authorName,
                 isPreferred: isPreferred,
+                isPremium: isPremium,
               ),
           withReferenceMapper:
               (p0) =>
@@ -6061,12 +5907,12 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$CollectionsTableTableTableManager get collectionsTable =>
       $$CollectionsTableTableTableManager(_db, _db.collectionsTable);
-  $$QuotesTableTableManager get quotes =>
-      $$QuotesTableTableManager(_db, _db.quotes);
   $$FavouritesTableTableManager get favourites =>
       $$FavouritesTableTableManager(_db, _db.favourites);
   $$CollectionsFavouritesTableTableManager get collectionsFavourites =>
       $$CollectionsFavouritesTableTableManager(_db, _db.collectionsFavourites);
+  $$QuotesTableTableManager get quotes =>
+      $$QuotesTableTableManager(_db, _db.quotes);
   $$OwnQuotesTableTableTableManager get ownQuotesTable =>
       $$OwnQuotesTableTableTableManager(_db, _db.ownQuotesTable);
   $$CollectionsOwnQuotesTableTableTableManager get collectionsOwnQuotesTable =>

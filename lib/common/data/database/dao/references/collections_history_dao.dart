@@ -1,10 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:sureline/core/db/app_database.dart';
 import 'package:sureline/core/db/tables/collections_table.dart';
-import 'package:sureline/core/db/tables/own_quotes_table.dart';
 import 'package:sureline/core/db/tables/quotes.dart';
-import 'package:sureline/core/db/tables/collections_table.dart';
-import 'package:sureline/core/db/tables/references/collections_own_quotes_table.dart';
 import 'package:sureline/core/db/tables/references/collections_history.dart';
 
 part 'collections_history_dao.g.dart';
@@ -39,16 +36,12 @@ class CollectionsHistoryDao extends DatabaseAccessor<AppDatabase>
     )).get();
   }
 
-  Future<void> addCollectionQuote(
-    CollectionsHistoryQuotesCompanion collectionHistoryQuote,
-  ) {
+  Future<void> addCollectionQuote(CollectionsHistoryQuotesCompanion collectionHistoryQuote) {
     return into(collectionsHistoryQuotes).insert(collectionHistoryQuote);
   }
 
   Future<void> removeCollectionQuote(int collectionId, int quoteId) {
-    return (delete(collectionsHistoryQuotes)..where(
-      (tbl) =>
-          tbl.collectionId.equals(collectionId) & tbl.quoteId.equals(quoteId),
-    )).go();
+    return (delete(collectionsHistoryQuotes)
+      ..where((tbl) => tbl.collectionId.equals(collectionId) & tbl.quoteId.equals(quoteId))).go();
   }
 }

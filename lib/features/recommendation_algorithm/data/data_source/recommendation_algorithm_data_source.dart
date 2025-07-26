@@ -4,10 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:ios_color_picker_with_title/custom_picker/extensions.dart';
-import 'package:path/path.dart' as path;
 import 'package:shared_preference_app_group/shared_preference_app_group.dart';
-import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/constants/quotes_data_files.dart';
 import 'package:sureline/core/constants/sp.dart';
@@ -19,27 +16,32 @@ import 'package:sureline/features/preferenecs/general_settings/muted_content/dat
 import 'package:sureline/features/recommendation_algorithm/data/database/dao/author_prefs_table_dao.dart';
 import 'package:sureline/features/recommendation_algorithm/data/database/dao/muted_content_table_dao.dart';
 import 'package:sureline/features/recommendation_algorithm/data/database/dao/quotes_dao.dart';
-import 'package:sureline/features/recommendation_algorithm/data/model/quote_model.dart';
+import 'package:sureline/common/data/model/quote_model.dart';
 
 abstract class RecommendationAlgorithmDataSource {
-  Future<Either<Failure, void>> initialize();
-  Future<Either<Failure, List<QuoteModel>>> getQuotes({int? page, int? limit});
+  Future<Either<Failure, void>> initialize({required bool isPremium});
+  Future<Either<Failure, List<QuoteModel>>> getQuotes({
+    int? page,
+    int? limit,
+    required bool isPremium,
+  });
   Future<Either<Failure, void>> markQuoteAsShown(int id);
-  Future<Either<Failure, List<QuoteModel>>> getShownQuotes();
+  Future<Either<Failure, List<QuoteModel>>> getShownQuotes({required bool isPremium});
 
   Future<Either<Failure, void>> updateAuthorPreference(
-    AuthorPrefModel authorPrefModel,
-  );
+    AuthorPrefModel authorPrefModel, {
+    required bool isPremium,
+  });
   Future<Either<Failure, List<AuthorPrefModel>>> getAuthorPreferences();
   Future<Either<Failure, void>> updateMutedContent({
     required bool withAuthor,
     required bool withoutAuthor,
+    required bool isPremium,
   });
   Future<Either<Failure, List<MutedContentModel>>> getMutedContent();
 }
 
-class RecommendationAlgorithmDataSourceImpl
-    extends RecommendationAlgorithmDataSource {
+class RecommendationAlgorithmDataSourceImpl extends RecommendationAlgorithmDataSource {
   final QuotesDao quotesDao;
   final AuthorPrefsTableDao authorPrefsTableDao;
   final MutedContentTableDao mutedContentTableDao;
@@ -51,9 +53,9 @@ class RecommendationAlgorithmDataSourceImpl
   );
 
   @override
-  Future<Either<Failure, void>> initialize() async {
+  Future<Either<Failure, void>> initialize({required bool isPremium}) async {
     try {
-      final existingQuotes = await quotesDao.getAllQuotes();
+      final existingQuotes = await quotesDao.getAllQuotes(isPremium: isPremium);
 
       if (existingQuotes.isEmpty) {
         final quotes = await _loadQuotesFromAssets();
@@ -65,13 +67,14 @@ class RecommendationAlgorithmDataSourceImpl
               quoteText: Value(quote.quoteText),
               author: Value(quote.author),
               order: Value(i),
+              isPremium: Value(quote.isPremium),
             ),
           );
         }
 
         await authorPrefsTableDao.initializeAllAuthors();
         await mutedContentTableDao.initializeAllMutedContent();
-        await _initializeQuoteAppGroup();
+        await _initializeQuoteAppGroup(isPremium: isPremium);
       }
       return Right(unit);
     } catch (e) {
@@ -82,11 +85,10 @@ class RecommendationAlgorithmDataSourceImpl
 
   Future<void> _shuffleAndRefreshQuotes() async {
     // Get ALL quotes from database
-    final allQuotes = await quotesDao.getAllQuotes();
+    final allQuotes = await quotesDao.getAllQuotes(isPremium: true);
     final quoteCount = allQuotes.length;
 
-    final List<int> shuffledOrder = List.generate(quoteCount, (index) => index)
-      ..shuffle();
+    final List<int> shuffledOrder = List.generate(quoteCount, (index) => index)..shuffle();
 
     for (int i = 0; i < allQuotes.length; i++) {
       await quotesDao.updateOrder(allQuotes[i].id, shuffledOrder[i]);
@@ -98,29 +100,24 @@ class RecommendationAlgorithmDataSourceImpl
   Future<Either<Failure, List<QuoteModel>>> getQuotes({
     int? page,
     int? limit,
+    required bool isPremium,
   }) async {
     try {
       if (limit != null) {
-        final quotes = await quotesDao.getAllQuotesWithLimit(limit);
-        final quoteModels =
-            quotes.map((quote) => QuoteModel.fromQuote(quote)).toList();
+        final quotes = await quotesDao.getAllQuotesWithLimit(limit, isPremium: isPremium);
+        final quoteModels = quotes.map((quote) => QuoteModel.fromQuote(quote)).toList();
         return Right(quoteModels);
       } else if (page != null) {
         final now = DateTime.now();
         final offset = page * Constants.quotesPageSize;
-        final newQuotes = await quotesDao.getAllNewQuotes();
+        final newQuotes = await quotesDao.getAllNewQuotes(isPremium: isPremium);
         // If we have enough new quotes for this page, return them
-        if (offset <= newQuotes.length &&
-            newQuotes.length >= (offset + Constants.quotesPageSize)) {
+        if (offset <= newQuotes.length && newQuotes.length >= (offset + Constants.quotesPageSize)) {
           final startIndex = offset;
-          final endIndex = (offset + Constants.quotesPageSize).clamp(
-            0,
-            newQuotes.length,
-          );
+          final endIndex = (offset + Constants.quotesPageSize).clamp(0, newQuotes.length);
           final pageQuotes = newQuotes.sublist(startIndex, endIndex);
 
-          final quoteModels =
-              pageQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList();
+          final quoteModels = pageQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList();
           return Right(quoteModels);
         }
 
@@ -130,26 +127,21 @@ class RecommendationAlgorithmDataSourceImpl
         // If we don't have enough new quotes for a full page, recycle all quotes
         if (remainingNewQuotes < Constants.quotesPageSize) {
           // Store remaining new quotes in temp variable
-          final remainingQuotes =
-              remainingNewQuotes > 0 ? newQuotes.sublist(offset) : <Quote>[];
+          final remainingQuotes = remainingNewQuotes > 0 ? newQuotes.sublist(offset) : <Quote>[];
 
           await _shuffleAndRefreshQuotes();
 
           // Calculate how many more quotes we need to reach page size
-          final quotesNeeded =
-              Constants.quotesPageSize - remainingQuotes.length;
+          final quotesNeeded = Constants.quotesPageSize - remainingQuotes.length;
 
           // Get the additional quotes needed from the newly shuffled database
-          final additionalQuotes = await quotesDao.getAllNewQuotes();
-          final additionalQuotesNeeded =
-              additionalQuotes.take(quotesNeeded).toList();
+          final additionalQuotes = await quotesDao.getAllNewQuotes(isPremium: isPremium);
+          final additionalQuotesNeeded = additionalQuotes.take(quotesNeeded).toList();
 
           // Combine remaining quotes with additional quotes
           final finalQuotes = [
             ...remainingQuotes.map((quote) => QuoteModel.fromQuote(quote)),
-            ...additionalQuotesNeeded.map(
-              (quote) => QuoteModel.fromQuote(quote),
-            ),
+            ...additionalQuotesNeeded.map((quote) => QuoteModel.fromQuote(quote)),
           ];
 
           if (finalQuotes.length != Constants.quotesPageSize) {
@@ -161,10 +153,8 @@ class RecommendationAlgorithmDataSourceImpl
 
         // If no new quotes remaining, return all quotes as fallback
         print('falling back');
-        final fallbackQuotes = await quotesDao.getAllQuotes();
-        return Right(
-          fallbackQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList(),
-        );
+        final fallbackQuotes = await quotesDao.getAllQuotes(isPremium: isPremium);
+        return Right(fallbackQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList());
       } else {
         debugPrint('Both parameters cannot be null');
         return Left(UnknownFailure());
@@ -187,12 +177,10 @@ class RecommendationAlgorithmDataSourceImpl
   }
 
   @override
-  Future<Either<Failure, List<QuoteModel>>> getShownQuotes() async {
+  Future<Either<Failure, List<QuoteModel>>> getShownQuotes({required bool isPremium}) async {
     try {
-      final shownQuotes = await quotesDao.getShownQuotes();
-      return Right(
-        shownQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList(),
-      );
+      final shownQuotes = await quotesDao.getShownQuotes(isPremium: isPremium);
+      return Right(shownQuotes.map((quote) => QuoteModel.fromQuote(quote)).toList());
     } catch (e) {
       debugPrint(e.toString());
       return Left(UnknownFailure());
@@ -201,14 +189,28 @@ class RecommendationAlgorithmDataSourceImpl
 
   Future<List<QuoteModel>> _loadQuotesFromAssets() async {
     final files = QuotesDataFiles.files;
+    final premiumFiles = QuotesDataFiles.premiumFiles;
 
     final List<QuoteModel> allQuotes = [];
 
+    // Load regular quotes
     for (final file in files) {
       final jsonStr = await rootBundle.loadString(file);
-      final List<dynamic> jsonList = json.decode(jsonStr);
-      print('jsonList is this $jsonList');
-      allQuotes.addAll(jsonList.map((json) => QuoteModel.fromJson(json)));
+      final List<dynamic> jsonList = json.decode(jsonStr) as List<dynamic>;
+      allQuotes.addAll(jsonList.map((json) => QuoteModel.fromJson(json as Map<String, dynamic>)));
+    }
+
+    // Load premium quotes and mark as premium
+    for (final file in premiumFiles) {
+      final jsonStr = await rootBundle.loadString(file);
+      final List<dynamic> jsonList = json.decode(jsonStr) as List<dynamic>;
+      allQuotes.addAll(
+        jsonList.map((json) {
+          final map = Map<String, dynamic>.from(json as Map);
+          map['isPremium'] = true;
+          return QuoteModel.fromJson(map);
+        }),
+      );
     }
     return allQuotes;
   }
@@ -217,15 +219,13 @@ class RecommendationAlgorithmDataSourceImpl
   Future<Either<Failure, void>> updateMutedContent({
     required bool withAuthor,
     required bool withoutAuthor,
+    required bool isPremium,
   }) async {
     try {
       await mutedContentTableDao.updateMutedContent(
-        MutedContentModel(
-          isWithAuthorMuted: withAuthor,
-          isWithoutAuthorMuted: withoutAuthor,
-        ),
+        MutedContentModel(isWithAuthorMuted: withAuthor, isWithoutAuthorMuted: withoutAuthor),
       );
-      await _synchronizeQuotesWithPreferences();
+      await _synchronizeQuotesWithPreferences(isPremium: isPremium);
       return Right(unit);
     } catch (e) {
       debugPrint(e.toString());
@@ -246,11 +246,12 @@ class RecommendationAlgorithmDataSourceImpl
 
   @override
   Future<Either<Failure, void>> updateAuthorPreference(
-    AuthorPrefModel authorPrefModel,
-  ) async {
+    AuthorPrefModel authorPrefModel, {
+    required bool isPremium,
+  }) async {
     try {
       await authorPrefsTableDao.updateAuthorPrefs(authorPrefModel);
-      await _synchronizeQuotesWithPreferences();
+      await _synchronizeQuotesWithPreferences(isPremium: isPremium);
       return Right(unit);
     } catch (e) {
       debugPrint(e.toString());
@@ -269,7 +270,7 @@ class RecommendationAlgorithmDataSourceImpl
     }
   }
 
-  Future<void> _synchronizeQuotesWithPreferences() async {
+  Future<void> _synchronizeQuotesWithPreferences({bool? isPremium}) async {
     final mutedContent = await mutedContentTableDao.getAllMutedContent();
     if (mutedContent.isNotEmpty) {
       if (mutedContent.first.isWithAuthorMuted) {
@@ -294,21 +295,18 @@ class RecommendationAlgorithmDataSourceImpl
       }
     }
 
-    await _updateQuoteAppGroup();
+    await _updateQuoteAppGroup(isPremium: isPremium);
   }
 
-  Future<void> _initializeQuoteAppGroup() async {
-    await _updateQuoteAppGroup();
+  Future<void> _initializeQuoteAppGroup({bool? isPremium}) async {
+    await _updateQuoteAppGroup(isPremium: isPremium);
   }
 
-  Future<void> _updateQuoteAppGroup() async {
-    final quotes = await quotesDao.getAllNewQuotes();
+  Future<void> _updateQuoteAppGroup({bool? isPremium}) async {
+    final quotes = await quotesDao.getAllNewQuotes(isPremium: isPremium ?? false);
     final quoteTexts = quotes.map((quote) => quote.quoteText).toList();
     await SharedPreferenceAppGroup.setAppGroup(Constants.widgetAppGroup);
-    await SharedPreferenceAppGroup.setStringList(
-      SP.quotesDataAppGroup,
-      quoteTexts,
-    );
+    await SharedPreferenceAppGroup.setStringList(SP.quotesDataAppGroup, quoteTexts);
     await Utils.saveThemeOnAppGroup();
   }
 }

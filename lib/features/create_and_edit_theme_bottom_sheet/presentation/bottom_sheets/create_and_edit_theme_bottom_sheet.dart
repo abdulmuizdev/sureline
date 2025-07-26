@@ -1,14 +1,15 @@
+/// Bottom sheet for creating and editing themes.
+///
+/// Provides comprehensive theme customization with background, text, and color options.
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
-import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/di/injection.dart';
-import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/create_and_edit_theme_bottom_sheet/data/model/theme_model.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_bloc.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_event.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bloc/create_and_edit_theme_state.dart';
@@ -26,18 +27,17 @@ import 'package:sureline/features/unsplash_screen/domain/entity/photo_entity.dar
 import 'package:sureline/features/unsplash_screen/presentation/pages/unsplash_screen.dart';
 import 'package:uuid/uuid.dart';
 
+/// Main bottom sheet for theme creation and editing.
 class CreateAndEditThemeBottomSheet extends StatefulWidget {
   final ThemeEntity entity;
 
   const CreateAndEditThemeBottomSheet({super.key, required this.entity});
 
   @override
-  State<CreateAndEditThemeBottomSheet> createState() =>
-      _CreateAndEditThemeBottomSheetState();
+  State<CreateAndEditThemeBottomSheet> createState() => _CreateAndEditThemeBottomSheetState();
 }
 
-class _CreateAndEditThemeBottomSheetState
-    extends State<CreateAndEditThemeBottomSheet> {
+class _CreateAndEditThemeBottomSheetState extends State<CreateAndEditThemeBottomSheet> {
   final Duration _animationDuration = Duration(milliseconds: 550);
   int _selectedIndex = 0;
   double _sliderValue = 0.5;
@@ -140,9 +140,7 @@ class _CreateAndEditThemeBottomSheetState
           if (state is ThemeChanged) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (context) => HomeScreen(isThemeChanged: true),
-              ),
+              MaterialPageRoute(builder: (context) => HomeScreen(isThemeChanged: true)),
               (Route<dynamic> route) => false,
             );
           }
@@ -167,15 +165,9 @@ class _CreateAndEditThemeBottomSheetState
                     ),
                   ),
                   GradientWidget(),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: GradientWidget(reverse: true),
-                  ),
+                  Align(alignment: Alignment.bottomCenter, child: GradientWidget(reverse: true)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 40,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -202,10 +194,7 @@ class _CreateAndEditThemeBottomSheetState
                                     isNetwork: _isNetworkImage,
                                     solidColor: _backgroundColor,
                                     isLiveBackground:
-                                        widget
-                                            .entity
-                                            .backgroundEntity
-                                            .isLiveBackground,
+                                        widget.entity.backgroundEntity.isLiveBackground,
                                     isLocallyStored: _isImageLocallyStored,
                                     previewImage: _previewUrl,
                                   ),
@@ -241,9 +230,7 @@ class _CreateAndEditThemeBottomSheetState
                       child: TextSizeSlider(
                         value: _sliderValue,
                         onSliderValueChange: (value) {
-                          context.read<CreateThemeBloc>().add(
-                            OnSliderValueChanged(value),
-                          );
+                          context.read<CreateThemeBloc>().add(OnSliderValueChanged(value));
                         },
                       ),
                     ),
@@ -267,32 +254,22 @@ class _CreateAndEditThemeBottomSheetState
                                     duration: _animationDuration,
                                     child: BackgroundActionsBar(
                                       onCameraPressed: () {
-                                        context.read<CreateThemeBloc>().add(
-                                          OnCameraIconPressed(),
-                                        );
+                                        context.read<CreateThemeBloc>().add(OnCameraIconPressed());
                                       },
                                       onUnsplashPressed: () async {
-                                        final PhotoEntity? selectedPhoto =
-                                            await Navigator.of(
-                                              context,
-                                            ).push<PhotoEntity?>(
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (context) =>
-                                                        UnsplashScreen(),
-                                              ),
-                                            );
+                                        final PhotoEntity? selectedPhoto = await Navigator.of(
+                                          context,
+                                        ).push<PhotoEntity?>(
+                                          MaterialPageRoute(builder: (context) => UnsplashScreen()),
+                                        );
                                         if (!context.mounted) return;
                                         if (selectedPhoto?.url != null) {
-                                          debugPrint(
-                                            'unsplash photo selected with preview',
-                                          );
+                                          debugPrint('unsplash photo selected with preview');
                                           debugPrint(selectedPhoto?.previewUrl);
                                           context.read<CreateThemeBloc>().add(
                                             OnUnsplashPhotoSelected(
                                               path: selectedPhoto!.url,
-                                              previewPath:
-                                                  selectedPhoto.previewUrl,
+                                              previewPath: selectedPhoto.previewUrl,
                                             ),
                                           );
                                         }
@@ -351,15 +328,10 @@ class _CreateAndEditThemeBottomSheetState
 
                                 // Background
                                 IgnorePointer(
-                                  ignoring:
-                                      !(_showBackgroundColorPicker &&
-                                          _selectedIndex == 0),
+                                  ignoring: !(_showBackgroundColorPicker && _selectedIndex == 0),
                                   child: AnimatedOpacity(
                                     opacity:
-                                        (_showBackgroundColorPicker &&
-                                                _selectedIndex == 0)
-                                            ? 1
-                                            : 0,
+                                        (_showBackgroundColorPicker && _selectedIndex == 0) ? 1 : 0,
                                     duration: _animationDuration,
                                     child: ColorSelector(
                                       onBackPressed: () {
@@ -383,15 +355,9 @@ class _CreateAndEditThemeBottomSheetState
 
                                 // Text
                                 IgnorePointer(
-                                  ignoring:
-                                      !(_selectedIndex == 1 &&
-                                          _showTextColorPicker),
+                                  ignoring: !(_selectedIndex == 1 && _showTextColorPicker),
                                   child: AnimatedOpacity(
-                                    opacity:
-                                        (_selectedIndex == 1 &&
-                                                _showTextColorPicker)
-                                            ? 1
-                                            : 0,
+                                    opacity: (_selectedIndex == 1 && _showTextColorPicker) ? 1 : 0,
                                     duration: _animationDuration,
                                     child: ColorSelector(
                                       onBackPressed: () {

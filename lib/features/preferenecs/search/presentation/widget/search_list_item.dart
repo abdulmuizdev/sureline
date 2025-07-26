@@ -2,31 +2,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
+import 'package:sureline/common/domain/entities/recommendation_algorithm/quote_entity.dart';
 
+/// Widget for displaying a search list item.
 class SearchListItem extends StatefulWidget {
+  /// The quote entity to display.
   final QuoteEntity entity;
-  final Function(bool) onLikePressed;
 
-  const SearchListItem({
-    super.key,
-    required this.entity,
-    required this.onLikePressed,
-  });
+  /// Callback function when like button is pressed.
+  final void Function({required bool isLiked}) onLikePressed;
+
+  /// Creates a new SearchListItem instance.
+  const SearchListItem({super.key, required this.entity, required this.onLikePressed});
 
   @override
   State<SearchListItem> createState() => _SearchListItemState();
 }
 
 class _SearchListItemState extends State<SearchListItem> {
-  bool _isLiked = false;
-
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
-        padding: EdgeInsets.only(top: 14, left: 14, right: 14),
+        padding: const EdgeInsets.only(top: 14, left: 14, right: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: AppColors.pureWhite,
@@ -36,13 +35,13 @@ class _SearchListItemState extends State<SearchListItem> {
           children: [
             Text(
               widget.entity.quoteText,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryColor,
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -50,36 +49,22 @@ class _SearchListItemState extends State<SearchListItem> {
                   children: [
                     IconButton(
                       onPressed: () {},
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.bookmark_border_outlined,
                         color: AppColors.primaryColor,
                       ),
                     ),
-
                     IconButton(
                       onPressed: () {
-                        // widget.onLikePressed(!widget.entity.isLiked);
-                        widget.onLikePressed(true);
+                        widget.onLikePressed(isLiked: true);
                       },
-                      icon: Icon(
-                        // (widget.entity.isLiked)
-                        (true)
-                            ? CupertinoIcons.heart_fill
-                            : CupertinoIcons.heart,
-                        color: AppColors.primaryColor,
-                      ),
+                      icon: const Icon(CupertinoIcons.heart_fill, color: AppColors.primaryColor),
                     ),
-
                     IconButton(
                       onPressed: () {
-                        SharePlus.instance.share(
-                          ShareParams(text: '"${widget.entity.quoteText}"'),
-                        );
+                        SharePlus.instance.share(ShareParams(text: '"${widget.entity.quoteText}"'));
                       },
-                      icon: Icon(
-                        Icons.ios_share_rounded,
-                        color: AppColors.primaryColor,
-                      ),
+                      icon: const Icon(Icons.ios_share_rounded, color: AppColors.primaryColor),
                     ),
                   ],
                 ),

@@ -6,8 +6,12 @@ class GenderIdentityGridItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onPressed;
 
-  const GenderIdentityGridItem({super.key, required this.isSelected,
-  required this.onPressed, required this.title});
+  const GenderIdentityGridItem({
+    super.key,
+    required this.isSelected,
+    required this.onPressed,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,12 +20,9 @@ class GenderIdentityGridItem extends StatelessWidget {
       child: GestureDetector(
         onTap: onPressed,
         child: Container(
-          padding: EdgeInsets.all(15),
+          padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            border:
-                isSelected
-                    ? null
-                    : Border.all(color: AppColors.primaryColor, width: 1),
+            border: isSelected ? null : Border.all(color: AppColors.primaryColor, width: 1),
             color: isSelected ? AppColors.peach : AppColors.pureWhite,
             borderRadius: BorderRadius.circular(6),
           ),

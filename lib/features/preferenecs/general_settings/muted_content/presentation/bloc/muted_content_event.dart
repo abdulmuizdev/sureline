@@ -10,5 +10,7 @@ class GetMutedContentOptions extends MutedContentEvent {
 
 class OnMutedContentPressed extends MutedContentEvent {
   final List<MutedContentEntity> mutedContent;
-  OnMutedContentPressed(this.mutedContent);
+  final bool isPremium;
+
+  OnMutedContentPressed(this.mutedContent, this.isPremium);
 }

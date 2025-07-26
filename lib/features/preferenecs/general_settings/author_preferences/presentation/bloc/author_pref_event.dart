@@ -10,5 +10,7 @@ class GetAuthorPrefOptions extends AuthorPrefEvent {
 
 class OnAuthorPrefPressed extends AuthorPrefEvent {
   final AuthorPrefEntity authorPref;
-  OnAuthorPrefPressed(this.authorPref);
+  final bool isPremium;
+
+  OnAuthorPrefPressed(this.authorPref, this.isPremium);
 }

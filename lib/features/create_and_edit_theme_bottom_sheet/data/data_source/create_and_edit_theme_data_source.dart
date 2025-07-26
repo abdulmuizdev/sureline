@@ -1,3 +1,7 @@
+/// Data source for theme creation operations.
+///
+/// Handles photo download and file management for themes.
+
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
@@ -8,13 +12,20 @@ import 'package:sureline/core/error/failures.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
+/// Abstract data source for theme creation operations.
 abstract class CreateThemeDataSource {
+  /// Downloads a photo from the given URL.
+  ///
+  /// [url]: URL of the photo to download
+  /// Returns: Either a failure or the local file path
   Future<Either<Failure, String>> downloadPhoto(String url);
 }
 
+/// Implementation of create theme data source.
 class CreateThemeDataSourceImpl extends CreateThemeDataSource {
   final http.Client client;
   CreateThemeDataSourceImpl(this.client);
+
   @override
   Future<Either<Failure, String>> downloadPhoto(String url) async {
     try {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 
 class Watermark extends StatelessWidget {
@@ -29,13 +30,13 @@ class Watermark extends StatelessWidget {
               borderRadius: BorderRadius.circular(5),
               child: Image.asset('assets/images/one.png'),
             ),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             Text(
               'Sureline.app',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
-                color: AppColors.primaryColor,
+                color: App.themeEntity.textDecorEntity.textColor,
               ),
             ),
           ],

@@ -1,13 +1,17 @@
+/// Progress indicator for like count achievement.
+///
+/// Shows visual progress towards like goals.
+
 import 'package:flutter/material.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/home/presentation/widgets/step_progress_bar.dart';
 
+/// Widget displaying like count progress with visual indicators.
 class LikeProgress extends StatelessWidget {
   final VoidCallback? onPressed;
   final int likeCount;
   final int likeGoal;
-  const LikeProgress({super.key, this.onPressed, required this.likeCount,
-  required this.likeGoal});
+  const LikeProgress({super.key, this.onPressed, required this.likeCount, required this.likeGoal});
 
   @override
   Widget build(BuildContext context) {
@@ -16,29 +20,22 @@ class LikeProgress extends StatelessWidget {
       child: Container(
         width: 174,
         height: 30,
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(14),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(14)),
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                Icons.favorite_outline_rounded,
-                color: AppColors.primaryColor,
-                size: 17,
-              ),
+              const Icon(Icons.favorite_outline_rounded, color: AppColors.primaryColor, size: 17),
               Text(
                 '$likeCount/$likeGoal',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.normal,
                   color: AppColors.primaryColor,
                 ),
               ),
-              StepProgressBar(value: likeCount, maxValue: likeGoal,)
+              StepProgressBar(value: likeCount, maxValue: likeGoal),
               // Container(
               //   width: 90,
               //   height: 6,

@@ -10,6 +10,7 @@ import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/libraries/direct_social_share/direct_social_share_schemas.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
+import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
 import 'package:sureline/features/share/domain/entity/render_entity.dart';
 import 'package:sureline/features/share/domain/entity/share_entity.dart';
@@ -45,8 +46,7 @@ class ShareControlsBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<ShareControlsBottomSheet> createState() =>
-      _ShareControlsBottomSheetState();
+  State<ShareControlsBottomSheet> createState() => _ShareControlsBottomSheetState();
 }
 
 class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
@@ -120,7 +120,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
     ];
 
     // Sort by timestamp in descending order (most recent first)
-    timesData.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+    timesData.sort((a, b) => (b['timestamp'].compareTo(a['timestamp']) as int));
 
     // Build TimesWidget list from sorted data
     _sortedTimesWidgets =
@@ -435,8 +435,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
         listener: (context, state) async {
           if (state is Rendering) {
             if (state.progress != null) {
-              _renderProgress =
-                  '${(state.progress! * 100).toStringAsFixed(0)}%';
+              _renderProgress = '${(state.progress! * 100).toStringAsFixed(0)}%';
             }
           }
           if (state is Rendered) {
@@ -531,10 +530,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                               children: [
                                 ShareControlListItem(
                                   icon: Icons.save_alt_rounded,
-                                  label:
-                                      (widget.isLiveBackground)
-                                          ? 'Save Video'
-                                          : 'Save Image',
+                                  label: (widget.isLiveBackground) ? 'Save Video' : 'Save Image',
                                   onPressed: () async {
                                     setState(() {
                                       _isInstagramShare = false;
@@ -542,20 +538,13 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                     context.read<ShareBloc>().add(
                                       SavePost(
                                         ShareEntity(
-                                          schema:
-                                              SocialShareSchema.facebookStory,
+                                          schema: SocialShareSchema.facebookStory,
                                           renderEntity: RenderEntity(
                                             quote: widget.quote,
-                                            isLiveBackground:
-                                                widget.isLiveBackground,
+                                            isLiveBackground: widget.isLiveBackground,
                                             quoteKey: widget.quoteKey,
                                             rootKey: widget.exportKey,
-                                            path:
-                                                App
-                                                    .themeEntity
-                                                    .backgroundEntity
-                                                    .path ??
-                                                '',
+                                            path: App.themeEntity.backgroundEntity.path ?? '',
                                           ),
                                         ),
                                       ),
@@ -566,9 +555,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                   icon: Icons.copy_rounded,
                                   label: 'Copy text',
                                   onPressed: () {
-                                    Clipboard.setData(
-                                      ClipboardData(text: widget.quote),
-                                    );
+                                    Clipboard.setData(ClipboardData(text: widget.quote));
                                   },
                                 ),
                                 ShareControlListItem(
@@ -576,24 +563,19 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                   label: 'Add to collection',
                                   onPressed: () {
                                     showModalBottomSheet(
-                                      context:
-                                          Navigator.of(
-                                            context,
-                                            rootNavigator: true,
-                                          ).context,
+                                      context: Navigator.of(context, rootNavigator: true).context,
                                       builder:
-                                          (ctx) =>
-                                              CollectionSelectionBottomSheet(
-                                                quoteId: widget.quoteId,
+                                          (ctx) => BlocProvider(
+                                            create: (_) => locator<CollectionsBloc>(),
+                                            child: CollectionSelectionBottomSheet(
+                                              quoteId: widget.quoteId,
 
-                                                onHistoryUpdated: (
-                                                  _,
-                                                  collectionsOfHistory,
-                                                ) {
-                                                  Navigator.of(ctx).pop();
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
+                                              onHistoryUpdated: (_, collectionsOfHistory) {
+                                                Navigator.of(ctx).pop();
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ),
                                       isScrollControlled: true,
                                       useSafeArea: true,
                                     );
@@ -614,13 +596,10 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                 ShareControlListItem(
                                   icon: Icons.water_drop_outlined,
                                   label:
-                                      (_isWaterMarkShowing)
-                                          ? 'Hide watermark'
-                                          : 'Show watermark',
+                                      (_isWaterMarkShowing) ? 'Hide watermark' : 'Show watermark',
                                   onPressed: () {
                                     setState(() {
-                                      _isWaterMarkShowing =
-                                          !_isWaterMarkShowing;
+                                      _isWaterMarkShowing = !_isWaterMarkShowing;
                                     });
                                     widget.onHideWaterMarkPressed();
                                   },
@@ -630,10 +609,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                   label: 'Dislike',
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    Utils.showCustomSnackBar(
-                                      context,
-                                      DislikedSnackbar(),
-                                    );
+                                    Utils.showCustomSnackBar(context, DislikedSnackbar());
                                   },
                                 ),
                                 ShareControlListItem(
@@ -641,10 +617,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                   label: 'Report',
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    Utils.showCustomSnackBar(
-                                      context,
-                                      ReportedSnackbar(),
-                                    );
+                                    Utils.showCustomSnackBar(context, ReportedSnackbar());
                                   },
                                 ),
                               ],
@@ -665,10 +638,7 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                         borderRadius: BorderRadius.circular(7),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 23,
-                          vertical: 17,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 17),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [

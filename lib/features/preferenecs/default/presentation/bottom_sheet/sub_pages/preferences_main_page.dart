@@ -1,6 +1,11 @@
+/// Main page for preferences interface.
+///
+/// Displays the primary preferences interface with streak data, settings
+/// navigation, and practice functionality. This widget serves as the
+/// central hub for accessing all app preferences and features.
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sureline/common/domain/entities/streak_display_entity.dart';
@@ -10,23 +15,29 @@ import 'package:sureline/common/presentation/widgets/settings_list_item.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/preferenecs/bottom_sheet/app_icon_setting_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/collections/presentation/pages/default/collections_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/favourites/presentation/pages/favourites_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/general_settings/default/presentation/pages/general_settings_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/history/presentation/pages/history_bottom_sheet.dart';
-import 'package:sureline/features/home_widget/presentation/bottom_sheet/home_widget_bottom_sheet.dart';
-import 'package:sureline/features/notifications_settings/presentation/bottom_sheet/notifications_settings_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/own_quotes/presentation/pages/own_quotes_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/practice/presentation/bottom_sheets/practice_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/practice/presentation/dialogs/practice_appreciation_dialog.dart';
-import 'package:sureline/features/preferenecs/practice/presentation/dialogs/practice_dialog.dart';
 import 'package:sureline/features/preferenecs/default/presentation/bloc/preferences_bloc.dart';
 import 'package:sureline/features/preferenecs/default/presentation/bloc/preferences_event.dart';
 import 'package:sureline/features/preferenecs/default/presentation/bloc/preferences_state.dart';
-import 'package:sureline/features/preferenecs/search/presentation/pages/search_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/practice/presentation/bottom_sheets/practice_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/practice/presentation/dialogs/practice_appreciation_dialog.dart';
+import 'package:sureline/features/preferenecs/practice/presentation/dialogs/practice_dialog.dart';
 
+/// Main preferences page widget.
+///
+/// This widget displays the primary preferences interface including:
+/// - Streak data visualization and sharing
+/// - Settings navigation to various app sections
+/// - Practice session functionality
+/// - Favourites count display
+///
+/// Key features:
+/// - Bloc integration for state management
+/// - Streak container with sharing functionality
+/// - Settings list with navigation
+/// - Practice dialog integration
+/// - Responsive design with proper spacing
 class PreferencesMainPage extends StatefulWidget {
+  /// Creates a new preferences main page.
   const PreferencesMainPage({super.key});
 
   @override
@@ -34,19 +45,27 @@ class PreferencesMainPage extends StatefulWidget {
 }
 
 class _PreferencesMainPageState extends State<PreferencesMainPage> {
+  /// Current streak data for display.
   List<StreakDisplayEntity> _streakData = [];
+
+  /// Whether share functionality is enabled.
   bool _isShareEnabled = true;
+
+  /// Whether to show streak features.
   bool _showStreak = true;
+
+  /// Current favourites count.
   int _favouritesCount = 0;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create:
           (_) =>
               locator<PreferencesBloc>()
-                ..add(GetLastSevenDaysStreakData())
-                ..add(GetStreakStatus())
-                ..add(GetFavouritesCount()),
+                ..add(const GetLastSevenDaysStreakData())
+                ..add(const GetStreakStatus())
+                ..add(const GetFavouritesCount()),
       child: BlocListener<PreferencesBloc, PreferencesState>(
         listener: (context, state) {
           if (state is GotRandomQuotes) {
@@ -60,7 +79,7 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                     perQuoteDuration: state.perQuoteDuration,
                   ),
             ).then((showAppreciationDialog) {
-              if (!showAppreciationDialog) {
+              if (showAppreciationDialog != true) {
                 return;
               }
               if (!context.mounted) return;
@@ -73,7 +92,7 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                     (context, animation, secondaryAnimation) => Center(
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 20),
-                        child: PracticeAppreciationDialog(),
+                        child: const PracticeAppreciationDialog(),
                       ),
                     ),
                 transitionBuilder: Utils.dialogTransitionBuilder,
@@ -106,7 +125,7 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Sureline',
                       style: TextStyle(
                         fontSize: 24,
@@ -115,7 +134,7 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                       ),
                     ),
                     // SizedBox(height: 10),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     if (_streakData.isNotEmpty && _showStreak) ...[
                       StreakContainer(
                         hideText: true,
@@ -133,10 +152,10 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                           );
                         },
                       ),
-                      SizedBox(height: 22),
+                      const SizedBox(height: 22),
                     ],
-                    Heading(text: 'SETTINGS'),
-                    SizedBox(height: 15),
+                    const Heading(text: 'SETTINGS'),
+                    const SizedBox(height: 15),
                     SettingsListItem(
                       title: 'General',
                       isFirst: true,
@@ -179,9 +198,9 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                     //     );
                     //   },
                     // ),
-                    SizedBox(height: 22),
-                    Heading(text: 'YOUR QUOTES'),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 22),
+                    const Heading(text: 'YOUR QUOTES'),
+                    const SizedBox(height: 15),
                     SettingsListItem(
                       title: 'Collections',
                       icon: CupertinoIcons.bookmark,
@@ -207,21 +226,17 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                           barrierLabel: '',
                           transitionDuration: const Duration(milliseconds: 500),
                           pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  Center(
-                                    child: Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                      ),
-                                      child: PracticeDialog(),
-                                    ),
-                                  ),
+                              (context, animation, secondaryAnimation) => Center(
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                                  child: const PracticeDialog(),
+                                ),
+                              ),
                           transitionBuilder: Utils.dialogTransitionBuilder,
                         );
-                        if (!context.mounted || option == null) return;
-                        context.read<PreferencesBloc>().add(
-                          GetRandomQuotes(option),
-                        );
+                        if (option != null && context.mounted) {
+                          context.read<PreferencesBloc>().add(GetRandomQuotes(option));
+                        }
                       },
                     ),
                     SettingsListItem(
@@ -233,21 +248,20 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                     ),
                     SettingsListItem(
                       title: 'History',
-                      icon: CupertinoIcons.hourglass_bottomhalf_fill,
+                      icon: CupertinoIcons.clock,
                       onPressed: () {
                         context.push('/history');
                       },
                     ),
                     SettingsListItem(
-                      title: 'Favourites ($_favouritesCount)',
-                      icon: CupertinoIcons.heart,
+                      title: 'Favourites',
+                      icon: CupertinoIcons.heart_fill,
                       isLast: true,
                       onPressed: () {
                         context.push('/favourites');
                       },
                     ),
-                    SizedBox(height: 15),
-                    SizedBox(height: 22),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),

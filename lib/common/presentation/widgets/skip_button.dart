@@ -13,10 +13,7 @@ class SkipButton extends StatelessWidget {
         padding: const EdgeInsets.only(top: 10, right: 30),
         child: GestureDetector(
           onTap: onTap,
-          child: Text(
-            'Skip',
-            style: TextStyle(color: AppColors.primaryColor, fontSize: 16),
-          ),
+          child: const Text('Skip', style: TextStyle(color: AppColors.primaryColor, fontSize: 16)),
         ),
       ),
     );

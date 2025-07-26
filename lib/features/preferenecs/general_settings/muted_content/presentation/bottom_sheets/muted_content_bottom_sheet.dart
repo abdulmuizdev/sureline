@@ -14,8 +14,7 @@ class MutedContentBottomSheet extends StatefulWidget {
   const MutedContentBottomSheet({super.key});
 
   @override
-  State<MutedContentBottomSheet> createState() =>
-      _MutedContentBottomSheetState();
+  State<MutedContentBottomSheet> createState() => _MutedContentBottomSheetState();
 }
 
 class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
@@ -23,15 +22,31 @@ class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
     isWithAuthorMuted: false,
     isWithoutAuthorMuted: false,
   );
+  bool? _isUserPremium;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && context.mounted) {
+        _checkPremiumStatus();
+      }
+    });
+  }
+
+  void _checkPremiumStatus() async {
+    final isPremium = await Utils.checkPremiumStatus();
+    setState(() {
+      _isUserPremium = isPremium;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<MutedContentBloc>(
-          create:
-              (context) =>
-                  locator<MutedContentBloc>()..add(GetMutedContentOptions()),
+          create: (context) => locator<MutedContentBloc>()..add(GetMutedContentOptions()),
         ),
       ],
       child: BlocListener<MutedContentBloc, MutedContentState>(
@@ -80,20 +95,16 @@ class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
                           SizedBox(height: 20),
                           Expanded(
                             child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    childAspectRatio: 170 / 85,
-                                    mainAxisSpacing: 18,
-                                    crossAxisSpacing: 18,
-                                  ),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 170 / 85,
+                                mainAxisSpacing: 18,
+                                crossAxisSpacing: 18,
+                              ),
                               itemCount: 2,
                               itemBuilder: (context, index) {
                                 return MutedContentGridItem(
-                                  title:
-                                      index == 0
-                                          ? 'With Author'
-                                          : 'Without Author',
+                                  title: index == 0 ? 'With Author' : 'Without Author',
                                   isSelected:
                                       index == 0
                                           ? _mutedContent.isWithAuthorMuted
@@ -101,18 +112,13 @@ class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
                                   onPressed: () {
                                     final newOptions = _mutedContent.copyWith(
                                       isWithAuthorMuted:
-                                          index == 0
-                                              ? !_mutedContent.isWithAuthorMuted
-                                              : false,
+                                          index == 0 ? !_mutedContent.isWithAuthorMuted : false,
                                       isWithoutAuthorMuted:
-                                          index == 1
-                                              ? !_mutedContent
-                                                  .isWithoutAuthorMuted
-                                              : false,
+                                          index == 1 ? !_mutedContent.isWithoutAuthorMuted : false,
                                     );
 
                                     context.read<MutedContentBloc>().add(
-                                      OnMutedContentPressed([newOptions]),
+                                      OnMutedContentPressed([newOptions], _isUserPremium ?? false),
                                     );
                                   },
                                 );

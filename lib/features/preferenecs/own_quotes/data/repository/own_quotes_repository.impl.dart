@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:sureline/common/data/model/collections/own_quote_model.dart';
+import 'package:sureline/common/domain/entities/collections/own_quote_entity.dart';
 import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/features/preferenecs/own_quotes/data/data_source/own_quotes_data_source.dart';
-import 'package:sureline/features/preferenecs/own_quotes/data/model/own_quote_model.dart';
-import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
 import 'package:sureline/features/preferenecs/own_quotes/domain/repository/own_quotes_repository.dart';
 
 class OwnQuotesRepositoryImpl extends OwnQuotesRepository {
@@ -17,9 +17,7 @@ class OwnQuotesRepositoryImpl extends OwnQuotesRepository {
 
   @override
   Future<Either<Failure, void>> addOwnQuote(OwnQuoteEntity ownQuote) async {
-    return await ownQuotesDataSource.addOwnQuote(
-      OwnQuoteModel.fromEntity(ownQuote),
-    );
+    return await ownQuotesDataSource.addOwnQuote(OwnQuoteModel.fromEntity(ownQuote));
   }
 
   @override

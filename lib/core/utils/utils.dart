@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_color_picker_with_title/custom_picker/extensions.dart';
 import 'package:path/path.dart' as path;
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preference_app_group/shared_preference_app_group.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/sp.dart';
@@ -9,12 +10,7 @@ import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/notifications_settings/domain/entity/day_entity.dart';
 
 class Utils {
-  static Widget Function(
-    BuildContext,
-    Animation<double>,
-    Animation<double>,
-    Widget,
-  )
+  static Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)
   dialogTransitionBuilder = (
     BuildContext context,
     Animation<double> animation,
@@ -51,8 +47,7 @@ class Utils {
     } else {
       String subtitle = '';
       for (DayEntity entity in selectedDays) {
-        subtitle =
-            '$subtitle, ${getWeekDayLabel(entity.dateTime, threeChars: true)}';
+        subtitle = '$subtitle, ${getWeekDayLabel(entity.dateTime, threeChars: true)}';
       }
       return subtitle;
     }
@@ -116,9 +111,7 @@ class Utils {
 
   static Future<void> saveThemeOnAppGroup() async {
     try {
-      await SharedPreferenceAppGroup.setAppGroup(
-        'group.com.abdulmuiz.sureline.quoteWidget',
-      );
+      await SharedPreferenceAppGroup.setAppGroup('group.com.abdulmuiz.sureline.quoteWidget');
       if (App.themeEntity.backgroundEntity.solidColor == null) {
         await SharedPreferenceAppGroup.remove(SP.solidColorAppGroup);
       } else {
@@ -138,19 +131,14 @@ class Utils {
         ); // Gets "background"
         final extension = path.extension(backgroundPath); // Gets ".png"
 
-        await SharedPreferenceAppGroup.setString(
-          SP.imageAssetAppGroup,
-          nameWithoutExtension,
-        );
+        await SharedPreferenceAppGroup.setString(SP.imageAssetAppGroup, nameWithoutExtension);
       }
 
       await SharedPreferenceAppGroup.setString(
         SP.textColorAppGroup,
         App.themeEntity.textDecorEntity.textColor.toHex(),
       );
-      print(
-        'text color is this in recm ${App.themeEntity.textDecorEntity.textColor.toHex()}',
-      );
+      print('text color is this in recm ${App.themeEntity.textDecorEntity.textColor.toHex()}');
       await SharedPreferenceAppGroup.setInt(
         SP.textSizeAppGroup,
         App.themeEntity.textDecorEntity.fontSize.round(),
@@ -183,10 +171,7 @@ class Utils {
             left: 0,
             right: 0,
             child: SafeArea(
-              child: SlideTransition(
-                position: animation,
-                child: Center(child: widget),
-              ),
+              child: SlideTransition(position: animation, child: Center(child: widget)),
             ),
           ),
     );
@@ -207,11 +192,53 @@ class Utils {
       borderRadius:
           (ignoreCorners ?? false)
               ? null
-              : BorderRadius.only(
-                topRight: Radius.circular(30),
-                topLeft: Radius.circular(30),
-              ),
+              : BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
       color: AppColors.white,
     );
+  }
+
+  /// Checks if the user has premium subscription status.
+  ///
+  /// Returns true if the user has an active premium subscription,
+  /// false otherwise. Also prints debug information about purchase
+  /// and expiration dates.
+  ///
+  /// Usage:
+  /// ```dart
+  /// final isPremium = await Utils.checkPremiumStatus();
+  /// ```
+  static Future<bool> checkPremiumStatus() async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      debugPrint('customerInfo purchase dates: ${customerInfo.allPurchaseDates}');
+      debugPrint('customerInfo expiration dates: ${customerInfo.allExpirationDates}');
+
+      final isUserPremium = customerInfo.activeSubscriptions.contains('sureline_premium_monthly');
+      debugPrint('isUserPremium: $isUserPremium');
+
+      return isUserPremium;
+    } catch (e) {
+      debugPrint('Error checking premium status: $e');
+      return false;
+    }
+  }
+
+  /// Gets customer info from RevenueCat for detailed subscription information.
+  ///
+  /// Returns the CustomerInfo object which contains all subscription details
+  /// including purchase dates, expiration dates, and active subscriptions.
+  ///
+  /// Usage:
+  /// ```dart
+  /// final customerInfo = await Utils.getCustomerInfo();
+  /// final activeSubscriptions = customerInfo.activeSubscriptions;
+  /// ```
+  static Future<CustomerInfo> getCustomerInfo() async {
+    try {
+      return await Purchases.getCustomerInfo();
+    } catch (e) {
+      debugPrint('Error getting customer info: $e');
+      rethrow;
+    }
   }
 }

@@ -5,20 +5,16 @@ class StreakSwitcher extends StatelessWidget {
   final bool isSelected;
   final Function(bool) onChange;
 
-  const StreakSwitcher({super.key, required this.isSelected,
-  required this.onChange});
+  const StreakSwitcher({super.key, required this.isSelected, required this.onChange});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-      decoration: BoxDecoration(
-        color: AppColors.pureWhite,
-        borderRadius: BorderRadius.circular(7),
-      ),
+      decoration: BoxDecoration(color: AppColors.pureWhite, borderRadius: BorderRadius.circular(7)),
       child: Row(
         children: [
-          Text(
+          const Text(
             'Track streak',
             style: TextStyle(
               fontSize: 16,
@@ -26,7 +22,7 @@ class StreakSwitcher extends StatelessWidget {
               color: AppColors.primaryColor,
             ),
           ),
-          Spacer(),
+          const Spacer(),
           CupertinoSwitch(
             value: isSelected,
             onChanged: onChange,

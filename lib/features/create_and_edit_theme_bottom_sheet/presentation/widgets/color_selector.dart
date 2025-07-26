@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ios_color_picker_with_title/custom_picker/extensions.dart';
 import 'package:ios_color_picker_with_title/show_ios_color_picker.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 
@@ -20,7 +19,7 @@ class ColorSelector extends StatefulWidget {
 }
 
 class _ColorSelectorState extends State<ColorSelector> {
-  final _colors = [
+  final _colors = const [
     Color(0xFF000000),
     Color(0xFF4C4B4B),
     Color(0xFFC6C6C6),
@@ -69,8 +68,7 @@ class _ColorSelectorState extends State<ColorSelector> {
     Color(0xFF1B6600),
     Color(0xFF656701),
   ];
-  final IOSColorPickerController iosColorPickerController =
-      IOSColorPickerController();
+  final IOSColorPickerController iosColorPickerController = IOSColorPickerController();
 
   @override
   Widget build(BuildContext context) {
@@ -85,19 +83,11 @@ class _ColorSelectorState extends State<ColorSelector> {
               borderRadius: BorderRadius.circular(30),
               color: AppColors.pureWhite,
             ),
-            child: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.primaryColor,
-              size: 12,
-            ),
+            child: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.primaryColor, size: 12),
           ),
         ),
         SizedBox(width: 10),
-        Container(
-          height: 36,
-          width: 1,
-          color: AppColors.primaryColor.withValues(alpha: 0.1),
-        ),
+        Container(height: 36, width: 1, color: AppColors.primaryColor.withValues(alpha: 0.1)),
         Expanded(
           child: SizedBox(
             height: 30,
@@ -114,7 +104,7 @@ class _ColorSelectorState extends State<ColorSelector> {
                         darkMode: false,
                         title: "Background Color",
                         startingColor: widget.initialColor,
-                        onColorChanged: (color) => widget.onColorSelected(color)
+                        onColorChanged: (color) => widget.onColorSelected(color),
                       );
                     },
                     child: Padding(
@@ -144,10 +134,7 @@ class _ColorSelectorState extends State<ColorSelector> {
                         height: 30,
                         decoration: BoxDecoration(
                           color: _colors[index - 1],
-                          border: Border.all(
-                            color: AppColors.pureWhite,
-                            width: 2,
-                          ),
+                          border: Border.all(color: AppColors.pureWhite, width: 2),
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),

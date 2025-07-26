@@ -9,9 +9,13 @@ class UpdateAuthorPreferenceUseCase {
 
   UpdateAuthorPreferenceUseCase(this.repository);
 
-  Future<Either<Failure, void>> call(AuthorPrefEntity authorPrefEntity) async {
+  Future<Either<Failure, void>> call(
+    AuthorPrefEntity authorPrefEntity, {
+    required bool isPremium,
+  }) async {
     return repository.updateAuthorPreference(
       AuthorPrefModel.fromEntity(authorPrefEntity),
+      isPremium: isPremium,
     );
   }
 }

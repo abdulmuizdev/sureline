@@ -40,10 +40,7 @@ class SurelineButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             border:
                 (isOutlined ?? false)
-                    ? Border.all(
-                      color: AppColors.primaryColor.withValues(alpha: 0.5),
-                      width: 1,
-                    )
+                    ? Border.all(color: AppColors.primaryColor.withValues(alpha: 0.5), width: 1)
                     : null,
           ),
           child: Center(
@@ -52,10 +49,7 @@ class SurelineButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color:
-                    (isOutlined ?? false)
-                        ? AppColors.primaryColor
-                        : AppColors.white,
+                color: (isOutlined ?? false) ? AppColors.primaryColor : AppColors.white,
               ),
             ),
           ),

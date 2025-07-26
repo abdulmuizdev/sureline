@@ -1,19 +1,22 @@
+/// Displays user's collections in a list format.
+///
+/// Shows empty state or collection items with navigation to detail pages.
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sureline/common/domain/entities/collections/collection_entity.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
-import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/preferenecs/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_event.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_state.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/widgets/collection_list_item.dart';
-import 'package:sureline/features/preferenecs/search/presentation/widget/sureline_search_bar.dart';
 
+/// Main page for displaying and managing user collections.
 class CollectionListPage extends StatefulWidget {
   final VoidCallback onNext;
   final VoidCallback onDetail;
@@ -106,7 +109,11 @@ class _CollectionListPageState extends State<CollectionListPage> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(width: 100, height: 100, child: Placeholder()),
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: Image.asset('assets/images/collection.png'),
+                      ),
                       OnboardingHeading(
                         title: 'You don\'t have any collections yet',
                         subTitle:
@@ -160,20 +167,12 @@ class _CollectionListPageState extends State<CollectionListPage> {
                                 onTap: () async {
                                   widget.onDetail();
                                   final collection = collections[index];
-                                  final encodedName = Uri.encodeComponent(
-                                    collection.name,
-                                  );
-                                  context.push(
-                                    '/collections/detail/${collection.id}/$encodedName',
-                                  );
+                                  final encodedName = Uri.encodeComponent(collection.name);
+                                  context.push('/collections/detail/${collection.id}/$encodedName');
                                   // Refresh collections after returning from detail page
                                   if (mounted && context.mounted) {
-                                    print(
-                                      'calling bloc to refresh collections',
-                                    );
-                                    context.read<CollectionsBloc>().add(
-                                      GetCollections(),
-                                    );
+                                    print('calling bloc to refresh collections');
+                                    context.read<CollectionsBloc>().add(GetCollections());
                                   }
                                 },
                                 child: CollectionListItem(
@@ -197,8 +196,7 @@ class _CollectionListPageState extends State<CollectionListPage> {
                                       });
                                     }
                                   },
-                                  isOverlayVisible:
-                                      _overlayVisibleIndex == index,
+                                  isOverlayVisible: _overlayVisibleIndex == index,
                                 ),
                               );
                             },

@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
-import 'package:sureline/common/presentation/widgets/playable.dart';
-import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/create_and_edit_theme_bottom_sheet/presentation/bottom_sheets/create_and_edit_theme_bottom_sheet.dart';
 import 'package:sureline/features/theme_selection/presentation/main/widgets/theme_selector_item/widget/edit_button.dart';
-import 'package:video_player/video_player.dart';
 
 class ThemeSelectorItem extends StatefulWidget {
   final ThemeEntity entity;
@@ -76,9 +73,7 @@ class _ThemeSelectorItemState extends State<ThemeSelectorItem> {
               borderRadius: BorderRadius.circular(22),
               border:
                   (widget.isSelected)
-                      ? Border.all(
-                        color: AppColors.primaryColor.withValues(alpha: 0.7),
-                      )
+                      ? Border.all(color: AppColors.primaryColor.withValues(alpha: 0.7))
                       : null,
             ),
             child: Container(
@@ -134,9 +129,7 @@ class _ThemeSelectorItemState extends State<ThemeSelectorItem> {
                               useSafeArea: false,
                               context: context,
                               builder:
-                                  (context) => CreateAndEditThemeBottomSheet(
-                                    entity: widget.entity,
-                                  ),
+                                  (context) => CreateAndEditThemeBottomSheet(entity: widget.entity),
                             );
                           },
                         ),

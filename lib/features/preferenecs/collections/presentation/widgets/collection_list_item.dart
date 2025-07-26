@@ -1,17 +1,47 @@
+/// Individual collection item widget for list display.
+///
+/// Shows collection name, quote count, and action buttons.
+/// This widget represents a single collection in the collections list,
+/// displaying the collection's name, quote count, and interactive
+/// elements for sharing and deletion. It provides a clean, touch-friendly
+/// interface for collection management.
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sureline/common/presentation/widgets/sureline_overlay.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/preferenecs/collections/domain/entity/collection_entity.dart';
+import 'package:sureline/common/domain/entities/collections/collection_entity.dart';
 
+/// Displays a single collection with its metadata and actions.
+///
+/// This widget represents an individual collection item in the collections list.
+/// It displays the collection's name, total quote count, and provides actions
+/// for sharing and deletion. The widget includes an overlay menu for additional
+/// actions and maintains proper touch targets for accessibility.
+///
+/// Key features:
+/// - Displays collection name with proper text overflow handling
+/// - Shows total quote count from all quote types
+/// - Provides share functionality for collection names
+/// - Includes overlay menu for delete action
+/// - Maintains proper touch targets and accessibility
+/// - Responsive design with proper spacing and styling
 class CollectionListItem extends StatefulWidget {
+  /// Whether the overlay menu is currently visible.
   final bool isOverlayVisible;
+
+  /// Callback for toggling overlay visibility.
   final Function(bool) onOverlayToggled;
+
+  /// Callback for delete action.
   final VoidCallback onDeletePressed;
+
+  /// The collection entity to display.
   final CollectionEntity entity;
 
+  /// Creates a new collection list item.
   const CollectionListItem({
     super.key,
     required this.entity,
@@ -30,7 +60,7 @@ class _CollectionListItemState extends State<CollectionListItem> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
-        padding: EdgeInsets.only(left: 14, right: 14, top: 14),
+        padding: const EdgeInsets.only(left: 14, right: 14, top: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: AppColors.pureWhite,
@@ -45,7 +75,7 @@ class _CollectionListItemState extends State<CollectionListItem> {
                     widget.entity.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.normal,
                       color: AppColors.primaryColor,
@@ -54,22 +84,18 @@ class _CollectionListItemState extends State<CollectionListItem> {
                 ),
 
                 SurelineOverlay(
-                  onClose:
-                      () => widget.onOverlayToggled(!widget.isOverlayVisible),
+                  onClose: () => widget.onOverlayToggled(!widget.isOverlayVisible),
 
                   overlay: GestureDetector(
                     onTap: widget.onDeletePressed,
                     child: Container(
                       width: 200,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 12,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                       decoration: BoxDecoration(
                         color: CupertinoColors.systemGrey6,
                         borderRadius: BorderRadius.circular(13),
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
@@ -80,10 +106,7 @@ class _CollectionListItemState extends State<CollectionListItem> {
                               fontWeight: FontWeight.normal,
                             ),
                           ),
-                          Icon(
-                            CupertinoIcons.delete,
-                            color: CupertinoColors.destructiveRed,
-                          ),
+                          Icon(CupertinoIcons.delete, color: CupertinoColors.destructiveRed),
                         ],
                       ),
                     ),
@@ -93,13 +116,8 @@ class _CollectionListItemState extends State<CollectionListItem> {
                   follower: Alignment.topRight,
                   animateUpwards: true,
                   child: IconButton(
-                    onPressed:
-                        () => widget.onOverlayToggled(!widget.isOverlayVisible),
-                    icon: Icon(
-                      Icons.more_vert_rounded,
-                      size: 20,
-                      color: AppColors.primaryColor,
-                    ),
+                    onPressed: () => widget.onOverlayToggled(!widget.isOverlayVisible),
+                    icon: const Icon(Icons.more_vert_rounded, size: 20, color: AppColors.primaryColor),
                   ),
                 ),
               ],
@@ -118,14 +136,9 @@ class _CollectionListItemState extends State<CollectionListItem> {
                 ),
                 IconButton(
                   onPressed: () {
-                    SharePlus.instance.share(
-                      ShareParams(text: '"${widget.entity.name}"'),
-                    );
+                    SharePlus.instance.share(ShareParams(text: '"${widget.entity.name}"'));
                   },
-                  icon: Icon(
-                    Icons.ios_share_rounded,
-                    color: AppColors.primaryColor,
-                  ),
+                  icon: const Icon(Icons.ios_share_rounded, color: AppColors.primaryColor),
                 ),
               ],
             ),

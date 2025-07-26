@@ -1,11 +1,29 @@
 metrics:
+  # Code complexity metrics
   cyclomatic-complexity: 5
   number-of-arguments: 3
   lines-of-code: 20
   maximum-nesting-level: 3
   number-of-methods: 5
+  number-of-parameters: 4
+  number-of-public-methods: 10
+  number-of-private-methods: 8
+  number-of-public-properties: 8
+  number-of-private-properties: 6
+  number-of-annotations: 3
+  number-of-annotations-per-file: 5
+  number-of-annotations-per-class: 3
+  number-of-annotations-per-method: 2
+  number-of-annotations-per-parameter: 1
+  number-of-annotations-per-property: 1
+  number-of-annotations-per-file: 5
+  number-of-annotations-per-class: 3
+  number-of-annotations-per-method: 2
+  number-of-annotations-per-parameter: 1
+  number-of-annotations-per-property: 1
 
 rules:
+  # Code style and formatting
   - prefer-trailing-comma
   - always-remove-unused-imports
   - avoid-returning-widgets
@@ -18,3 +36,66 @@ rules:
   - avoid-unnecessary-setstate
   - avoid-throw-in-catch-block
   - prefer-moving-to-variable
+
+  # Clean Architecture specific rules
+  - avoid-global-state
+  - avoid-unnecessary-type-casts
+  - avoid-unnecessary-type-assertions
+  - avoid-unnecessary-type-annotations
+  - avoid-unnecessary-null-checks
+  - avoid-unnecessary-null-aware-operators
+  - avoid-unnecessary-null-aware-assignments
+  - avoid-unnecessary-null-in-if-null-operators
+  - avoid-unnecessary-nullable-for-final-variable-declarations
+  - avoid-unnecessary-overrides
+  - avoid-unnecessary-parenthesis
+  - avoid-unnecessary-raw-strings
+  - avoid-unnecessary-statements
+  - avoid-unnecessary-string-escapes
+  - avoid-unnecessary-string-interpolations
+  - avoid-unnecessary-this
+  - avoid-unnecessary-to-list-in-spreads
+  - avoid-unnecessary-underscores
+
+  # Performance and best practices
+  - avoid-slow-async-io
+  - cancel-subscriptions
+  - sized-box-for-whitespace
+  - sized-box-shrink-expand
+  - use-build-context-synchronously
+  - use-colored-box
+  - use-key-in-widget-constructors
+  - sort-child-properties-last
+  - sort-constructors-first
+  - sort-unnamed-constructors-first
+
+  # Type safety
+  - avoid-double-and-int-checks
+  - avoid-equals-and-hash-code-on-mutable-classes
+  - avoid-positional-boolean-parameters
+  - avoid-return-types-on-setters
+  - avoid-shadowing-type-parameters
+  - avoid-types-as-parameter-names
+  - cast-nullable-to-non-nullable
+  - collection-methods-unrelated-type
+  - null-check-on-nullable-type-parameter
+  - null-closures
+  - test-types-in-equals
+  - tighten-type-of-initializing-formals
+  - type-annotate-public-apis
+  - type-init-formals
+  - unrelated-type-equality-checks
+  - void-checks
+
+# Exclude generated files and platform-specific code
+exclude:
+  - "**/*.g.dart"
+  - "**/*.freezed.dart"
+  - "**/generated_plugin_registrant.dart"
+  - "ios/**"
+  - "android/**"
+  - "macos/**"
+  - "linux/**"
+  - "windows/**"
+  - "web/**"
+  - "build/**"

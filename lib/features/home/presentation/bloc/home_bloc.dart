@@ -10,9 +10,9 @@ import 'package:sureline/common/domain/use_cases/streak/get_last_seven_days_stre
 import 'package:sureline/common/domain/use_cases/streak/is_streak_broken_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/log_streak_entry_use_case.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/preferenecs/favourites/domain/use_cases/add_favourite_use_case.dart';
-import 'package:sureline/features/preferenecs/favourites/domain/use_cases/get_favourites_count_use_case.dart';
-import 'package:sureline/features/preferenecs/favourites/domain/use_cases/remove_favourite_use_case.dart';
+import 'package:sureline/common/domain/use_cases/favourites/add_favourite_use_case.dart';
+import 'package:sureline/common/domain/use_cases/favourites/get_favourites_count_use_case.dart';
+import 'package:sureline/common/domain/use_cases/favourites/remove_favourite_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/feed/is_feed_setup_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/like/guide/is_like_guide_shown_use_case.dart';
 import 'package:sureline/features/home/domain/use_cases/share/is_share_guide_shown_use_case.dart';
@@ -25,14 +25,13 @@ import 'package:sureline/features/home/domain/use_cases/swipe/set_swipe_to_compl
 import 'package:sureline/features/home/presentation/bloc/home_event.dart';
 import 'package:sureline/features/home/presentation/bloc/home_state.dart';
 import 'package:sureline/common/domain/use_cases/streak/can_log_streak_entry_use_case.dart';
-import 'package:sureline/features/notifications_settings/domain/use_cases/edit_notification_preset_use_case.dart';
-import 'package:sureline/features/notifications_settings/domain/use_cases/get_notification_presets_use_case.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_quotes_from_recommendation_algorithm.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/use_cases/mark_quote_as_shown_use_case.dart';
+import 'package:sureline/common/domain/use_cases/notifications_settings/edit_notification_preset_use_case.dart';
+import 'package:sureline/common/domain/use_cases/notifications_settings/get_notification_presets_use_case.dart';
+import 'package:sureline/common/domain/use_cases/recommendation_algorithm/get_quotes_from_recommendation_algorithm.dart';
+import 'package:sureline/common/domain/use_cases/recommendation_algorithm/mark_quote_as_shown_use_case.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final GetQuotesFromRecommendationAlgorithm
-  _getQuotesFromRecommendationAlgorithm;
+  final GetQuotesFromRecommendationAlgorithm _getQuotesFromRecommendationAlgorithm;
   final SetOnboardingToCompletedUseCase _setOnboardingToCompletedUseCase;
 
   final IsSwipeCompletedUseCase _isSwipeCompletedUseCase;
@@ -92,6 +91,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<GetQuotes>((event, emit) async {
       final result = await _getQuotesFromRecommendationAlgorithm.call(
         page: event.page,
+        isPremium: event.isPremium,
       );
       result.fold(
         (left) {
@@ -200,10 +200,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
   }
 
-  Future<void> _checkForBrokenStreak(
-    List<StreakEntity> entities,
-    Emitter<HomeState> emit,
-  ) async {
+  Future<void> _checkForBrokenStreak(List<StreakEntity> entities, Emitter<HomeState> emit) async {
     final brokenCheckResult = _isStreakBrokenUseCase.execute(entities);
     await brokenCheckResult.fold((left) {}, (broken) async {
       if (broken) {
@@ -218,9 +215,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final result = _getLastCheckInUseCase.execute();
 
     await result.fold((left) {}, (right) async {
-      bool canLog = _canLogStreakEntryUseCase.execute(
-        lastCheckIn: right?.timeStamp,
-      );
+      bool canLog = _canLogStreakEntryUseCase.execute(lastCheckIn: right?.timeStamp);
       if (canLog) {
         await _handleStreakLog(emit);
       }
@@ -238,9 +233,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     await status.fold((failed) {}, (successful) async {
       final presets = await _getNotificationPresetsUseCase.execute();
       await presets.fold((left) {}, (right) async {
-        final entity = right.singleWhere(
-          (entity) => entity.isStreakReminder == true,
-        );
+        final entity = right.singleWhere((entity) => entity.isStreakReminder == true);
         final now = DateTime.now();
         await _editNotificationPresetUseCase.execute(
           entity.copyWith(

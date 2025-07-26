@@ -1,9 +1,14 @@
+/// Individual quote item widget for home screen.
+///
+/// Displays quotes with like, share, and swipe interactions.
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/common/presentation/widgets/watermark.dart';
 
+/// Widget for displaying individual quote items in the home screen.
 class HomeListItem extends StatefulWidget {
   final String quote;
   final bool isWelcome;
@@ -36,8 +41,7 @@ class HomeListItem extends StatefulWidget {
   State<HomeListItem> createState() => _HomeListItemState();
 }
 
-class _HomeListItemState extends State<HomeListItem>
-    with TickerProviderStateMixin {
+class _HomeListItemState extends State<HomeListItem> with TickerProviderStateMixin {
   late AnimationController _welcomeSwipeSlideController;
   late AnimationController _swipeSlideController;
   late AnimationController _swipeFadeController;
@@ -77,191 +81,167 @@ class _HomeListItemState extends State<HomeListItem>
         SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          child: Column(
+          child: Stack(
             children: [
-              SizedBox(height: 26),
-              Expanded(
-                child: SlideTransition(
-                  position: _swipeSlideTransition,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Column(
-                      children: [
-                        Expanded(flex: 1, child: Container()),
-                        Expanded(
-                          flex: 8,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: widget.onTap,
-                                onDoubleTap: _triggerLike,
-                                child: RepaintBoundary(
-                                  key: widget.quoteKey,
-                                  child: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      return Stack(
-                                        children: [
-                                          Center(child: quoteText(isWelcome)),
-                                          AnimatedOpacity(
-                                            opacity:
-                                                widget.showExtras
-                                                    ? 0
-                                                    : (widget.showWaterMark
-                                                        ? 1
-                                                        : 0),
-                                            duration: Duration(
-                                              milliseconds: 1000,
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                    top:
-                                                        ((constraints
-                                                                    .maxHeight /
-                                                                2) -
-                                                            (_waterMarkHeight /
-                                                                2)) +
-                                                        (_quoteWidgetSize
-                                                                .height /
-                                                            2) +
-                                                        43,
-                                                  ),
-                                                  child: Watermark(
-                                                    height: _waterMarkHeight,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              FadeTransition(
-                                opacity: _likeFadeAnimation,
-                                child: ScaleTransition(
-                                  scale: _likeScaleAnimation,
-                                  child:
-                                      (_showLike)
-                                          ? Icon(
-                                            Icons.favorite,
-                                            color:
-                                                App
-                                                    .themeEntity
-                                                    .textDecorEntity
-                                                    .textColor,
-                                            size: 140,
-                                          )
-                                          : Container(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        if (!isWelcome) ...[
-                          Expanded(
-                            flex: 1,
-                            child: AnimatedOpacity(
-                              duration: const Duration(milliseconds: 1000),
-                              opacity: (widget.showExtras) ? 1 : 0,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+              Column(
+                children: [
+                  SizedBox(height: 26),
+                  Expanded(
+                    child: SlideTransition(
+                      position: _swipeSlideTransition,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 100),
+                        child: Column(
+                          children: [
+                            Expanded(flex: 1, child: Container()),
+                            Expanded(
+                              flex: 8,
+                              child: Stack(
+                                alignment: Alignment.center,
                                 children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      widget.onSharePressed();
-                                    },
-                                    icon: Icon(
-                                      Icons.ios_share_rounded,
-                                      color:
-                                          App
-                                              .themeEntity
-                                              .textDecorEntity
-                                              .textColor,
-                                      size: 27,
+                                  GestureDetector(
+                                    onTap: widget.onTap,
+                                    onDoubleTap: _triggerLike,
+                                    child: RepaintBoundary(
+                                      key: widget.quoteKey,
+                                      child: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          return Stack(
+                                            children: [
+                                              Center(child: quoteText(isWelcome)),
+                                              AnimatedOpacity(
+                                                opacity:
+                                                    widget.showExtras
+                                                        ? 0
+                                                        : (widget.showWaterMark ? 1 : 0),
+                                                duration: Duration(milliseconds: 1000),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                        top:
+                                                            ((constraints.maxHeight / 2) -
+                                                                (_waterMarkHeight / 2)) +
+                                                            (_quoteWidgetSize.height / 2) +
+                                                            43,
+                                                      ),
+                                                      child: Watermark(height: _waterMarkHeight),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ),
-                                  IconButton(
-                                    onPressed: () {
-                                      _triggerLike();
-                                    },
-                                    icon: Icon(
-                                      (widget.isLiked)
-                                          ? Icons.favorite
-                                          : Icons.favorite_outline_rounded,
-                                      color:
-                                          App
-                                              .themeEntity
-                                              .textDecorEntity
-                                              .textColor,
-                                      size: 27,
+                                  FadeTransition(
+                                    opacity: _likeFadeAnimation,
+                                    child: ScaleTransition(
+                                      scale: _likeScaleAnimation,
+                                      child:
+                                          (_showLike)
+                                              ? Icon(
+                                                Icons.favorite,
+                                                color: App.themeEntity.textDecorEntity.textColor,
+                                                size: 140,
+                                              )
+                                              : Container(),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ] else ...[
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              children: [
-                                SlideTransition(
-                                  position: _welcomeSwipeSlideAnimation,
-                                  child: Image.asset(
-                                    'assets/images/swipe.png',
-                                    color:
-                                        App
-                                            .themeEntity
-                                            .textDecorEntity
-                                            .textColor,
-                                    width: 29,
+
+                            if (!isWelcome) ...[
+                              Expanded(
+                                flex: 1,
+                                child: AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 1000),
+                                  opacity: (widget.showExtras) ? 1 : 0,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          widget.onSharePressed();
+                                        },
+                                        icon: Icon(
+                                          Icons.ios_share_rounded,
+                                          color: App.themeEntity.textDecorEntity.textColor,
+                                          size: 27,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          _triggerLike();
+                                        },
+                                        icon: Icon(
+                                          (widget.isLiked)
+                                              ? Icons.favorite
+                                              : Icons.favorite_outline_rounded,
+                                          color: App.themeEntity.textDecorEntity.textColor,
+                                          size: 27,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 14),
-                                Text(
-                                  'Swipe up',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.normal,
-                                    color:
-                                        App
-                                            .themeEntity
-                                            .textDecorEntity
-                                            .textColor,
-                                  ),
+                              ),
+                            ] else ...[
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  children: [
+                                    SlideTransition(
+                                      position: _welcomeSwipeSlideAnimation,
+                                      child: Image.asset(
+                                        'assets/images/swipe.png',
+                                        color: App.themeEntity.textDecorEntity.textColor,
+                                        width: 29,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    Text(
+                                      'Swipe up',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.normal,
+                                        color: App.themeEntity.textDecorEntity.textColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 26,
-                child: FadeTransition(
-                  opacity: _swipeFadeAnimation,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Swipe up',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
-                          color: App.themeEntity.textDecorEntity.textColor,
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                    ],
+                    ),
+                  ),
+                  SizedBox(height: 26),
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: 126,
+                  child: FadeTransition(
+                    opacity: _swipeFadeAnimation,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Swipe up',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                            color: App.themeEntity.textDecorEntity.textColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -281,9 +261,7 @@ class _HomeListItemState extends State<HomeListItem>
         App.themeEntity.textDecorEntity.fontFamily,
         textStyle: TextStyle(
           foreground:
-              (App.themeEntity.textDecorEntity.outlineState == 0)
-                    ? null
-                    : Paint()
+              (App.themeEntity.textDecorEntity.outlineState == 0) ? null : Paint()
                 ?..style = PaintingStyle.stroke
                 ..strokeWidth = double.parse(
                   App.themeEntity.textDecorEntity.outlineState.toString(),
@@ -323,12 +301,7 @@ class _HomeListItemState extends State<HomeListItem>
     _welcomeSwipeSlideAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0, -2),
-    ).animate(
-      CurvedAnimation(
-        parent: _welcomeSwipeSlideController,
-        curve: Curves.linearToEaseOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _welcomeSwipeSlideController, curve: Curves.linearToEaseOut));
 
     _swipeSlideController = AnimationController(
       vsync: this,
@@ -338,45 +311,32 @@ class _HomeListItemState extends State<HomeListItem>
     _swipeSlideTransition = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0, -0.05),
-    ).animate(
-      CurvedAnimation(parent: _swipeSlideController, curve: Curves.linear),
-    );
+    ).animate(CurvedAnimation(parent: _swipeSlideController, curve: Curves.linear));
 
     _swipeFadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
 
-    _swipeFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _swipeFadeController, curve: Curves.linear),
-    );
+    _swipeFadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _swipeFadeController, curve: Curves.linear));
 
-    _likeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
+    _likeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
 
     _likeScaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(
-          begin: 1.0,
-          end: 1.4,
-        ).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(begin: 1.0, end: 1.4).chain(CurveTween(curve: Curves.easeOut)),
         weight: 30,
       ),
       TweenSequenceItem(
-        tween: Tween(
-          begin: 1.4,
-          end: 1.0,
-        ).chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(begin: 1.4, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
         weight: 30,
       ),
       TweenSequenceItem(tween: ConstantTween(1.0), weight: 20),
       TweenSequenceItem(
-        tween: Tween(
-          begin: 1.0,
-          end: 1.3,
-        ).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(begin: 1.0, end: 1.3).chain(CurveTween(curve: Curves.easeOut)),
         weight: 20,
       ),
     ]).animate(_likeController);

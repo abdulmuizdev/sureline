@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:sureline/common/data/model/collections/collection_model.dart';
+import 'package:sureline/common/data/model/collections/own_quote_model.dart';
 import 'package:sureline/common/data/database/dao/references/collections_own_quotes_table_dao.dart';
 import 'package:sureline/core/db/app_database.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/preferenecs/collections/data/model/collection_model.dart';
 import 'package:sureline/features/preferenecs/own_quotes/data/database/dao/own_quotes_dao.dart';
-import 'package:sureline/features/preferenecs/own_quotes/data/model/own_quote_model.dart';
 
 abstract class OwnQuotesDataSource {
   Future<Either<Failure, List<OwnQuoteModel>>> getAllOwnQuotes();
@@ -27,11 +27,9 @@ class OwnQuotesDataSourceImpl extends OwnQuotesDataSource {
       final List<OwnQuoteModel> ownQuoteModels = [];
 
       for (final ownQuote in ownQuotes) {
-        final collections = await collectionsOwnQuotesDao
-            .getCollectionsOfOwnQuote(ownQuote.id);
+        final collections = await collectionsOwnQuotesDao.getCollectionsOfOwnQuote(ownQuote.id);
         print('collections: ${collections.length}');
-        final collectionModels =
-            collections.map((c) => CollectionModel.fromCollection(c)).toList();
+        final collectionModels = collections.map((c) => CollectionModel.fromCollection(c)).toList();
 
         final isFavourite = await ownQuotesDao.isOwnQuoteFavourite(ownQuote.id);
 

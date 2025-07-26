@@ -1,3 +1,5 @@
+/// Core application configuration and global state management.
+
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -8,15 +10,25 @@ import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/remote_config/domain/entities/remote_config_entity.dart';
 import 'package:uuid/uuid.dart';
 
+/// Core application class for global state and configuration management.
 class App {
+  /// Global volume setting for the application.
   static double volume = Constants.defaultVolume;
+
+  /// Global voice configuration map.
   static Map<String, String>? voice;
+
+  /// Remote configuration entity for feature flags and settings.
   static RemoteConfigEntity remoteConfigEntity = Constants.remoteConfigModel;
-  static ValueKey homeScreenQuoteKey = ValueKey('quote_0');
+
+  /// ValueKey for the home screen quote widget.
+  static ValueKey homeScreenQuoteKey = const ValueKey('quote_0');
+
+  /// Default theme configuration for the application.
   static ThemeEntity defaultTheme = ThemeEntity(
-    id: Uuid().v4(),
+    id: const Uuid().v4(),
     lastAccessed: DateTime.now(),
-    textDecorEntity: ThemeTextDecorEntity(
+    textDecorEntity: const ThemeTextDecorEntity(
       fontSize: Constants.defaultFontSize,
       fontWeight: Constants.defaultFontWeight,
       fontFamily: Constants.defaultFontFamily,
@@ -25,7 +37,7 @@ class App {
       outlineState: 0,
       textPadding: 18,
     ),
-    backgroundEntity: ThemeBackgroundEntity(
+    backgroundEntity: const ThemeBackgroundEntity(
       path: Constants.defaultBackground,
       isNetwork: false,
       solidColor: null,
@@ -39,10 +51,16 @@ class App {
     isMostPopular: false,
     isUserCreated: false,
   );
+
+  /// Current theme entity for the application.
   static ThemeEntity themeEntity = defaultTheme;
 
+  /// Primary action color for home screen elements.
   static Color homeActionColor = AppColors.primaryColor;
+
+  /// Background color for home screen buttons.
   static Color homeButtonColor = AppColors.pureWhite;
 
+  /// Solid background color for the application.
   static Color? bgSolidColor;
 }

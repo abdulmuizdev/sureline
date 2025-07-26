@@ -2,9 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/features/onboarding/interested_catag/domain/entity/category_entity.dart';
 
+/// Widget that displays a single category item in the category selection grid.
+/// This component renders a category with selection state styling and provides
+/// advanced touch handling with drag cancellation for better user experience.
+///
+/// The widget includes visual feedback for selected state with background
+/// highlighting, border styling, and animated icon transitions.
 class CategoryItem extends StatefulWidget {
+  /// The category entity containing the category data and selection state.
   final CategoryEntity entity;
+
+  /// Callback function triggered when the category is tapped.
+  /// Handles the selection logic in the parent component.
   final VoidCallback onPressed;
+
+  /// Whether this category is currently selected by the user.
+  /// Controls the visual styling and icon display.
   final bool isSelected;
 
   const CategoryItem({
@@ -19,9 +32,20 @@ class CategoryItem extends StatefulWidget {
 }
 
 class _CategoryItemState extends State<CategoryItem> {
+  /// Whether the user is currently pressing down on the category item.
+  /// Used for visual feedback during touch interactions.
   bool _isTapDown = false;
+
+  /// Whether the user has dragged outside the cancellation radius.
+  /// Prevents accidental selections when users drag away from the item.
   bool _isDraggingOutsideBounds = false;
+
+  /// The initial position where the user first touched the item.
+  /// Used to calculate drag distance for cancellation logic.
   late Offset _initialTapPosition;
+
+  /// The radius within which dragging is allowed before cancellation.
+  /// If the user drags beyond this radius, the tap is cancelled.
   final double _cancelRadius = 100.0;
 
   @override
@@ -56,13 +80,11 @@ class _CategoryItemState extends State<CategoryItem> {
         });
       },
       onPanUpdate: (details) {
-        double distance =
-            (_initialTapPosition - details.localPosition).distance;
+        double distance = (_initialTapPosition - details.localPosition).distance;
         if (distance > _cancelRadius) {
           setState(() {
             _isTapDown = false; // Cancel if out of the radius
-            _isDraggingOutsideBounds =
-                true; // Mark as dragging outside the bounds
+            _isDraggingOutsideBounds = true; // Mark as dragging outside the bounds
           });
         } else {
           setState(() {
@@ -77,10 +99,7 @@ class _CategoryItemState extends State<CategoryItem> {
           curve: Curves.easeInOut,
           height: 49,
           decoration: BoxDecoration(
-            color:
-                widget.isSelected
-                    ? AppColors.white
-                    : AppColors.white.withOpacity(0.3),
+            color: widget.isSelected ? AppColors.white : AppColors.white.withOpacity(0.3),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(color: AppColors.white, width: 1.5),
           ),
@@ -92,8 +111,7 @@ class _CategoryItemState extends State<CategoryItem> {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 100),
                   transitionBuilder:
-                      (child, animation) =>
-                          FadeTransition(opacity: animation, child: child),
+                      (child, animation) => FadeTransition(opacity: animation, child: child),
                   child: Icon(
                     widget.isSelected ? Icons.check_rounded : Icons.add_rounded,
                     key: ValueKey<bool>(widget.isSelected),

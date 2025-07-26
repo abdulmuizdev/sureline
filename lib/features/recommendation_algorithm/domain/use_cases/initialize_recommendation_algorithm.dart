@@ -7,7 +7,7 @@ class InitializeRecommendationAlgorithm {
 
   InitializeRecommendationAlgorithm(this.repository);
 
-  Future<Either<Failure, void>> call() async {
-    return repository.initialize();
+  Future<Either<Failure, void>> call({required bool isPremium}) async {
+    return repository.initialize(isPremium: isPremium);
   }
 }

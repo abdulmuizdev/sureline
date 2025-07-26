@@ -14,26 +14,28 @@ import 'package:sureline/features/onboarding/interested_catag/presentation/widge
 import 'package:sureline/features/onboarding/lock_screen_widget_recom/presentation/pages/lock_screen_widget_screen.dart';
 import 'package:sureline/features/onboarding/survey/presentation/pages/survey_screen.dart';
 
+/// Screen for collecting user category preferences during onboarding.
+/// This screen allows users to select which quote categories interest them,
+/// helping to personalize their quote feed and improve content relevance.
+///
+/// The screen displays available categories in a wrap layout with
+/// toggle functionality, and includes state management for category selection.
 class InterestedCategoriesScreen extends StatefulWidget {
   const InterestedCategoriesScreen({super.key});
 
   @override
-  State<InterestedCategoriesScreen> createState() =>
-      _InterestedCategoriesScreenState();
+  State<InterestedCategoriesScreen> createState() => _InterestedCategoriesScreenState();
 }
 
-class _InterestedCategoriesScreenState
-    extends State<InterestedCategoriesScreen> {
+class _InterestedCategoriesScreenState extends State<InterestedCategoriesScreen> {
+  /// List of available categories with their selection states.
+  /// This list is populated from the bloc and updated based on user interactions.
   List<CategoryEntity> _categories = [];
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) => locator<CategoryBloc>()..add(GetCategories()),
-        ),
-      ],
+      providers: [BlocProvider(create: (_) => locator<CategoryBloc>()..add(GetCategories()))],
       child: BlocListener<CategoryBloc, CategoryState>(
         listener: (context, state) {
           if (state is GotCategories) {
@@ -58,8 +60,7 @@ class _InterestedCategoriesScreenState
                         ),
                         OnboardingHeading(
                           title: 'Which categories are you interested in?',
-                          subTitle:
-                              'This will be used to personalize your feed',
+                          subTitle: 'This will be used to personalize your feed',
                           reduceMargins: true,
                         ),
                         Padding(
@@ -67,19 +68,11 @@ class _InterestedCategoriesScreenState
                           child: Wrap(
                             spacing: 15,
                             runSpacing: 15,
-                            children: List.generate(_categories.length, (
-                              index,
-                            ) {
+                            children: List.generate(_categories.length, (index) {
                               return CategoryItem(
                                 entity: _categories[index],
                                 onPressed: () {
-                                  debugPrint('pressed');
-                                  final current = _categories[index];
-                                  setState(() {
-                                    _categories[index] = current.copyWith(
-                                      isSelected: !current.isSelected,
-                                    );
-                                  });
+                                  _toggleCategorySelection(index);
                                 },
                                 isSelected: _categories[index].isSelected,
                               );
@@ -105,8 +98,23 @@ class _InterestedCategoriesScreenState
     );
   }
 
+  /// Toggles the selection state of a category at the specified index.
+  /// This method updates the local state to reflect user category preferences.
+  ///
+  /// [index] - The index of the category to toggle
+  void _toggleCategorySelection(int index) {
+    debugPrint('pressed');
+    final current = _categories[index];
+    setState(() {
+      _categories[index] = current.copyWith(isSelected: !current.isSelected);
+    });
+  }
+
+  /// Navigates to the next onboarding step (survey screen).
+  /// This method handles the transition to the survey step, maintaining
+  /// the onboarding flow sequence.
   void _goToNextPage() {
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder:
             (context) => SurveyScreen(

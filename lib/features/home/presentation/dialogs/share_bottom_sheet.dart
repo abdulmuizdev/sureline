@@ -31,7 +31,7 @@ class ShareBottomSheet extends StatelessWidget {
             ),
           ),
           SizedBox(height: 45),
-          SizedBox(width: 120, height: 120, child: Placeholder()),
+          SizedBox(width: 120, height: 120, child: Image.asset('assets/images/handshake.png')),
           OnboardingHeading(
             title: 'Spread the inspiration',
             subTitle: 'Brighten someone\'s day with positivity',

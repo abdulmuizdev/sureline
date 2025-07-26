@@ -4,9 +4,32 @@ import 'package:sureline/features/notifications_settings/data/model/day_model.da
 import 'package:sureline/features/notifications_settings/domain/entity/day_entity.dart';
 import 'package:sureline/features/notifications_settings/domain/entity/notification_preset_entity.dart';
 
+/// Data model for notification preset configuration in the data layer.
+/// This model extends NotificationPresetEntity and provides JSON serialization
+/// capabilities for storing and retrieving notification presets from local storage.
+///
+/// The model handles conversion between domain entities and JSON data,
+/// ensuring proper data persistence for complete notification preset configurations
+/// including timing, frequency, day preferences, and reminder types.
 class NotificationPresetModel extends NotificationPresetEntity {
+  /// List of day models representing the days when notifications are active.
+  /// Each day model contains the day information and selection status.
   final List<DayModel> days;
 
+  /// Creates a NotificationPresetModel instance with the specified configuration.
+  ///
+  /// [id] - Unique identifier for the preset configuration
+  /// [title] - Display name for the preset (e.g., "Morning Motivation", "Evening Reflection")
+  /// [qtyPerDay] - Number of notifications to send per day within the time range
+  /// [startTime] - The earliest time when notifications can be sent
+  /// [endTime] - The latest time when notifications can be sent
+  /// [lastScheduledAt] - Timestamp of when this preset was last scheduled
+  /// [days] - List of day models defining when notifications should be sent
+  /// [isSelected] - Whether this preset is currently selected and active
+  /// [isWritingReminder] - Whether writing reminder notifications are enabled
+  /// [isPracticeReminder] - Whether practice reminder notifications are enabled
+  /// [isStreakReminder] - Whether streak reminder notifications are enabled
+  /// [isQuoteReminder] - Whether quote reminder notifications are enabled
   NotificationPresetModel({
     required super.id,
     required super.title,
@@ -22,29 +45,39 @@ class NotificationPresetModel extends NotificationPresetEntity {
     super.isQuoteReminder,
   }) : super(days: days);
 
+  /// Creates a NotificationPresetModel from JSON data retrieved from storage.
+  /// This factory method handles deserialization of complete notification preset
+  /// configuration from persistent storage format.
+  ///
+  /// [json] - JSON data containing notification preset configuration
   factory NotificationPresetModel.fromJson(Map<String, dynamic> json) {
     return NotificationPresetModel(
-      id: json['id'],
-      title: json['title'],
-      qtyPerDay: json['qtyPerDay'],
-      startTime: Utils.stringToTime(json['startTime']),
-      endTime: Utils.stringToTime(json['endTime']),
+      id: json['id'] as int,
+      title: json['title'] as String,
+      qtyPerDay: json['qtyPerDay'] as int,
+      startTime: Utils.stringToTime(json['startTime'] as String),
+      endTime: Utils.stringToTime(json['endTime'] as String),
       lastScheduledAt:
           json['lastScheduledAt'] != null
-              ? DateTime.parse(json['lastScheduledAt'])
+              ? DateTime.parse(json['lastScheduledAt'] as String)
               : null,
       days:
           (json['days'] as List<dynamic>)
-              .map((day) => DayModel.fromJson(day))
+              .map((day) => DayModel.fromJson(day as Map<String, dynamic>))
               .toList(),
-      isSelected: json['isSelected'],
-      isWritingReminder: json['isWritingReminder'],
-      isPracticeReminder: json['isPracticeReminder'],
-      isStreakReminder: json['isStreakReminder'],
-      isQuoteReminder: json['isQuoteReminder'],
+      isSelected: json['isSelected'] as bool,
+      isWritingReminder: json['isWritingReminder'] as bool?,
+      isPracticeReminder: json['isPracticeReminder'] as bool?,
+      isStreakReminder: json['isStreakReminder'] as bool?,
+      isQuoteReminder: json['isQuoteReminder'] as bool?,
     );
   }
 
+  /// Converts the NotificationPresetModel to JSON for storage.
+  /// This method serializes the complete notification preset configuration
+  /// for persistence, including all timing, frequency, and reminder settings.
+  ///
+  /// Returns a JSON map containing the notification preset configuration data
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -62,6 +95,10 @@ class NotificationPresetModel extends NotificationPresetEntity {
     };
   }
 
+  /// Creates a NotificationPresetModel from a domain NotificationPresetEntity.
+  /// This factory method converts domain entities to data models for persistence.
+  ///
+  /// [entity] - The domain entity to convert to a data model
   factory NotificationPresetModel.fromEntity(NotificationPresetEntity entity) {
     return NotificationPresetModel(
       id: entity.id,
@@ -79,6 +116,10 @@ class NotificationPresetModel extends NotificationPresetEntity {
     );
   }
 
+  /// Creates a copy of this NotificationPresetModel with updated values.
+  /// Used for immutable state updates in notification preset configuration.
+  ///
+  /// All parameters are optional and will use current values if not provided.
   @override
   NotificationPresetModel copyWith({
     int? id,
@@ -101,9 +142,7 @@ class NotificationPresetModel extends NotificationPresetEntity {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       lastScheduledAt: lastScheduledAt ?? this.lastScheduledAt,
-      days:
-          days?.map((entity) => DayModel.fromEntity(entity)).toList() ??
-          this.days,
+      days: days?.map((entity) => DayModel.fromEntity(entity)).toList() ?? this.days,
       isSelected: isSelected ?? this.isSelected,
       isWritingReminder: isWritingReminder ?? this.isWritingReminder,
       isPracticeReminder: isPracticeReminder ?? this.isPracticeReminder,

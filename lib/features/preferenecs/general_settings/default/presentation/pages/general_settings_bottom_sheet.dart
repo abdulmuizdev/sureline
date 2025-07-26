@@ -23,6 +23,21 @@ import 'package:sureline/features/preferenecs/general_settings/vote_on_next_feat
 import 'package:sureline/features/preferenecs/manage_subscription/presentation/bottom_sheet/manage_subscription_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Bottom sheet widget for general app settings and preferences.
+///
+/// This widget provides a comprehensive interface for users to access
+/// and configure various app settings. It includes features like:
+/// - Premium subscription management
+/// - Voice and sound settings
+/// - Author preferences and content filtering
+/// - User profile settings (name, language)
+/// - Streak and gamification settings
+/// - App sharing and review functionality
+/// - Help and support resources
+/// - Privacy policy and terms of service
+///
+/// The widget follows a clean, organized layout with grouped settings
+/// and clear navigation to sub-settings screens.
 class GeneralSettingsBottomSheet extends StatelessWidget {
   const GeneralSettingsBottomSheet({super.key});
 
@@ -39,6 +54,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Header with title
                   Text(
                     'Settings',
                     style: TextStyle(
@@ -48,6 +64,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 25),
+                  // Premium section
                   Heading(text: 'PREMIUM'),
                   SizedBox(height: 10),
                   SettingsListItem(
@@ -61,6 +78,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                     },
                   ),
                   SizedBox(height: 22),
+                  // Personalization section
                   Heading(text: 'MAKE IT YOURS'),
                   SizedBox(height: 15),
                   SettingsListItem(
@@ -88,6 +106,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                       context.push('/general-settings/muted-content');
                     },
                   ),
+                  // Commented out gender identity setting
                   // SettingsListItem(
                   //   useDarkHover: true,
                   //   title: 'Gender identity',
@@ -135,6 +154,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                     },
                   ),
 
+                  // Commented out account section
                   // SizedBox(height: 22),
                   // Heading(text: 'ACCOUNT'),
                   // SizedBox(height: 15),
@@ -153,6 +173,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                   //   },
                   // ),
                   SizedBox(height: 22),
+                  // Support section
                   Heading(text: 'SUPPORT UP'),
                   SizedBox(height: 15),
                   SettingsListItem(
@@ -163,9 +184,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                     hideArrow: true,
                     onPressed: () {
                       SharePlus.instance.share(
-                        ShareParams(
-                          text: 'Hey! Check this app out: https://sureline.app',
-                        ),
+                        ShareParams(text: 'Hey! Check this app out: https://sureline.app'),
                       );
                     },
                   ),
@@ -200,6 +219,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                   ),
 
                   SizedBox(height: 22),
+                  // Help section
                   Heading(text: 'HELP'),
                   SizedBox(height: 15),
                   SettingsListItem(

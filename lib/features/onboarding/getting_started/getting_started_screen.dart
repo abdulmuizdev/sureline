@@ -10,6 +10,12 @@ import 'package:sureline/features/onboarding/getting_started/widgets/review_list
 import 'package:sureline/features/onboarding/name/presentation/pages/name_screen.dart';
 import 'package:sureline/features/onboarding/survey/presentation/pages/survey_screen.dart';
 
+/// Initial onboarding screen that introduces users to Sureline.
+/// This screen displays the app's value proposition with an auto-scrolling
+/// review carousel and motivational content to engage new users.
+///
+/// The screen features an animated page view of user reviews and
+/// provides the entry point to the complete onboarding flow.
 class GettingStartedScreen extends StatefulWidget {
   const GettingStartedScreen({super.key});
 
@@ -18,21 +24,38 @@ class GettingStartedScreen extends StatefulWidget {
 }
 
 class _GettingStartedScreenState extends State<GettingStartedScreen> {
+  /// Controller for managing the auto-scrolling review carousel.
+  /// Handles the page transitions and animation timing.
   late PageController _controller;
+
+  /// Current page index in the review carousel.
+  /// Tracks which review is currently displayed.
   int _currentPage = 0;
+
+  /// Timer for auto-scrolling the review carousel.
+  /// Triggers automatic page transitions every 4 seconds.
   late Timer _timer;
 
   @override
   void initState() {
     super.initState();
-    _controller = PageController(
-      viewportFraction: 0.8,
-      initialPage: _currentPage,
-    );
+    _controller = PageController(viewportFraction: 0.8, initialPage: _currentPage);
 
     _timer = Timer.periodic(Duration(seconds: 4), _autoScroll);
   }
 
+  @override
+  void dispose() {
+    _timer.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  /// Automatically scrolls to the next review in the carousel.
+  /// Cycles through all reviews and resets to the first one when
+  /// reaching the end of the list.
+  ///
+  /// [timer] - The timer that triggered this auto-scroll
   void _autoScroll(Timer timer) {
     if (_currentPage < App.remoteConfigEntity.reviews.length - 1) {
       _currentPage++;
@@ -62,7 +85,11 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
                 Spacer(),
                 Spacer(),
                 Spacer(),
-                SizedBox(height: 200, width: 200, child: Placeholder()),
+                SizedBox(
+                  height: 200,
+                  width: 200,
+                  child: Image.asset('assets/images/excited_man.png'),
+                ),
                 Spacer(),
                 Image.asset('assets/images/achievement.png', width: 260),
                 Spacer(),
@@ -90,8 +117,7 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
                     itemBuilder: (context, index) {
                       return ReviewListItem(
                         starCount: App.remoteConfigEntity.reviews[index].stars,
-                        reviewText:
-                            App.remoteConfigEntity.reviews[index].reviewText,
+                        reviewText: App.remoteConfigEntity.reviews[index].reviewText,
                       );
                     },
                   ),
@@ -104,16 +130,7 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
                     text: 'Get started',
                     disableVerticalPadding: true,
                     onPressed: () {
-                      HapticFeedback.lightImpact();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => SurveyScreen(
-                                entities: App.remoteConfigEntity.survey1,
-                                navigateTo: NameScreen(),
-                              ),
-                        ),
-                      );
+                      _navigateToSurvey(context);
                     },
                   ),
                 ),
@@ -122,6 +139,22 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Navigates to the survey screen as the first step in the onboarding flow.
+  /// This method handles the transition from the getting started screen
+  /// to the user survey collection, initiating the onboarding sequence.
+  ///
+  /// [context] - The build context for navigation
+  void _navigateToSurvey(BuildContext context) {
+    HapticFeedback.lightImpact();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder:
+            (context) =>
+                SurveyScreen(entities: App.remoteConfigEntity.survey1, navigateTo: NameScreen()),
       ),
     );
   }

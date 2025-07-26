@@ -1,17 +1,24 @@
-import 'package:flutter/cupertino.dart';
+/// Bottom sheet container for preferences management.
+///
+/// Provides a comprehensive preferences interface with navigation to various
+/// settings and features. This widget serves as the main entry point for
+/// all preferences and settings functionality, including general settings,
+/// collections, own quotes, and other app features.
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/preferenecs/own_quotes/presentation/bloc/own_quotes_bloc.dart';
-import 'package:sureline/features/preferenecs/own_quotes/presentation/bloc/own_quotes_event.dart';
-import 'package:sureline/features/preferenecs/default/presentation/bottom_sheet/sub_pages/preferences_main_page.dart';
-import 'package:sureline/features/preferenecs/bottom_sheet/app_icon_setting_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/app_icon_selection/presentation/bottom_sheet/app_icon_setting_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/pages/default/collections_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/pages/default/sub_pages/collection_detail_page.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/pages/default/sub_pages/create_collection_page.dart';
+import 'package:sureline/features/preferenecs/default/presentation/bottom_sheet/sub_pages/preferences_main_page.dart';
 import 'package:sureline/features/preferenecs/favourites/presentation/pages/favourites_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/general_settings/default/presentation/pages/general_settings_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/general_settings/author_preferences/presentation/pages/author_pref_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/general_settings/default/presentation/pages/general_settings_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/general_settings/help/presentation/help_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/general_settings/more_apps/presentation/pages/more_apps_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/general_settings/muted_content/presentation/bottom_sheets/muted_content_bottom_sheet.dart';
@@ -24,23 +31,47 @@ import 'package:sureline/features/preferenecs/history/presentation/pages/history
 import 'package:sureline/features/home_widget/presentation/bottom_sheet/home_widget_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/manage_subscription/presentation/bottom_sheet/manage_subscription_bottom_sheet.dart';
 import 'package:sureline/features/notifications_settings/presentation/bottom_sheet/notifications_settings_bottom_sheet.dart';
+import 'package:sureline/features/preferenecs/own_quotes/presentation/bloc/own_quotes_bloc.dart';
 import 'package:sureline/features/preferenecs/own_quotes/presentation/pages/own_quotes_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/own_quotes/presentation/pages/sub_pages/create_own_quote_page.dart';
 import 'package:sureline/features/preferenecs/search/presentation/pages/search_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
-import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_event.dart';
-import 'package:sureline/core/di/injection.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:collection/collection.dart';
 
+/// Configuration for route definitions.
+///
+/// This class encapsulates route configuration including the path,
+/// builder function, and optional custom app bar for each route.
+/// It provides a clean way to define routes with their associated
+/// UI components and navigation behavior.
 class RouteConfig {
+  /// The route path.
   final String path;
+
+  /// The widget builder function for the route.
   final Widget Function(BuildContext, GoRouterState) builder;
+
+  /// Optional custom app bar for the route.
   final Widget Function(BuildContext, GoRouterState)? customAppBar;
 
+  /// Creates a new route configuration.
   RouteConfig({required this.path, required this.builder, this.customAppBar});
 }
 
+/// Main preferences bottom sheet container.
+///
+/// This widget provides a comprehensive preferences interface with navigation
+/// to various settings and features. It uses GoRouter for navigation and
+/// includes bloc providers for state management. The bottom sheet serves as
+/// the central hub for all app preferences and settings.
+///
+/// Key features:
+/// - Centralized navigation to all preferences sections
+/// - Bloc providers for state management
+/// - Custom app bars for different sections
+/// - Shell route with consistent layout
+/// - Integration with collections and own quotes features
 class PreferencesBottomSheet extends StatefulWidget {
+  /// Creates a new preferences bottom sheet.
   const PreferencesBottomSheet({super.key});
 
   @override
@@ -48,8 +79,13 @@ class PreferencesBottomSheet extends StatefulWidget {
 }
 
 class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
+  /// Navigator key for GoRouter.
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+  /// GoRouter instance for navigation.
   late final GoRouter _router;
+
+  /// List of route configurations.
   late final List<RouteConfig> _routeConfigs;
 
   @override
@@ -59,74 +95,72 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
     _initializeRouter();
   }
 
+  /// Initializes the route configurations for all preferences sections.
+  ///
+  /// Sets up routes for general settings, collections, own quotes,
+  /// notifications, and other app features. Each route includes
+  /// appropriate builders and custom app bars where needed.
   void _initializeRouteConfigs() {
     _routeConfigs = [
-      RouteConfig(
-        path: '/',
-        builder: (context, state) => PreferencesMainPage(),
-      ),
+      RouteConfig(path: '/', builder: (context, state) => const PreferencesMainPage()),
       RouteConfig(
         path: '/general-settings',
-        builder: (context, state) => GeneralSettingsBottomSheet(),
+        builder: (context, state) => const GeneralSettingsBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/manage-subscription',
-        builder: (context, state) => ManageSubscriptionBottomSheet(),
+        builder: (context, state) => const ManageSubscriptionBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/voice',
-        builder: (context, state) => VoiceBottomSheet(),
+        builder: (context, state) => const VoiceBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/author-preferences',
-        builder: (context, state) => AuthorPrefBottomSheet(),
+        builder: (context, state) => const AuthorPrefBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/muted-content',
-        builder: (context, state) => MutedContentBottomSheet(),
+        builder: (context, state) => const MutedContentBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/name',
-        builder: (context, state) => NameBottomSheet(),
+        builder: (context, state) => const NameBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/sound',
-        builder: (context, state) => SoundBottomSheet(),
+        builder: (context, state) => const SoundBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/streak',
-        builder: (context, state) => StreakSettingBottomSheet(),
+        builder: (context, state) => const StreakSettingBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/more-apps',
-        builder: (context, state) => MoreAppsBottomSheet(),
+        builder: (context, state) => const MoreAppsBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/vote-on-next-feature',
-        builder: (context, state) => VoteOnNextFeatureBottomSheet(),
+        builder: (context, state) => const VoteOnNextFeatureBottomSheet(),
       ),
       RouteConfig(
         path: '/general-settings/help',
-        builder: (context, state) => HelpBottomSheet(),
+        builder: (context, state) => const HelpBottomSheet(),
       ),
       RouteConfig(
         path: '/collections',
-        builder: (context, state) => CollectionsBottomSheet(),
-        customAppBar:
-            (context, state) => _buildCollectionsAppBar(context, state),
+        builder: (context, state) => const CollectionsBottomSheet(),
+        customAppBar: _buildCollectionsAppBar,
       ),
       RouteConfig(
         path: '/collections/create',
-        builder: (context, state) => CreateCollectionPage(),
-        customAppBar:
-            (context, state) => _buildCollectionsAppBar(context, state),
+        builder: (context, state) => const CreateCollectionPage(),
+        customAppBar: _buildCollectionsAppBar,
       ),
       RouteConfig(
         path: '/collections/detail/:collectionId/:name',
         builder: (context, state) {
-          final collectionId = int.parse(
-            state.pathParameters['collectionId'] ?? '0',
-          );
+          final collectionId = int.parse(state.pathParameters['collectionId'] ?? '0');
           final name = state.pathParameters['name'] ?? '';
           return CollectionDetailPage(
             collectionId: collectionId,
@@ -134,49 +168,46 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
             onFavouritesUpdated: () {},
           );
         },
-        customAppBar:
-            (context, state) => _buildCollectionsAppBar(context, state),
+        customAppBar: _buildCollectionsAppBar,
       ),
       RouteConfig(
         path: '/app-icon',
-        builder: (context, state) => AppIconSettingBottomSheet(),
+        builder: (context, state) => const AppIconSettingBottomSheet(),
       ),
       RouteConfig(
         path: '/notifications',
-        builder: (context, state) => NotificationsSettingsBottomSheet(),
+        builder: (context, state) => const NotificationsSettingsBottomSheet(),
       ),
-      RouteConfig(
-        path: '/home-widget',
-        builder: (context, state) => HomeWidgetBottomSheet(),
-      ),
+      RouteConfig(path: '/home-widget', builder: (context, state) => const HomeWidgetBottomSheet()),
       RouteConfig(
         path: '/own-quotes',
-        builder: (context, state) => OwnQuotesBottomSheet(),
-        customAppBar: (context, state) => _buildOwnQuotesAppBar(context, state),
+        builder: (context, state) => const OwnQuotesBottomSheet(),
+        customAppBar: _buildOwnQuotesAppBar,
       ),
       RouteConfig(
         path: '/own-quotes/create',
-        builder: (context, state) => CreateOwnQuotePage(),
-        customAppBar: (context, state) => _buildOwnQuotesAppBar(context, state),
+        builder: (context, state) => const CreateOwnQuotePage(),
+        customAppBar: _buildOwnQuotesAppBar,
       ),
       RouteConfig(
         path: '/search',
-        builder: (context, state) => SearchBottomSheet(),
-        customAppBar: (context, state) => _buildSearchAppBar(context, state),
+        builder: (context, state) => const SearchBottomSheet(),
+        customAppBar: _buildSearchAppBar,
       ),
-      RouteConfig(
-        path: '/history',
-        builder: (context, state) => HistoryBottomSheet(),
-      ),
+      RouteConfig(path: '/history', builder: (context, state) => const HistoryBottomSheet()),
       RouteConfig(
         path: '/favourites',
-        builder: (context, state) => FavouritesBottomSheet(),
-        customAppBar:
-            (context, state) => _buildFavouritesAppBar(context, state),
+        builder: (context, state) => const FavouritesBottomSheet(),
+        customAppBar: _buildFavouritesAppBar,
       ),
     ];
   }
 
+  /// Initializes the GoRouter with all route configurations.
+  ///
+  /// Sets up the router with shell route for consistent layout,
+  /// bloc providers for state management, and proper navigation
+  /// structure for all preferences sections.
   void _initializeRouter() {
     _router = GoRouter(
       navigatorKey: _navigatorKey,
@@ -191,10 +222,7 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
                   padding: const EdgeInsets.only(top: 18, left: 18, right: 18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildAppBar(context, state),
-                      SizedBox(height: 27),
-                    ],
+                    children: [_buildAppBar(context, state), const SizedBox(height: 27)],
                   ),
                 ),
                 Expanded(child: child),
@@ -205,12 +233,8 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
             // if (isCollectionsRoute) {
             content = MultiBlocProvider(
               providers: [
-                BlocProvider<CollectionsBloc>(
-                  create: (context) => locator<CollectionsBloc>(),
-                ),
-                BlocProvider<OwnQuotesBloc>(
-                  create: (context) => locator<OwnQuotesBloc>(),
-                ),
+                BlocProvider<CollectionsBloc>(create: (context) => locator<CollectionsBloc>()),
+                BlocProvider<OwnQuotesBloc>(create: (context) => locator<OwnQuotesBloc>()),
               ],
               child: content,
             );
@@ -227,16 +251,21 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
           },
           routes:
               _routeConfigs
-                  .map(
-                    (config) =>
-                        GoRoute(path: config.path, builder: config.builder),
-                  )
+                  .map((config) => GoRoute(path: config.path, builder: config.builder))
                   .toList(),
         ),
       ],
     );
   }
 
+  /// Builds the app bar for the current route.
+  ///
+  /// Determines the appropriate app bar based on the current route
+  /// and whether a custom app bar is defined for that route.
+  ///
+  /// [context]: The build context
+  /// [state]: The current router state
+  /// Returns: The appropriate app bar widget
   Widget _buildAppBar(BuildContext context, GoRouterState state) {
     final routeConfig = _getRouteConfig(state.uri.path);
 
@@ -247,19 +276,13 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
     // Default back button behavior
     if (state.uri.path != '/') {
       return GestureDetector(
-        onTap: () {
-          _handleBack();
-        },
+        onTap: _handleBack,
         child: Row(
           children: [
-            Icon(
-              Icons.keyboard_arrow_left_rounded,
-              color: AppColors.primaryColor,
-              size: 20,
-            ),
+            const Icon(Icons.keyboard_arrow_left_rounded, color: AppColors.primaryColor, size: 20),
             Text(
               _getAppBarTitle(state.uri.path),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryColor,
@@ -276,7 +299,7 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
         // Close the bottom sheet using root navigator
         Navigator.of(context, rootNavigator: true).pop();
       },
-      child: Text(
+      child: const Text(
         'Done',
         style: TextStyle(
           fontSize: 16,
@@ -295,19 +318,17 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
-          onTap: () {
-            _handleBack();
-          },
+          onTap: _handleBack,
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.keyboard_arrow_left_rounded,
                 color: AppColors.primaryColor,
                 size: 20,
               ),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
                   color: AppColors.primaryColor,
@@ -321,7 +342,7 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
             onTap: () {
               context.push('/collections/create');
             },
-            child: Text(
+            child: const Text(
               'Add new',
               style: TextStyle(
                 fontSize: 16,
@@ -342,19 +363,17 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
-          onTap: () {
-            _handleBack();
-          },
+          onTap: _handleBack,
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.keyboard_arrow_left_rounded,
                 color: AppColors.primaryColor,
                 size: 20,
               ),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
                   color: AppColors.primaryColor,
@@ -368,7 +387,7 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
             onTap: () {
               context.push('/own-quotes/create');
             },
-            child: Text(
+            child: const Text(
               'Add new',
               style: TextStyle(
                 fontSize: 16,
@@ -386,16 +405,10 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
-          onTap: () {
-            _handleBack();
-          },
-          child: Row(
+          onTap: _handleBack,
+          child: const Row(
             children: [
-              Icon(
-                Icons.keyboard_arrow_left_rounded,
-                color: AppColors.primaryColor,
-                size: 20,
-              ),
+              Icon(Icons.keyboard_arrow_left_rounded, color: AppColors.primaryColor, size: 20),
               Text(
                 'Sureline',
                 style: TextStyle(
@@ -413,7 +426,7 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
             // This could navigate to a full search results page or close the bottom sheet
             Navigator.of(context, rootNavigator: true).pop();
           },
-          child: Text(
+          child: const Text(
             'View all',
             style: TextStyle(
               fontSize: 16,
@@ -431,16 +444,10 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
-          onTap: () {
-            _handleBack();
-          },
-          child: Row(
+          onTap: _handleBack,
+          child: const Row(
             children: [
-              Icon(
-                Icons.keyboard_arrow_left_rounded,
-                color: AppColors.primaryColor,
-                size: 20,
-              ),
+              Icon(Icons.keyboard_arrow_left_rounded, color: AppColors.primaryColor, size: 20),
               Text(
                 'Sureline',
                 style: TextStyle(
@@ -458,7 +465,7 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
             // This could navigate to a full favourites page or close the bottom sheet
             Navigator.of(context, rootNavigator: true).pop();
           },
-          child: Text(
+          child: const Text(
             'View all',
             style: TextStyle(
               fontSize: 16,
@@ -473,17 +480,15 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
 
   RouteConfig? _getRouteConfig(String path) {
     // First try exact match
-    try {
-      return _routeConfigs.firstWhere((config) => config.path == path);
-    } catch (e) {
-      // If no exact match, try to match parameterized routes
-      for (final config in _routeConfigs) {
-        if (_matchesParameterizedRoute(config.path, path)) {
-          return config;
-        }
+    final exact = _routeConfigs.firstWhereOrNull((config) => config.path == path);
+    if (exact != null) return exact;
+    // If no exact match, try to match parameterized routes
+    for (final config in _routeConfigs) {
+      if (_matchesParameterizedRoute(config.path, path)) {
+        return config;
       }
-      return RouteConfig(path: '', builder: (context, state) => SizedBox());
     }
+    return RouteConfig(path: '', builder: (context, state) => const SizedBox());
   }
 
   bool _matchesParameterizedRoute(String routePath, String currentPath) {
@@ -588,7 +593,7 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(30),
           topLeft: Radius.circular(30),

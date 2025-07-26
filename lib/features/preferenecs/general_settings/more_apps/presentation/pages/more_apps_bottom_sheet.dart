@@ -34,17 +34,22 @@ class MoreAppsBottomSheet extends StatelessWidget {
             ),
           ),
           SizedBox(height: 60),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: 1,
-            itemBuilder: (context, index) {
-              return AppListItem(
-                isFirst: index == 0,
-                isLast: index == 1 - 1,
-                onPressed: () {
-                  _openInAppBrowser();
-                },
-              );
+          AppListItem(
+            isFirst: true,
+            isLast: false,
+            title: 'Reveo AI',
+            image: 'assets/images/reveo.png',
+            onPressed: () {
+              _openInAppBrowser('https://apps.apple.com/pk/app/reveo-ai/id6748625301');
+            },
+          ),
+          AppListItem(
+            isFirst: false,
+            isLast: true,
+            title: 'Carma AI',
+            image: 'assets/images/carmaai.png',
+            onPressed: () {
+              _openInAppBrowser('https://apps.apple.com/us/app/carma-ai/id6741025552');
             },
           ),
         ],
@@ -52,17 +57,19 @@ class MoreAppsBottomSheet extends StatelessWidget {
     );
   }
 
-  void _openInAppBrowser() async {
-    final Uri url = Uri.parse(
-      'https://apps.apple.com/us/app/carma-ai/id6741025552',
-    );
-    if (await canLaunchUrl(url)) {
-      await launchUrl(
-        url,
-        mode: LaunchMode.inAppWebView, // Uses SafariViewController on iOS
-      );
-    } else {
-      throw 'Could not launch $url';
+  void _openInAppBrowser(String urlString) async {
+    try {
+      final Uri url = Uri.parse(urlString);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(
+          url,
+          mode: LaunchMode.inAppWebView, // Uses SafariViewController on iOS
+        );
+      } else {
+        print('Could not launch $url');
+      }
+    } catch (e) {
+      print('Could not launch $urlString');
     }
   }
 }

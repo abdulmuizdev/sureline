@@ -4,4 +4,5 @@ class AuthorPrefsTable extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get authorName => text()();
   BoolColumn get isPreferred => boolean().withDefault(const Constant(true))();
+  BoolColumn get isPremium => boolean().withDefault(const Constant(false))();
 }

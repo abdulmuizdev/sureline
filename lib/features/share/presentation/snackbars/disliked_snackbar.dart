@@ -11,21 +11,14 @@ class DislikedSnackbar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 15),
       height: 52,
 
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(17),
-      ),
+      decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(17)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.thumb_down_off_alt_rounded,
-            size: 20,
-            color: AppColors.primaryColor,
-          ),
-          SizedBox(width: 10),
-          Text(
+          Icon(Icons.thumb_down_off_alt_rounded, size: 20, color: AppColors.primaryColor),
+          const SizedBox(width: 10),
+          const Text(
             'Disliked',
             style: TextStyle(
               fontSize: 16,

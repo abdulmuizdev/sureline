@@ -9,10 +9,8 @@ class AuthorPrefBloc extends Bloc<AuthorPrefEvent, AuthorPrefState> {
   final GetAuthorPreferencesUseCase _getAuthorPreferencesUseCase;
   final UpdateAuthorPreferenceUseCase _updateAuthorPreferenceUseCase;
 
-  AuthorPrefBloc(
-    this._getAuthorPreferencesUseCase,
-    this._updateAuthorPreferenceUseCase,
-  ) : super(Initial()) {
+  AuthorPrefBloc(this._getAuthorPreferencesUseCase, this._updateAuthorPreferenceUseCase)
+    : super(Initial()) {
     on<GetAuthorPrefOptions>((event, emit) async {
       debugPrint('got it');
       emit(GettingAuthorPrefOptions());
@@ -26,6 +24,7 @@ class AuthorPrefBloc extends Bloc<AuthorPrefEvent, AuthorPrefState> {
     on<OnAuthorPrefPressed>((event, emit) async {
       final result = await _updateAuthorPreferenceUseCase.call(
         event.authorPref.copyWith(isPreferred: !event.authorPref.isPreferred),
+        isPremium: event.isPremium,
       );
       result.fold((left) {}, (right) async {
         add(GetAuthorPrefOptions());

@@ -1,29 +1,77 @@
+/// Core application constants and configuration values.
+
 import 'dart:ui';
 
-import 'package:sureline/common/data/model/question_model.dart';
+import 'package:sureline/common/data/model/recommendation_algorithm/question_model.dart';
 import 'package:sureline/common/data/model/review_model.dart';
 import 'package:sureline/features/remote_config/data/model/remote_config_model.dart';
+import 'package:sureline/core/constants/secrets.dart';
 
+/// Core constants class containing all application-wide configuration values.
 class Constants {
+  /// Number of quotes to load per page for pagination.
   static const int quotesPageSize = 20;
+
+  /// Maximum number of heads-up notifications allowed.
   static const int headsUpNotificationLimit = 15;
-  static const String widgetAppGroup =
-      'group.com.abdulmuiz.sureline.quoteWidget';
-  static const String streakReminderNotificationTitle =
-      '❄️ Streak will freeze soon!';
+
+  /// App group identifier for widget extensions.
+  static const String widgetAppGroup = 'group.com.abdulmuiz.sureline.quoteWidget';
+
+  /// Title for streak reminder notifications.
+  static const String streakReminderNotificationTitle = '❄️ Streak will freeze soon!';
+
+  /// Body text for streak reminder notifications.
   static const String streakReminderNotificationBody =
-      'Come back today or your streak freeze will be used and you\'ll lose your streak';
+      "Come back today or your streak freeze will be used and you'll lose your streak";
+
+  /// Unique identifier for streak reminder notifications.
   static const int streakReminderNotificationId = 100;
+
+  /// Minimum number of likes required to achieve a goal.
   static const int minimumLikeGoal = 5;
+
+  /// Default volume setting for audio features.
   static const double defaultVolume = 0.5;
+
+  /// Default font family for text display.
   static const String defaultFontFamily = 'Poppins';
+
+  /// Default font size for text display.
   static const double defaultFontSize = 20;
+
+  /// Default font weight for text display.
+  ///
+  /// Used as the base font weight for quote text and other content.
   static const FontWeight defaultFontWeight = FontWeight.w500;
-  static const String flagSmithApiKey = 'nuo5Uhia5pPLRbguT3q6RS';
+
+  /// API key for FlagSmith feature flag service.
+  ///
+  /// Used for remote configuration and feature flag management.
+  static const String flagSmithApiKey = Secrets.flagSmithApiKey;
+
+  /// Default background image path.
+  ///
+  /// Used as the fallback background when no custom background is selected.
   static const String defaultBackground = 'assets/images/background2.png';
+
+  /// Remote configuration model with survey questions and app settings.
+  ///
+  /// Contains all the survey questions for user onboarding, reviews,
+  /// and benefits that are used for personalization and user engagement.
+  ///
+  /// Survey Structure:
+  /// - survey1: How user discovered the app
+  /// - survey2: Demographics and personal preferences
+  /// - survey3: Time commitment preferences
+  /// - survey4: Current mood and improvement areas
+  /// - survey5: Personal growth goals
+  /// - survey6: Achievement goals
+  /// - reviews: User testimonials
+  /// - benefits: App benefits list
   static final remoteConfigModel = RemoteConfigModel(
     survey1: [
-      QuestionModel(
+      const QuestionModel(
         title: 'How did you hear about Sureline?',
         subTitle: 'Select an option to continue',
         choices: [
@@ -38,26 +86,19 @@ class Constants {
       ),
     ],
     survey2: [
-      QuestionModel(
+      const QuestionModel(
         title: 'How old are you?',
         subTitle: 'Your age is used to personalize your content',
         isSkipable: true,
-        choices: [
-          '13 to 17',
-          '18 to 24',
-          '25 to 34',
-          '35 to 44',
-          '45 to 54',
-          '55+',
-        ],
+        choices: ['13 to 17', '18 to 24', '25 to 34', '35 to 44', '45 to 54', '55+'],
       ),
-      QuestionModel(
+      const QuestionModel(
         title: 'Which option represents you best, Abdul Muiz?',
         subTitle: 'Some quotes will use your gender or pronouns',
         choices: ['Female', 'Male', 'Others', 'Prefer not to say'],
       ),
-      QuestionModel(
-        title: 'What\'s your Zodiac sign?',
+      const QuestionModel(
+        title: "What's your Zodiac sign?",
         subTitle: 'This information will be used to personalize your quotes',
         isSkipable: true,
         choices: [
@@ -75,32 +116,24 @@ class Constants {
           'Sagittarius',
         ],
       ),
-      QuestionModel(
+      const QuestionModel(
         title: 'Are you religious?',
-        subTitle:
-            'This information will be used to tailor your quotes to your beliefs',
+        subTitle: 'This information will be used to tailor your quotes to your beliefs',
         isSkipable: true,
         choices: ['Yes', 'No', 'Spiritual but not religious'],
       ),
-      QuestionModel(
+      const QuestionModel(
         title: 'Which of these best describes your beliefs?',
         subTitle: 'This information will be used to personalize your quotes',
         isSkipable: true,
-        choices: [
-          'Islam',
-          'Judaism',
-          'Christianity',
-          'Hinduism',
-          'Buddhism',
-          'Other',
-        ],
+        choices: ['Islam', 'Judaism', 'Christianity', 'Hinduism', 'Buddhism', 'Other'],
       ),
-      QuestionModel(
+      const QuestionModel(
         title: 'Get quotes that fit your relationship status',
         subTitle: 'Choose the option that describes it the best',
         isSkipable: true,
         choices: [
-          'It\'s complicated',
+          "It's complicated",
           'Single and open to connection',
           'Going through a breakup',
           'Happily single',
@@ -108,39 +141,34 @@ class Constants {
           'Not interested in this topic',
         ],
       ),
-      QuestionModel(
+      const QuestionModel(
         title: 'How familiar are you with quotes, Abdul Muiz?',
         subTitle: 'Your experience will be adjusted according to your answer',
-        choices: [
-          'This is new for me',
-          'I\'ve used them occasionally',
-          'I use them regularly',
-        ],
+        choices: ['This is new for me', "I've used them occasionally", 'I use them regularly'],
       ),
     ],
     survey3: [
-      QuestionModel(
+      const QuestionModel(
         title: 'How much time will you devote to quotes?',
         subTitle: 'You can change your goal later',
         choices: ['1 minute a day', '3 minutes a day', '10 minutes a day'],
       ),
     ],
     survey4: [
-      QuestionModel(
+      const QuestionModel(
         title: 'How have you been feeling lately, Abdul Muiz?',
         subTitle: 'Choose a mood to personalize your content',
         choices: ['Awesome', 'Good', 'Neutral', 'Bad', 'Terrible', 'Other'],
       ),
-      QuestionModel(
-        title: 'What\'s making you feel that way?',
+      const QuestionModel(
+        title: "What's making you feel that way?",
         subTitle: 'You can select more than one option',
         isStay: true,
         choices: ['Health', 'Family', 'Work', 'Friends', 'Love', 'Other'],
       ),
-      QuestionModel(
+      const QuestionModel(
         title: 'What do you want to improve?',
-        subTitle:
-            'Choose at least one to tailor your content so it resonates with you',
+        subTitle: 'Choose at least one to tailor your content so it resonates with you',
         isStay: true,
         choices: [
           'Loving myself',
@@ -153,7 +181,7 @@ class Constants {
       ),
     ],
     survey5: [
-      QuestionModel(
+      const QuestionModel(
         title: 'How can Sureline help you with?',
         subTitle: 'Choose at least one to see quotes based on your goals',
         choices: [
@@ -165,7 +193,7 @@ class Constants {
           'Learn to love myself',
         ],
       ),
-      QuestionModel(
+      const QuestionModel(
         title: 'What are you learning to accept about yourself?',
         subTitle: 'Select all the options that resonate',
         choices: [
@@ -178,7 +206,7 @@ class Constants {
       ),
     ],
     survey6: [
-      QuestionModel(
+      const QuestionModel(
         title: 'What do you want to achieve with Sureline?',
         subTitle: 'Choose at least one to see quotes based on your goals',
         choices: [
@@ -192,17 +220,15 @@ class Constants {
       ),
     ],
     reviews: [
-      ReviewModel(
-        stars: 5,
-        reviewText: 'This app has helped me get through so many tough times',
-      ),
+      ReviewModel(stars: 5, reviewText: 'This app has helped me get through so many tough times'),
       ReviewModel(stars: 4, reviewText: 'Must install for struggling founders'),
       ReviewModel(stars: 5, reviewText: 'life changing'),
     ],
-    benefits: [
-      'Focus on achieving goals',
-      'Shift negative thoughts',
-      'Improve mental health',
+    benefits: ['Focus on achieving goals', 'Shift negative thoughts', 'Improve mental health'],
+    benefitsImages: [
+      'assets/images/focus.png',
+      'assets/images/negative_thoughts.png',
+      'assets/images/positive_thoughts.png',
     ],
   );
 }

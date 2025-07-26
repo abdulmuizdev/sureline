@@ -5,10 +5,12 @@ import 'package:sureline/features/preferenecs/general_settings/gender_identity/d
 import 'package:sureline/features/preferenecs/general_settings/gender_identity/domain/domain/gender_identity_entity.dart';
 import 'package:sureline/features/preferenecs/general_settings/gender_identity/domain/repository/gender_identity_repository.dart';
 
-class GenderIdentityRepositoryImpl extends GenderIdentityRepository {
+/// Implementation of GenderIdentityRepository that handles gender identity operations.
+class GenderIdentityRepositoryImpl implements GenderIdentityRepository {
   final GenderIdentityDataSource dataSource;
 
-  GenderIdentityRepositoryImpl(this.dataSource);
+  /// Creates a new GenderIdentityRepositoryImpl instance.
+  const GenderIdentityRepositoryImpl(this.dataSource);
 
   @override
   Either<Failure, List<GenderIdentityEntity>> getGenderIdentities() {
@@ -20,9 +22,7 @@ class GenderIdentityRepositoryImpl extends GenderIdentityRepository {
     List<GenderIdentityEntity> genderIdentities,
   ) {
     return dataSource.updateGenderIdentities(
-      genderIdentities
-          .map((entity) => GenderIdentityModel.fromEntity(entity))
-          .toList(),
+      genderIdentities.map(GenderIdentityModel.fromEntity).toList(),
     );
   }
 }

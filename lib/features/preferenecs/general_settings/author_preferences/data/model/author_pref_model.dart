@@ -1,16 +1,14 @@
 import 'package:sureline/features/preferenecs/general_settings/author_preferences/domain/entity/author_pref_entity.dart';
 
 class AuthorPrefModel extends AuthorPrefEntity {
-  AuthorPrefModel({
-    required super.authorName,
-    super.isPreferred,
-    required super.isLocked,
-  });
+  AuthorPrefModel({required super.authorName, super.isPreferred, required super.isPremium});
+
   factory AuthorPrefModel.fromEntity(AuthorPrefEntity entity) {
     return AuthorPrefModel(
       authorName: entity.authorName,
       isPreferred: entity.isPreferred,
-      isLocked: entity.isLocked,
+
+      isPremium: entity.isPremium,
     );
   }
 }

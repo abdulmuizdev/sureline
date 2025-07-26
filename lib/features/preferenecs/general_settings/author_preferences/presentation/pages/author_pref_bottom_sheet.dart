@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:sureline/common/presentation/dialog/streak/widget/sureline_back_button.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
@@ -19,14 +20,30 @@ class AuthorPrefBottomSheet extends StatefulWidget {
 
 class _AuthorPrefBottomSheetState extends State<AuthorPrefBottomSheet> {
   List<AuthorPrefEntity> _options = [];
+  bool? _isUserPremium;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && context.mounted) {
+        _checkPremiumStatus();
+      }
+    });
+  }
+
+  void _checkPremiumStatus() async {
+    final isPremium = await Utils.checkPremiumStatus();
+    setState(() {
+      _isUserPremium = isPremium;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => locator<AuthorPrefBloc>()..add(GetAuthorPrefOptions()),
-        ),
+        BlocProvider(create: (_) => locator<AuthorPrefBloc>()..add(GetAuthorPrefOptions())),
       ],
       child: BlocListener<AuthorPrefBloc, AuthorPrefState>(
         listener: (context, state) {
@@ -60,29 +77,36 @@ class _AuthorPrefBottomSheetState extends State<AuthorPrefBottomSheet> {
                     ),
                   ),
                   SizedBox(height: 60),
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 170 / 85,
-                        mainAxisSpacing: 18,
-                        crossAxisSpacing: 18,
+                  if (_isUserPremium != null) ...[
+                    Expanded(
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 170 / 85,
+                          mainAxisSpacing: 18,
+                          crossAxisSpacing: 18,
+                        ),
+                        itemCount: _options.length,
+                        itemBuilder: (context, index) {
+                          return AuthorPrefGridItem(
+                            title: _options[index].authorName,
+                            isSelected: _options[index].isPreferred,
+                            isLocked: (_isUserPremium ?? false) ? false : _options[index].isPremium,
+                            onSubscriptionPurchased: () {
+                              _checkPremiumStatus();
+                            },
+                            onPressed: () {
+                              context.read<AuthorPrefBloc>().add(
+                                OnAuthorPrefPressed(_options[index], _isUserPremium ?? false),
+                              );
+                            },
+                          );
+                        },
                       ),
-                      itemCount: _options.length,
-                      itemBuilder: (context, index) {
-                        return AuthorPrefGridItem(
-                          title: _options[index].authorName,
-                          isSelected: _options[index].isPreferred,
-                          isLocked: _options[index].isLocked,
-                          onPressed: () {
-                            context.read<AuthorPrefBloc>().add(
-                              OnAuthorPrefPressed(_options[index]),
-                            );
-                          },
-                        );
-                      },
                     ),
-                  ),
+                  ] else ...[
+                    const Center(child: CircularProgressIndicator()),
+                  ],
                 ],
               ),
             );

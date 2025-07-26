@@ -1,20 +1,25 @@
+/// Implementation of quote repository for home feature.
+///
+/// Handles quote operations, user preferences, and guide states.
+
 import 'package:dartz/dartz.dart';
+import 'package:sureline/common/data/model/quote_model.dart';
+import 'package:sureline/common/domain/entities/recommendation_algorithm/quote_entity.dart';
 import 'package:sureline/core/error/failures.dart';
-import 'package:sureline/features/preferenecs/collections/data/model/collection_model.dart';
-import 'package:sureline/features/preferenecs/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/home/data/data_source/quote_data_source.dart';
-import 'package:sureline/features/recommendation_algorithm/data/model/quote_model.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
 import 'package:sureline/features/home/domain/repository/quote_repository.dart';
 
+/// Implementation of the quote repository.
 class QuoteRepositoryImpl extends QuoteRepository {
-  final QuoteDataSource quoteDataSource;
-
+  /// Creates a new QuoteRepositoryImpl instance.
   QuoteRepositoryImpl(this.quoteDataSource);
 
+  /// Data source for quote operations.
+  final QuoteDataSource quoteDataSource;
+
   @override
-  Future<Either<Failure, List<QuoteEntity>>> getQuotes() {
-    return quoteDataSource.getQuotes();
+  Future<Either<Failure, List<QuoteEntity>>> getQuotes({required bool isPremium}) {
+    return quoteDataSource.getQuotes(isPremium: isPremium);
   }
 
   @override
@@ -83,8 +88,8 @@ class QuoteRepositoryImpl extends QuoteRepository {
   }
 
   @override
-  Future<Either<Failure, void>> saveAllQuotesToAppGroup() {
-    return quoteDataSource.saveAllQuotesToAppGroup();
+  Future<Either<Failure, void>> saveAllQuotesToAppGroup({required bool isPremium}) {
+    return quoteDataSource.saveAllQuotesToAppGroup(isPremium: isPremium);
   }
 
   @override
@@ -98,16 +103,13 @@ class QuoteRepositoryImpl extends QuoteRepository {
   }
 
   @override
-  Future<Either<Failure, List<QuoteEntity>>> getQuotesSearchResults(
-    String query,
-    int page,
-  ) {
+  Future<Either<Failure, List<QuoteEntity>>> getQuotesSearchResults(String query, int page) {
     return quoteDataSource.getQuotesSearchResults(query, page);
   }
 
   @override
-  Future<Either<Failure, List<QuoteEntity>>> getRandomQuotes(int qty) {
-    return quoteDataSource.getRandomQuotes(qty);
+  Future<Either<Failure, List<QuoteEntity>>> getRandomQuotes(int qty, {required bool isPremium}) {
+    return quoteDataSource.getRandomQuotes(qty, isPremium: isPremium);
   }
 
   @override

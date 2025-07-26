@@ -19,15 +19,11 @@ class PracticeAppreciationDialog extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                icon: Icon(
-                  Icons.close_rounded,
-                  size: 20,
-                  color: AppColors.primaryColor,
-                ),
+                icon: Icon(Icons.close_rounded, size: 20, color: AppColors.primaryColor),
               ),
             ),
             SizedBox(height: 20),
-            SizedBox(width: 100, height: 100, child: Placeholder()),
+            SizedBox(width: 100, height: 100, child: Image.asset('assets/images/clap.png')),
             SizedBox(height: 40),
             Text(
               'Great job!',

@@ -10,10 +10,12 @@ class UpdateMutedContentUseCase {
   Future<Either<Failure, void>> call({
     required bool withAuthor,
     required bool withoutAuthor,
+    required bool isPremium,
   }) async {
     return repository.updateMutedContent(
       withAuthor: withAuthor,
       withoutAuthor: withoutAuthor,
+      isPremium: isPremium,
     );
   }
 }

@@ -1,15 +1,11 @@
-import 'dart:io';
+/// Main home screen displaying quotes with swipe navigation.
+///
+/// Features quote browsing, like functionality, sharing, and user guides.
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_app_group_directory/flutter_app_group_directory.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ios_color_picker_with_title/custom_picker/extensions.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:shared_preference_app_group/shared_preference_app_group.dart';
 import 'package:sureline/common/domain/entities/streak_display_entity.dart';
 import 'package:sureline/common/presentation/dialog/streak/page/streak_bottom_sheet.dart';
 import 'package:sureline/core/constants/sp.dart';
@@ -19,7 +15,7 @@ import 'package:sureline/core/app/app.dart';
 import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
+import 'package:sureline/common/domain/entities/recommendation_algorithm/quote_entity.dart';
 import 'package:sureline/features/home/presentation/bloc/home_bloc.dart';
 import 'package:sureline/features/home/presentation/bloc/home_event.dart';
 import 'package:sureline/features/home/presentation/bloc/home_state.dart';
@@ -35,8 +31,8 @@ import 'package:sureline/features/home/presentation/widgets/like_progress.dart';
 import 'package:sureline/features/share/presentation/snackbars/theme_changed_snack_bar/theme_changed_snack_bar.dart';
 import 'package:sureline/common/domain/entities/streak_entity.dart';
 import 'package:sureline/features/theme_selection/presentation/main/bottom_sheet/theme_selection_bottom_sheet.dart';
-import 'package:video_player/video_player.dart';
 
+/// Main home screen for quote browsing and interaction.
 class HomeScreen extends StatefulWidget {
   final bool? isThemeChanged;
 
@@ -46,8 +42,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late Animation<double> _controlsFadeAnimation;
   late AnimationController _controller;
   final PageController _pageController = PageController();
@@ -65,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool _showWaterMark = true;
   int _likeCount = 0;
   int _currentIndex = 0;
+  bool _isPremium = false;
 
   final ScreenshotCallback screenshotCallback = ScreenshotCallback();
 
@@ -72,16 +68,17 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 1),
-    );
+    _controller = AnimationController(vsync: this, duration: Duration(seconds: 1));
     _controlsFadeAnimation = Tween<double>(
       begin: 0,
       end: 1,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _isPremium = await Utils.checkPremiumStatus();
+      if (mounted && context.mounted) {
+        context.read<HomeBloc>().add(GetQuotes(_page, _isPremium));
+      }
       screenshotCallback.addListener(() {
         _showShareBottomSheet(_currentIndex);
       });
@@ -128,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen>
           create:
               (_) =>
                   locator<HomeBloc>()
-                    ..add(GetQuotes(_page))
+                    // ..add(GetQuotes(_page))
                     ..add(OnboardingComplete())
                     ..add(IsSwipeComplete())
                     ..add(IsFeedSetupShown())
@@ -149,8 +146,7 @@ class _HomeScreenState extends State<HomeScreen>
               useSafeArea: true,
               isScrollControlled: true,
               context: context,
-              builder:
-                  (context) => StreakBottomSheet(entities: state.streakData),
+              builder: (context) => StreakBottomSheet(entities: state.streakData),
             );
           }
           if (state is ShowStreakBottomSheet) {
@@ -161,9 +157,7 @@ class _HomeScreenState extends State<HomeScreen>
                   useSafeArea: true,
                   isScrollControlled: true,
                   context: context,
-                  builder:
-                      (context) =>
-                          StreakBottomSheet(entities: state.streakData),
+                  builder: (context) => StreakBottomSheet(entities: state.streakData),
                 );
               }
             });
@@ -236,31 +230,25 @@ class _HomeScreenState extends State<HomeScreen>
                                 );
                               }
                               // Handle swipe completion
-                              if (pageIndex >= 1 &&
-                                  _controlsFadeAnimation.value == 0) {
+                              if (pageIndex >= 1 && _controlsFadeAnimation.value == 0) {
                                 context.read<HomeBloc>().add(OnSwipeComplete());
                                 _controller.forward();
                               }
 
                               // Handle like guide at index 2
                               if (pageIndex == 2) {
-                                debugPrint(
-                                  'like guide is this $_isLikeGuideShown',
-                                );
+                                debugPrint('like guide is this $_isLikeGuideShown');
                                 if (_likeCount < Constants.minimumLikeGoal) {
                                   if (!_isLikeGuideShown) {
                                     showModalBottomSheet(
                                       isScrollControlled: true,
                                       context: context,
-                                      builder:
-                                          (context) => LikeDetailBottomSheet(),
+                                      builder: (context) => LikeDetailBottomSheet(),
                                     );
                                     setState(() {
                                       _isLikeGuideShown = true;
                                     });
-                                    context.read<HomeBloc>().add(
-                                      OnLikeGuideShown(),
-                                    );
+                                    context.read<HomeBloc>().add(OnLikeGuideShown());
                                   } else {
                                     setState(() {
                                       _showLikeProgress = true;
@@ -273,37 +261,31 @@ class _HomeScreenState extends State<HomeScreen>
                               if (pageIndex >= _quotes.length - 3) {
                                 _page++;
                                 print('getting more quotes $_page');
-                                context.read<HomeBloc>().add(GetQuotes(_page));
+                                context.read<HomeBloc>().add(GetQuotes(_page, _isPremium));
                               }
                             },
                             children: List.generate(
                               _quotes.length,
                               (index) => HomeListItem(
                                 quoteKey: _quotes[index].quoteKey,
-                                isWelcome:
-                                    (_isSwipeCompleted) ? false : index == 0,
-                                showSwipeUp:
-                                    (_isSwipeCompleted) ? false : index >= 1,
-                                showSwipeGuide:
-                                    (_isSwipeCompleted) ? false : index == 1,
+                                isWelcome: (_isSwipeCompleted) ? false : index == 0,
+                                showSwipeUp: (_isSwipeCompleted) ? false : index >= 1,
+                                showSwipeGuide: (_isSwipeCompleted) ? false : index == 1,
                                 quote: _quotes[index].quoteText,
                                 isLiked: _quotes[index].isLiked,
                                 showExtras: _showExtraWidgets,
                                 showWaterMark: _showWaterMark,
                                 onTap: () {
-                                  Future.delayed(
-                                    Duration(milliseconds: 500),
-                                    () {
-                                      HapticFeedback.lightImpact();
-                                      if (context.mounted) {
-                                        _pageController.animateToPage(
-                                          index + 1,
-                                          duration: Duration(milliseconds: 250),
-                                          curve: Curves.linear,
-                                        );
-                                      }
-                                    },
-                                  );
+                                  Future.delayed(Duration(milliseconds: 500), () {
+                                    HapticFeedback.lightImpact();
+                                    if (context.mounted) {
+                                      _pageController.animateToPage(
+                                        index + 1,
+                                        duration: Duration(milliseconds: 250),
+                                        curve: Curves.linear,
+                                      );
+                                    }
+                                  });
                                 },
                                 onLikePressed: (isLiked) {
                                   context.read<HomeBloc>().add(
@@ -311,9 +293,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   );
                                   final current = _quotes[index];
                                   setState(() {
-                                    _quotes[index] = (current).copyWith(
-                                      isLiked: !current.isLiked,
-                                    );
+                                    _quotes[index] = (current).copyWith(isLiked: !current.isLiked);
                                   });
                                 },
                                 onSharePressed: () {
@@ -338,16 +318,11 @@ class _HomeScreenState extends State<HomeScreen>
                               opacity:
                                   (_isSwipeCompleted)
                                       ? Tween<double>(begin: 1, end: 1).animate(
-                                        CurvedAnimation(
-                                          parent: _controller,
-                                          curve: Curves.linear,
-                                        ),
+                                        CurvedAnimation(parent: _controller, curve: Curves.linear),
                                       )
                                       : _controlsFadeAnimation,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 30,
-                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 30),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
@@ -357,9 +332,7 @@ class _HomeScreenState extends State<HomeScreen>
                                       children: [
                                         GestureDetector(
                                           child: HomeButton(
-                                            icon:
-                                                Icons
-                                                    .imagesearch_roller_outlined,
+                                            icon: Icons.imagesearch_roller_outlined,
                                           ),
                                           onTap: () {
                                             HapticFeedback.lightImpact();
@@ -368,32 +341,23 @@ class _HomeScreenState extends State<HomeScreen>
                                               isScrollControlled: true,
                                               context: context,
                                               builder:
-                                                  (
-                                                    context,
-                                                  ) => ThemeSelectionBottomSheet(
+                                                  (context) => ThemeSelectionBottomSheet(
                                                     quote:
-                                                        _quotes[(_pageController
-                                                                        .page ??
-                                                                    1)
-                                                                .round()]
+                                                        _quotes[(_pageController.page ?? 1).round()]
                                                             .quoteText,
                                                   ),
                                             );
                                           },
                                         ),
                                         GestureDetector(
-                                          child: HomeButton(
-                                            icon: Icons.person_3_outlined,
-                                          ),
+                                          child: HomeButton(icon: Icons.person_3_outlined),
                                           onTap: () {
                                             HapticFeedback.lightImpact();
                                             showModalBottomSheet(
                                               isScrollControlled: true,
                                               useSafeArea: true,
                                               context: context,
-                                              builder:
-                                                  (context) =>
-                                                      PreferencesBottomSheet(),
+                                              builder: (context) => PreferencesBottomSheet(),
                                             );
                                           },
                                         ),
@@ -412,9 +376,7 @@ class _HomeScreenState extends State<HomeScreen>
                       opacity:
                           (_showExtraWidgets)
                               ? (_showLikeProgress)
-                                  ? ((_likeCount < Constants.minimumLikeGoal)
-                                      ? 1
-                                      : 0)
+                                  ? ((_likeCount < Constants.minimumLikeGoal) ? 1 : 0)
                                   : 0
                               : 0,
                       child: Align(
@@ -485,8 +447,7 @@ class _HomeScreenState extends State<HomeScreen>
               quoteKey: _quotes[index].quoteKey,
               exportKey: _exportKey,
               quote: _quotes[index].quoteText,
-              isLiveBackground:
-                  App.themeEntity.backgroundEntity.isLiveBackground,
+              isLiveBackground: App.themeEntity.backgroundEntity.isLiveBackground,
               onPop: () {
                 setState(() {
                   _showExtraWidgets = true;

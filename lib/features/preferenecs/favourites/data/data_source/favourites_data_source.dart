@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:sureline/common/data/database/dao/references/collections_history_dao.dart';
 import 'package:sureline/common/data/database/dao/references/collections_own_quotes_table_dao.dart';
 import 'package:sureline/common/data/database/dao/references/collections_search_dao.dart';
+import 'package:sureline/common/data/model/collections/collection_model.dart';
+import 'package:sureline/common/data/model/collections/search_model.dart';
 import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/common/data/database/dao/references/collections_favourites_dao.dart';
-import 'package:sureline/features/preferenecs/collections/data/model/collection_model.dart';
 import 'package:sureline/features/preferenecs/favourites/data/database/dao/favourites_dao.dart';
-import 'package:sureline/features/preferenecs/favourites/data/model/favourite_model.dart';
-import 'package:sureline/features/preferenecs/history/data/model/history_model.dart';
-import 'package:sureline/features/preferenecs/own_quotes/data/model/own_quote_model.dart';
-import 'package:sureline/features/recommendation_algorithm/data/model/quote_model.dart';
-import 'package:sureline/features/preferenecs/search/data/model/search_model.dart';
+import 'package:sureline/common/data/model/collections/favourite_model.dart';
+import 'package:sureline/common/data/model/quote_model.dart';
+import 'package:sureline/common/data/model/collections/own_quote_model.dart';
+import 'package:sureline/common/data/model/collections/history_model.dart';
 
 abstract class FavouritesDataSource {
   Future<Either<Failure, List<FavouriteModel>>> getFavourites();
@@ -63,27 +63,21 @@ class FavouritesDataSourceImpl extends FavouritesDataSource {
             favourite.ownQuoteId == null &&
             favourite.historyId == null &&
             favourite.searchId == null) {
-          final collections = await collectionsFavouritesDao
-              .getCollectionsOfFavourite(favourite.id);
+          final collections = await collectionsFavouritesDao.getCollectionsOfFavourite(
+            favourite.id,
+          );
 
-          collectionModels =
-              collections
-                  .map((c) => CollectionModel.fromCollection(c))
-                  .toList();
+          collectionModels = collections.map((c) => CollectionModel.fromCollection(c)).toList();
         } else if (favourite.ownQuoteId != null &&
             favourite.quoteId == null &&
             favourite.historyId == null &&
             favourite.searchId == null) {
-          collectionModels = await _getCollectionsOfOwnQuote(
-            favourite.ownQuoteId!,
-          );
+          collectionModels = await _getCollectionsOfOwnQuote(favourite.ownQuoteId!);
         } else if (favourite.historyId != null &&
             // favourite.quoteId == null &&
             favourite.ownQuoteId == null &&
             favourite.searchId == null) {
-          collectionModels = await _getCollectionsOfHistory(
-            favourite.historyId!,
-          );
+          collectionModels = await _getCollectionsOfHistory(favourite.historyId!);
         } else if (favourite.searchId != null &&
             favourite.quoteId == null &&
             favourite.ownQuoteId == null &&
@@ -112,31 +106,21 @@ class FavouritesDataSourceImpl extends FavouritesDataSource {
     }
   }
 
-  Future<List<CollectionModel>> _getCollectionsOfOwnQuote(
-    int ownQuoteId,
-  ) async {
-    final collections = await collectionsOwnQuotesTableDao
-        .getCollectionsOfOwnQuote(ownQuoteId);
-    final collectionModels =
-        collections.map((c) => CollectionModel.fromCollection(c)).toList();
+  Future<List<CollectionModel>> _getCollectionsOfOwnQuote(int ownQuoteId) async {
+    final collections = await collectionsOwnQuotesTableDao.getCollectionsOfOwnQuote(ownQuoteId);
+    final collectionModels = collections.map((c) => CollectionModel.fromCollection(c)).toList();
     return collectionModels;
   }
 
   Future<List<CollectionModel>> _getCollectionsOfHistory(int historyId) async {
-    final collections = await collectionsHistoryDao.getCollectionsOfHistory(
-      historyId,
-    );
-    final collectionModels =
-        collections.map((c) => CollectionModel.fromCollection(c)).toList();
+    final collections = await collectionsHistoryDao.getCollectionsOfHistory(historyId);
+    final collectionModels = collections.map((c) => CollectionModel.fromCollection(c)).toList();
     return collectionModels;
   }
 
   Future<List<CollectionModel>> _getCollectionsOfSearch(int searchId) async {
-    final collections = await collectionsSearchDao.getCollectionsOfSearch(
-      searchId,
-    );
-    final collectionModels =
-        collections.map((c) => CollectionModel.fromCollection(c)).toList();
+    final collections = await collectionsSearchDao.getCollectionsOfSearch(searchId);
+    final collectionModels = collections.map((c) => CollectionModel.fromCollection(c)).toList();
     return collectionModels;
   }
 

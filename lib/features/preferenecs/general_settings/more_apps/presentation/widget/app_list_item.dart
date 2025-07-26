@@ -4,9 +4,18 @@ import 'package:sureline/core/theme/app_colors.dart';
 class AppListItem extends StatelessWidget {
   final bool? isFirst;
   final bool? isLast;
+  final String title;
+  final String image;
   final VoidCallback onPressed;
 
-  const AppListItem({super.key, this.isFirst, this.isLast, required this.onPressed});
+  const AppListItem({
+    super.key,
+    this.isFirst,
+    this.isLast,
+    required this.title,
+    required this.image,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +45,12 @@ class AppListItem extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.asset('assets/images/carmaai.png', width: 40, height: 40),
+              child: Image.asset(image, width: 40, height: 40),
             ),
-            SizedBox(width: 14),
+            const SizedBox(width: 14),
             Text(
-              'Carma AI',
-              style: TextStyle(
+              title,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryColor,

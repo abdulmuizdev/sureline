@@ -3,15 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/core/constants/sureline_default_notification_days.dart';
 import 'package:sureline/features/notifications_settings/domain/entity/notification_preset_entity.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/cancel_notification_preset_case_case.dart';
-import 'package:sureline/features/notifications_settings/domain/use_cases/edit_notification_preset_use_case.dart';
+import 'package:sureline/common/domain/use_cases/notifications_settings/edit_notification_preset_use_case.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/enable_notification_preset_case_case.dart';
-import 'package:sureline/features/notifications_settings/domain/use_cases/get_notification_presets_use_case.dart';
+import 'package:sureline/common/domain/use_cases/notifications_settings/get_notification_presets_use_case.dart';
 import 'package:sureline/features/notifications_settings/presentation/bloc/notification_setting_event.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/add_notification_preset_use_case';
 import 'package:sureline/features/notifications_settings/presentation/bloc/notification_setting_state.dart';
 
-class NotificationSettingBloc
-    extends Bloc<NotificationSettingEvent, NotificationSettingState> {
+/// Bloc for managing notification preset state and operations.
+class NotificationSettingBloc extends Bloc<NotificationSettingEvent, NotificationSettingState> {
   final EditNotificationPresetUseCase _editNotificationPresetUseCase;
   final GetNotificationPresetsUseCase _getNotificationPresetsUseCase;
   final CancelNotificationPresetCaseCase _cancelNotificationPresetCaseCase;
@@ -72,11 +72,7 @@ class NotificationSettingBloc
       final result = await _getNotificationPresetsUseCase.execute();
       result.fold((left) {}, (right) {
         emit(
-          RefreshedNotificationPresets(
-            right,
-            editAfterwards: event.editAfterwards,
-            id: event.id,
-          ),
+          RefreshedNotificationPresets(right, editAfterwards: event.editAfterwards, id: event.id),
         );
       });
     });

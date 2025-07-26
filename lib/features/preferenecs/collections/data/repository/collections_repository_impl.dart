@@ -1,19 +1,37 @@
+/// Implementation of collections repository.
+///
+/// Handles data operations through the data source layer.
+/// This implementation provides the concrete realization of the collections
+/// repository interface, delegating actual data operations to the data source
+/// layer. It maintains the separation between domain and data layers while
+/// ensuring proper error handling and data transformation.
+
 import 'package:dartz/dartz.dart';
+import 'package:sureline/common/data/model/collections/collection_model.dart';
+import 'package:sureline/common/domain/entities/collections/collection_entity.dart';
+import 'package:sureline/common/domain/entities/collections/favourite_entity.dart';
+import 'package:sureline/common/domain/entities/collections/history_entity.dart';
+import 'package:sureline/common/domain/entities/collections/own_quote_entity.dart';
+import 'package:sureline/common/domain/entities/collections/search_entity.dart';
 import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/features/preferenecs/collections/data/data_sources/collections_data_source.dart';
-import 'package:sureline/features/preferenecs/collections/data/model/collection_model.dart';
-import 'package:sureline/features/preferenecs/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/preferenecs/collections/domain/repository/collections_repository.dart';
-import 'package:sureline/features/preferenecs/favourites/data/model/favourite_model.dart';
-import 'package:sureline/features/preferenecs/favourites/domain/entity/favourite_entity.dart';
-import 'package:sureline/features/preferenecs/history/domain/entity/history_entity.dart';
-import 'package:sureline/features/home/data/model/quote_model.dart';
-import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
-import 'package:sureline/features/preferenecs/search/domain/entity/search_entity.dart';
 
+/// Concrete implementation of collections repository.
+///
+/// This class implements the collections repository interface by delegating
+/// operations to the data source layer. It handles the conversion between
+/// domain entities and data models, ensuring proper data flow between layers.
+///
+/// Key responsibilities:
+/// - Delegating operations to the data source
+/// - Maintaining clean separation between domain and data layers
+/// - Ensuring consistent error handling across all operations
 class CollectionsRepositoryImpl extends CollectionsRepository {
+  /// Data source for collections operations.
   final CollectionsDataSource dataSource;
 
+  /// Creates a new repository implementation with the required data source.
   CollectionsRepositoryImpl(this.dataSource);
 
   @override
@@ -22,16 +40,12 @@ class CollectionsRepositoryImpl extends CollectionsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> saveCollection(
-    CollectionEntity collection,
-  ) async {
+  Future<Either<Failure, void>> saveCollection(CollectionEntity collection) async {
     return dataSource.saveCollection(CollectionModel.fromEntity(collection));
   }
 
   @override
-  Future<Either<Failure, void>> removeCollection(
-    CollectionEntity collection,
-  ) async {
+  Future<Either<Failure, void>> removeCollection(CollectionEntity collection) async {
     return dataSource.removeCollection(CollectionModel.fromEntity(collection));
   }
 
@@ -52,24 +66,17 @@ class CollectionsRepositoryImpl extends CollectionsRepository {
   }
 
   @override
-  Future<Either<Failure, List<FavouriteEntity>>> getFavouritesOfCollection(
-    int collectionId,
-  ) async {
+  Future<Either<Failure, List<FavouriteEntity>>> getFavouritesOfCollection(int collectionId) async {
     return dataSource.getFavouritesOfCollection(collectionId);
   }
 
   @override
-  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfFavourite(
-    int favouriteId,
-  ) async {
+  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfFavourite(int favouriteId) async {
     return dataSource.getCollectionsOfFavourite(favouriteId);
   }
 
   @override
-  Future<Either<Failure, void>> addOwnQuoteToCollection(
-    int collectionId,
-    int ownQuoteId,
-  ) async {
+  Future<Either<Failure, void>> addOwnQuoteToCollection(int collectionId, int ownQuoteId) async {
     return dataSource.addOwnQuoteToCollection(collectionId, ownQuoteId);
   }
 
@@ -82,76 +89,55 @@ class CollectionsRepositoryImpl extends CollectionsRepository {
   }
 
   @override
-  Future<Either<Failure, List<OwnQuoteEntity>>> getOwnQuotesOfCollection(
-    int collectionId,
-  ) async {
+  Future<Either<Failure, List<OwnQuoteEntity>>> getOwnQuotesOfCollection(int collectionId) async {
     return dataSource.getOwnQuotesOfCollection(collectionId);
   }
 
   @override
-  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfOwnQuote(
-    int ownQuoteId,
-  ) async {
+  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfOwnQuote(int ownQuoteId) async {
     return dataSource.getCollectionsOfOwnQuote(ownQuoteId);
   }
 
   @override
-  Future<Either<Failure, void>> addHistoryToCollection(
-    int collectionId,
-    int quoteId,
-  ) async {
+  Future<Either<Failure, void>> addHistoryToCollection(int collectionId, int quoteId) async {
     return dataSource.addHistoryToCollection(collectionId, quoteId);
   }
 
   @override
-  Future<Either<Failure, void>> removeHistoryFromCollection(
-    int collectionId,
-    int quoteId,
-  ) async {
+  Future<Either<Failure, void>> removeHistoryFromCollection(int collectionId, int quoteId) async {
     return dataSource.removeHistoryFromCollection(collectionId, quoteId);
   }
 
   @override
-  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfHistory(
-    int historyId,
-  ) async {
+  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfHistory(int historyId) async {
     return dataSource.getCollectionsOfHistory(historyId);
   }
 
   @override
-  Future<Either<Failure, List<HistoryEntity>>> getHistoryOfCollection(
-    int collectionId,
-  ) async {
+  Future<Either<Failure, List<HistoryEntity>>> getHistoryOfCollection(int collectionId) async {
     return dataSource.getHistoryOfCollection(collectionId);
   }
 
   @override
-  Future<Either<Failure, void>> addSearchToCollection(
-    int collectionId,
-    int searchId,
-  ) async {
+  Future<Either<Failure, void>> addSearchToCollection(int collectionId, int searchId) async {
     return dataSource.addSearchToCollection(collectionId, searchId);
   }
 
   @override
-  Future<Either<Failure, void>> removeSearchFromCollection(
-    int collectionId,
-    int searchId,
-  ) async {
+  Future<Either<Failure, void>> removeSearchFromCollection(int collectionId, int searchId) async {
     return dataSource.removeSearchFromCollection(collectionId, searchId);
   }
 
   @override
-  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfSearch(
-    int searchId,
-  ) async {
+  Future<Either<Failure, List<CollectionEntity>>> getCollectionsOfSearch(int searchId) async {
     return dataSource.getCollectionsOfSearch(searchId);
   }
 
   @override
   Future<Either<Failure, List<SearchEntity>>> getSearchOfCollection(
-    int collectionId,
-  ) async {
-    return dataSource.getSearchOfCollection(collectionId);
+    int collectionId, {
+    required bool isPremium,
+  }) async {
+    return dataSource.getSearchOfCollection(collectionId, isPremium: isPremium);
   }
 }

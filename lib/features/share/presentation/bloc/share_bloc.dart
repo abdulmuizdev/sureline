@@ -22,16 +22,33 @@ import 'package:sureline/features/share/domain/use_cases/share_on_social_use_cas
 import 'package:sureline/features/share/presentation/bloc/share_event.dart';
 import 'package:sureline/features/share/presentation/bloc/share_state.dart';
 
+/// Bloc for managing social media sharing functionality and content rendering.
 class ShareBloc extends Bloc<ShareEvent, ShareState> {
+  /// Use case for rendering video posts with animations.
   final RenderVideoPostUseCase _renderPostUseCase;
+
+  /// Use case for retrieving rendering progress stream.
   final GetRenderResultsStreamUseCase _getRenderResultsStreamUseCase;
+
+  /// Use case for sharing content on social media platforms.
   final ShareOnSocialUseCase _shareOnSocialUseCase;
+
+  /// Use case for sharing content via messages.
   final ShareOnMessageUseCase _shareOnMessageUseCase;
+
+  /// Use case for sharing content via default share sheet.
   final ShareOnDefaultUseCase _shareOnDefaultUseCase;
+
+  /// Use case for saving rendered content to device.
   final SavePostUseCase _savePostUseCase;
+
+  /// Use case for rendering image posts.
   final RenderImagePostUseCase _renderImagePostUseCase;
+
+  /// Use case for disposing rendering streams.
   final DisposeStreamUseCase _disposeStreamUseCase;
 
+  /// Creates a new ShareBloc instance with all required use cases.
   ShareBloc(
     this._renderPostUseCase,
     this._getRenderResultsStreamUseCase,
@@ -41,23 +58,23 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
     this._shareOnDefaultUseCase,
     this._renderImagePostUseCase,
     this._disposeStreamUseCase,
-  ) : super(Initial()) {
+  ) : super(const Initial()) {
+    // Instagram sharing with video/image support
     on<OpenInstagram>((event, emit) async {
       _renderPost(event, (url) {
         print('ig post is rendered');
-        DirectSocialShare.shareOnInstagram(
-          url,
-          !event.entity.renderEntity.isLiveBackground,
-        );
+        DirectSocialShare.shareOnInstagram(url, !event.entity.renderEntity.isLiveBackground);
       });
     });
 
+    // Facebook sharing with video support
     on<OpenFacebook>((event, emit) async {
       _renderPost(event, (url) {
         DirectSocialShare.shareOnFacebook(videoPath: url);
       });
     });
 
+    // TikTok sharing with video/image support
     on<OpenTikTok>((event, emit) async {
       _renderPost(event, (url) async {
         DirectSocialShare.shareOnTikTok(
@@ -67,10 +84,11 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
       });
     });
 
+    // Generic social media sharing
     on<ShareOnSocial>((event, emit) {
       _renderPost(event, (url) async {
         await _shareOnSocialUseCase.execute(
-          // Make input and output entities
+          // Create share entity with rendered content
           ShareEntity(
             schema: event.entity.schema,
             path: url,
@@ -80,18 +98,21 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
       });
     });
 
+    // Handle rendering progress updates
     on<RenderResultReceived>((event, emit) {
       emit(Rendering(event.result.progress));
     });
 
+    // Handle rendering completion
     on<RenderCompleted>((event, emit) {
       emit(Rendered(event.proceed));
     });
 
+    // Messages sharing integration
     on<OpenMessages>((event, emit) {
       _renderPost(event, (url) async {
         await _shareOnMessageUseCase.execute(
-          // Make input and output entities
+          // Create share entity for messages
           ShareEntity(
             schema: event.entity.schema,
             path: url,
@@ -101,6 +122,7 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
       });
     });
 
+    // Default share sheet integration
     on<OpenDefaultShare>((event, emit) {
       _renderPost(event, (url) async {
         debugPrint('callback is executing');
@@ -114,46 +136,77 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
       });
     });
 
+    // Save rendered content to device
     on<SavePost>((event, emit) {
       _renderPost(event, (url) async {
         await _savePostUseCase.execute(url);
       });
     });
 
+    // Handle rendering in progress state
     on<RenderingInProgress>((event, emit) {
       emit(Rendering(null));
     });
   }
 
+  /// Moves XFile to a shareable directory for social media platforms.
+  ///
+  /// This method ensures that files are in the correct location and format
+  /// for sharing on various social media platforms. It creates a temporary
+  /// copy with the appropriate filename and extension.
+  ///
+  /// Parameters:
+  /// - [xfile] The XFile to be moved and prepared for sharing
+  ///
+  /// Returns:
+  /// - [Future<File>] The prepared file ready for sharing
   Future<File> _moveXFileToShareableDir(XFile xfile) async {
-    final tempDir =
-        await getTemporaryDirectory(); // or getApplicationDocumentsDirectory()
+    final tempDir = await getTemporaryDirectory(); // or getApplicationDocumentsDirectory()
     final newPath = path.join(tempDir.path, path.basename(xfile.path));
     final file = await File(xfile.path).copy(newPath);
     final latestPath = path.join(tempDir.path, 'sureline_share.ig');
     return await File(file.path).copy(latestPath);
   }
 
-  void _renderPost(event, Function(String) onComplete) async {
-    if (((event.entity) as ShareEntity).renderEntity.isLiveBackground) {
-      await _renderPostUseCase.execute(event.entity.renderEntity);
+  /// Renders content and executes sharing callback upon completion.
+  ///
+  /// This method coordinates the rendering process for both image and video
+  /// content. It handles live background rendering with progress tracking
+  /// and static image rendering for immediate sharing.
+  ///
+  /// Parameters:
+  /// - [event] The share event containing render entity and schema
+  /// - [onComplete] Callback function to execute when rendering is complete
+  void _renderPost(ShareEvent event, void Function(String) onComplete) async {
+    // Ensure event.entity is a ShareEntity
+    if (!((event as dynamic).entity is ShareEntity)) {
+      throw ArgumentError('event.entity must be a ShareEntity');
+    }
+    final ShareEntity shareEntity = (event as dynamic).entity as ShareEntity;
+
+    if (shareEntity.renderEntity.isLiveBackground) {
+      // Handle live background rendering with progress tracking
+      await _renderPostUseCase.execute(shareEntity.renderEntity);
       final stream = _getRenderResultsStreamUseCase.execute();
       StreamSubscription? subscription;
+
       subscription = stream.listen((result) async {
         debugPrint('url is this ${result.url}');
         if (result.url.isEmpty) {
+          // Still rendering, update progress
           add(RenderResultReceived(result));
         } else {
-          add(RenderCompleted(proceed: onComplete(result.url)));
+          // Rendering complete, execute callback
+          onComplete(result.url);
+          add(RenderCompleted(proceed: () {}));
           await subscription?.cancel();
           _disposeStreamUseCase.execute();
         }
       });
     } else {
+      // Handle static image rendering
       add(RenderingInProgress());
-      final result = await _renderImagePostUseCase.execute(
-        (event.entity as ShareEntity).renderEntity,
-      );
+      final result = await _renderImagePostUseCase.execute(shareEntity.renderEntity);
 
       result.fold(
         (left) {
@@ -161,7 +214,13 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
         },
         (right) {
           debugPrint(right);
-          add(RenderCompleted(proceed: () => onComplete(right)));
+          add(
+            RenderCompleted(
+              proceed: () {
+                onComplete(right);
+              },
+            ),
+          );
         },
       );
     }

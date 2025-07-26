@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:sureline/common/domain/entities/collections/favourite_entity.dart';
+import 'package:sureline/common/domain/entities/collections/history_entity.dart';
+import 'package:sureline/common/domain/entities/collections/own_quote_entity.dart';
+import 'package:sureline/common/domain/entities/collections/search_entity.dart';
 import 'package:sureline/common/presentation/widgets/favourite_list_item.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/preferenecs/collections/domain/entity/collection_entity.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_event.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_state.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/pages/selection/collection_selection_bottom_sheet.dart';
-import 'package:sureline/features/preferenecs/favourites/domain/entity/favourite_entity.dart';
-import 'package:sureline/features/preferenecs/history/domain/entity/history_entity.dart';
-import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
-import 'package:sureline/features/preferenecs/search/domain/entity/search_entity.dart';
 import 'package:sureline/features/preferenecs/search/presentation/widget/sureline_search_bar.dart';
 
 class CollectionDetailPage extends StatefulWidget {
@@ -44,18 +43,10 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && context.mounted) {
-        context.read<CollectionsBloc>().add(
-          GetFavouritesOfCollection(widget.collectionId),
-        );
-        context.read<CollectionsBloc>().add(
-          GetOwnQuotesOfCollection(widget.collectionId),
-        );
-        context.read<CollectionsBloc>().add(
-          GetHistoryOfCollection(widget.collectionId),
-        );
-        context.read<CollectionsBloc>().add(
-          GetSearchOfCollection(widget.collectionId),
-        );
+        context.read<CollectionsBloc>().add(GetFavouritesOfCollection(widget.collectionId));
+        context.read<CollectionsBloc>().add(GetOwnQuotesOfCollection(widget.collectionId));
+        context.read<CollectionsBloc>().add(GetHistoryOfCollection(widget.collectionId));
+        context.read<CollectionsBloc>().add(GetSearchOfCollection(widget.collectionId));
       }
     });
   }
@@ -86,7 +77,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
           return Portal(
             child: Container(
               color: AppColors.white,
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.only(left: 18, right: 18, bottom: 18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -111,12 +102,11 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                             SizedBox(
                               height: 100,
                               width: 100,
-                              child: Placeholder(),
+                              child: Image.asset('assets/images/collection.png'),
                             ),
                             SizedBox(height: 20),
                             OnboardingHeading(
-                              title:
-                                  'You haven\'t added anything to this collection yet',
+                              title: 'You haven\'t added anything to this collection yet',
 
                               disableMargins: true,
                             ),
@@ -126,14 +116,14 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                     ),
                   ] else ...[
                     SurelineSearchBar(controller: SearchController()),
-                    SizedBox(height: 27),
-                    SurelineButton(
-                      isOutlined: true,
-                      text: 'Show all in feed',
-                      onPressed: () {},
-                      disableVerticalPadding: true,
-                    ),
-                    SizedBox(height: 27),
+                    // SizedBox(height: 27),
+                    // SurelineButton(
+                    //   isOutlined: true,
+                    //   text: 'Show all in feed',
+                    //   onPressed: () {},
+                    //   disableVerticalPadding: true,
+                    // ),
+                    // SizedBox(height: 27),
                     Expanded(
                       child: ListView.builder(
                         itemCount:
@@ -145,13 +135,9 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                           // Calculate which list the index belongs to
                           final favouriteIndex = index;
                           final ownQuoteIndex = index - favourites.length;
-                          final historyIndex =
-                              index - favourites.length - ownQuotes.length;
+                          final historyIndex = index - favourites.length - ownQuotes.length;
                           final searchIndex =
-                              index -
-                              favourites.length -
-                              ownQuotes.length -
-                              histories.length;
+                              index - favourites.length - ownQuotes.length - histories.length;
 
                           // Determine which entity to pass based on index
                           FavouriteEntity? favouriteEntity;
@@ -161,13 +147,10 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
 
                           if (index < favourites.length) {
                             favouriteEntity = favourites[favouriteIndex];
-                          } else if (index <
-                              favourites.length + ownQuotes.length) {
+                          } else if (index < favourites.length + ownQuotes.length) {
                             ownQuoteEntity = ownQuotes[ownQuoteIndex];
                           } else if (index <
-                              favourites.length +
-                                  ownQuotes.length +
-                                  histories.length) {
+                              favourites.length + ownQuotes.length + histories.length) {
                             historyEntity = histories[historyIndex];
                           } else {
                             searchEntity = searchQuotes[searchIndex];
@@ -180,35 +163,28 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                             searchEntity: searchEntity,
                             onDeletePressed: () {
                               context.read<CollectionsBloc>().add(
-                                OnDeleteQuotePressed(
-                                  favourites[index].id,
-                                  widget.collectionId,
-                                ),
+                                OnDeleteQuotePressed(favourites[index].id, widget.collectionId),
                               );
                             },
                             onAddToCollectionPressed: () async {
                               await showModalBottomSheet(
-                                context:
-                                    Navigator.of(
-                                      context,
-                                      rootNavigator: true,
-                                    ).context,
+                                context: Navigator.of(context, rootNavigator: true).context,
                                 builder:
-                                    (ctx) => CollectionSelectionBottomSheet(
-                                      favouriteId: favouriteEntity?.id,
-                                      ownQuoteId: ownQuoteEntity?.id,
-                                      quoteId: historyEntity?.id,
-                                      onFavouritesUpdated:
-                                          (favourites, collections) {},
+                                    (ctx) => BlocProvider(
+                                      create: (_) => locator<CollectionsBloc>(),
+                                      child: CollectionSelectionBottomSheet(
+                                        favouriteId: favouriteEntity?.id,
+                                        ownQuoteId: ownQuoteEntity?.id,
+                                        quoteId: historyEntity?.id,
+                                        onFavouritesUpdated: (favourites, collections) {},
+                                      ),
                                     ),
                                 isScrollControlled: true,
                                 useSafeArea: true,
                               );
                               if (mounted && context.mounted) {
                                 context.read<CollectionsBloc>().add(
-                                  GetFavouritesOfCollection(
-                                    widget.collectionId,
-                                  ),
+                                  GetFavouritesOfCollection(widget.collectionId),
                                 );
                                 context.read<CollectionsBloc>().add(
                                   GetOwnQuotesOfCollection(widget.collectionId),
@@ -229,8 +205,7 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                 });
                               }
                             },
-                            isOverlayVisible:
-                                _deleteOverlayVisibleIndex == index,
+                            isOverlayVisible: _deleteOverlayVisibleIndex == index,
                           );
                         },
                       ),

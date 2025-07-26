@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sureline/common/domain/entities/collections/own_quote_entity.dart';
 import 'package:sureline/common/presentation/widgets/sureline_overlay.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
-import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
 
 class OwnQuoteListItem extends StatefulWidget {
   final bool isOverlayVisible;
@@ -56,17 +56,13 @@ class _OwnQuoteListItemState extends State<OwnQuoteListItem> {
                 ),
 
                 SurelineOverlay(
-                  onClose:
-                      () => widget.onOverlayToggled(!widget.isOverlayVisible),
+                  onClose: () => widget.onOverlayToggled(!widget.isOverlayVisible),
 
                   overlay: GestureDetector(
                     onTap: widget.onDeletePressed,
                     child: Container(
                       width: 200,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 12,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                       decoration: BoxDecoration(
                         color: CupertinoColors.systemGrey6,
                         borderRadius: BorderRadius.circular(13),
@@ -82,10 +78,7 @@ class _OwnQuoteListItemState extends State<OwnQuoteListItem> {
                               fontWeight: FontWeight.normal,
                             ),
                           ),
-                          Icon(
-                            CupertinoIcons.delete,
-                            color: CupertinoColors.destructiveRed,
-                          ),
+                          Icon(CupertinoIcons.delete, color: CupertinoColors.destructiveRed),
                         ],
                       ),
                     ),
@@ -95,13 +88,8 @@ class _OwnQuoteListItemState extends State<OwnQuoteListItem> {
                   follower: Alignment.topRight,
                   animateUpwards: true,
                   child: IconButton(
-                    onPressed:
-                        () => widget.onOverlayToggled(!widget.isOverlayVisible),
-                    icon: Icon(
-                      Icons.more_vert_rounded,
-                      size: 20,
-                      color: AppColors.primaryColor,
-                    ),
+                    onPressed: () => widget.onOverlayToggled(!widget.isOverlayVisible),
+                    icon: Icon(Icons.more_vert_rounded, size: 20, color: AppColors.primaryColor),
                   ),
                 ),
               ],
@@ -136,14 +124,9 @@ class _OwnQuoteListItemState extends State<OwnQuoteListItem> {
                     ),
                     IconButton(
                       onPressed: () {
-                        SharePlus.instance.share(
-                          ShareParams(text: '"${widget.entity.quoteText}"'),
-                        );
+                        SharePlus.instance.share(ShareParams(text: '"${widget.entity.quoteText}"'));
                       },
-                      icon: Icon(
-                        Icons.ios_share_rounded,
-                        color: AppColors.primaryColor,
-                      ),
+                      icon: Icon(Icons.ios_share_rounded, color: AppColors.primaryColor),
                     ),
                   ],
                 ),

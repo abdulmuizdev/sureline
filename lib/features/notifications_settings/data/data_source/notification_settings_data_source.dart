@@ -10,45 +10,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/constants/sureline_notification_presets.dart';
 import 'package:sureline/core/error/failures.dart';
+import 'package:sureline/core/utils/utils.dart';
 import 'package:sureline/features/notifications_settings/data/model/notification_model.dart';
 import 'package:sureline/features/notifications_settings/data/model/notification_preset_model.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/use_cases/get_quotes_from_recommendation_algorithm.dart';
+import 'package:sureline/common/domain/use_cases/recommendation_algorithm/get_quotes_from_recommendation_algorithm.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 abstract class NotificationSettingsDataSource {
-  Future<Either<Failure, void>> editNotificationPreset(
-    NotificationPresetModel newModel,
-  );
+  Future<Either<Failure, void>> editNotificationPreset(NotificationPresetModel newModel);
 
-  Future<Either<Failure, void>> enableNotificationPreset(
-    NotificationPresetModel model,
-  );
+  Future<Either<Failure, void>> enableNotificationPreset(NotificationPresetModel model);
 
   Future<Either<Failure, void>> cancelNotificationPreset(int id);
 
   Future<Either<Failure, void>> scheduleUpToSixtyNotifications();
 
-  Future<Either<Failure, List<NotificationPresetModel>>>
-  getNotificationPresets();
+  Future<Either<Failure, List<NotificationPresetModel>>> getNotificationPresets();
 
-  Future<Either<Failure, void>> addNotificationPreset(
-    NotificationPresetModel model,
-  );
+  Future<Either<Failure, void>> addNotificationPreset(NotificationPresetModel model);
 
   Future<Either<Failure, void>> initializeNotificationsPresets();
 }
 
-class NotificationSettingsDataSourceImpl
-    extends NotificationSettingsDataSource {
+class NotificationSettingsDataSourceImpl extends NotificationSettingsDataSource {
   final SharedPreferences prefs;
-  final GetQuotesFromRecommendationAlgorithm
-  _getQuotesFromRecommendationAlgorithm;
+  final GetQuotesFromRecommendationAlgorithm _getQuotesFromRecommendationAlgorithm;
 
-  NotificationSettingsDataSourceImpl(
-    this.prefs,
-    this._getQuotesFromRecommendationAlgorithm,
-  );
+  NotificationSettingsDataSourceImpl(this.prefs, this._getQuotesFromRecommendationAlgorithm);
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -64,16 +53,12 @@ class NotificationSettingsDataSourceImpl
       return Left(UnknownFailure());
     }
 
-    List<NotificationPresetModel> recurringPresets = _getRecurringPresets(
-      presets,
-    );
+    List<NotificationPresetModel> recurringPresets = _getRecurringPresets(presets);
 
     debugPrint('recurring presets: ${recurringPresets.length}');
 
     final availableSlots =
-        64 -
-        (await flutterLocalNotificationsPlugin.pendingNotificationRequests())
-            .length;
+        64 - (await flutterLocalNotificationsPlugin.pendingNotificationRequests()).length;
 
     debugPrint('available slots: $availableSlots');
     debugPrint('check 0');
@@ -106,8 +91,10 @@ class NotificationSettingsDataSourceImpl
               .toList()
               .map((day) => day.dateTime)
               .toList();
+      final isPremium = await Utils.checkPremiumStatus();
       final quotesResult = await _getQuotesFromRecommendationAlgorithm.call(
         limit: limits[i],
+        isPremium: isPremium,
       );
       await quotesResult.fold((left) {}, (right) async {
         await scheduleNotifications(
@@ -126,9 +113,7 @@ class NotificationSettingsDataSourceImpl
     return Right(unit);
   }
 
-  List<NotificationPresetModel> _getRecurringPresets(
-    List<NotificationPresetModel> list,
-  ) {
+  List<NotificationPresetModel> _getRecurringPresets(List<NotificationPresetModel> list) {
     return list
         .where(
           (model) =>
@@ -166,14 +151,11 @@ class NotificationSettingsDataSourceImpl
   }
 
   @override
-  Future<Either<Failure, void>> editNotificationPreset(
-    NotificationPresetModel newModel,
-  ) async {
+  Future<Either<Failure, void>> editNotificationPreset(NotificationPresetModel newModel) async {
     try {
       await setupTimezone();
       await initializeNotifications();
-      final List<NotificationPresetModel>? savedNotificationPresets =
-          _getNotificationPresets();
+      final List<NotificationPresetModel>? savedNotificationPresets = _getNotificationPresets();
       if (savedNotificationPresets == null) {
         debugPrint('it cannot be null');
         return Left(UnknownFailure());
@@ -182,17 +164,13 @@ class NotificationSettingsDataSourceImpl
       final foundPresetIndex = savedNotificationPresets.indexWhere(
         (preset) => preset.id == newModel.id,
       );
-      await _cancelNotificationPreset(
-        savedNotificationPresets[foundPresetIndex].id,
-      );
+      await _cancelNotificationPreset(savedNotificationPresets[foundPresetIndex].id);
       await _enableNotificationPreset(newModel);
 
       savedNotificationPresets[foundPresetIndex] = newModel;
       await prefs.setString(
         SP.notificationPresets,
-        jsonEncode(
-          savedNotificationPresets.map((model) => model.toJson()).toList(),
-        ),
+        jsonEncode(savedNotificationPresets.map((model) => model.toJson()).toList()),
       );
 
       debugPrint('updated successfully');
@@ -206,9 +184,7 @@ class NotificationSettingsDataSourceImpl
   }
 
   @override
-  Future<Either<Failure, void>> enableNotificationPreset(
-    NotificationPresetModel model,
-  ) async {
+  Future<Either<Failure, void>> enableNotificationPreset(NotificationPresetModel model) async {
     try {
       await setupTimezone();
       await initializeNotifications();
@@ -231,8 +207,10 @@ class NotificationSettingsDataSourceImpl
             .toList();
 
     int limit = await _getAvailableNotificationScheduleLimit();
+    final isPremium = await Utils.checkPremiumStatus();
     final quotesResult = await _getQuotesFromRecommendationAlgorithm.call(
       limit: limit,
+      isPremium: isPremium,
     );
     await quotesResult.fold((left) {}, (right) async {
       await scheduleNotifications(
@@ -271,20 +249,18 @@ class NotificationSettingsDataSourceImpl
   }
 
   Future<int> _getAvailableNotificationScheduleLimit() async {
-    final slotsUsed =
-        (await flutterLocalNotificationsPlugin.pendingNotificationRequests())
-            .length;
+    final slotsUsed = (await flutterLocalNotificationsPlugin.pendingNotificationRequests()).length;
     int maxLimit = 64;
     debugPrint('remaining slots: ${maxLimit - slotsUsed}');
     return maxLimit - slotsUsed;
   }
 
   Future<void> initializeNotifications() async {
-    const DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings();
+    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings();
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(iOS: initializationSettingsIOS);
+    const InitializationSettings initializationSettings = InitializationSettings(
+      iOS: initializationSettingsIOS,
+    );
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
@@ -297,14 +273,10 @@ class NotificationSettingsDataSourceImpl
   }
 
   Future<void> _cancelNotificationPreset(int id) async {
-    final activeNotifications =
-        await flutterLocalNotificationsPlugin.getActiveNotifications();
+    final activeNotifications = await flutterLocalNotificationsPlugin.getActiveNotifications();
     final filteredNotifications =
         activeNotifications
-            .where(
-              (notification) =>
-                  notification.id.toString().substring(0, 3) == id.toString(),
-            )
+            .where((notification) => notification.id.toString().substring(0, 3) == id.toString())
             .toList();
     if (filteredNotifications.isNotEmpty) {
       for (ActiveNotification active in filteredNotifications) {
@@ -320,9 +292,9 @@ class NotificationSettingsDataSourceImpl
   List<NotificationPresetModel>? _getNotificationPresets() {
     final raw = prefs.getString(SP.notificationPresets);
     if (raw == null) return null;
-    List<dynamic> list = jsonDecode(raw);
+    final list = jsonDecode(raw) as List<dynamic>;
     final presets =
-        list.map((json) => NotificationPresetModel.fromJson(json)).toList();
+        list.map((json) => NotificationPresetModel.fromJson(json as Map<String, dynamic>)).toList();
     return presets;
   }
 
@@ -344,20 +316,8 @@ class NotificationSettingsDataSourceImpl
     final now = todayReference ?? DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    final start = DateTime(
-      today.year,
-      today.month,
-      today.day,
-      startTime.hour,
-      startTime.minute,
-    );
-    final end = DateTime(
-      today.year,
-      today.month,
-      today.day,
-      endTime.hour,
-      endTime.minute,
-    );
+    final start = DateTime(today.year, today.month, today.day, startTime.hour, startTime.minute);
+    final end = DateTime(today.year, today.month, today.day, endTime.hour, endTime.minute);
     final totalSeconds = end.difference(start).inSeconds;
 
     if (totalSeconds < 0 || notificationsPerDay <= 0) return;
@@ -379,17 +339,14 @@ class NotificationSettingsDataSourceImpl
         when,
         const NotificationDetails(iOS: DarwinNotificationDetails()),
         matchDateTimeComponents: DateTimeComponents.time,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.wallClockTime,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime,
         androidScheduleMode: AndroidScheduleMode.exact,
       );
     } else {
       outerLoop:
       for (final weekday in weekdays) {
         for (int i = 0; i < notificationsPerDay; i++) {
-          final scheduledTime = start.add(
-            Duration(seconds: interval.round() * i),
-          );
+          final scheduledTime = start.add(Duration(seconds: interval.round() * i));
           final when = _nextInstanceOfWeekdayTime(
             scheduledTime.hour,
             scheduledTime.minute,
@@ -398,10 +355,7 @@ class NotificationSettingsDataSourceImpl
           debugPrint('when is this 2 $when');
           if (currentQty >= limit) {
             if (currentQty != 0) {
-              await prefs.setString(
-                SP.lastNotificationScheduledAt,
-                when.toIso8601String(),
-              );
+              await prefs.setString(SP.lastNotificationScheduledAt, when.toIso8601String());
             }
             break outerLoop;
           }
@@ -446,11 +400,7 @@ class NotificationSettingsDataSourceImpl
     return quote;
   }
 
-  tz.TZDateTime _nextInstanceOfWeekdayTime(
-    int hour,
-    int minute, {
-    int? weekday,
-  }) {
+  tz.TZDateTime _nextInstanceOfWeekdayTime(int hour, int minute, {int? weekday}) {
     final now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime scheduledDate = tz.TZDateTime(
       tz.local,
@@ -497,14 +447,10 @@ class NotificationSettingsDataSourceImpl
   }
 
   @override
-  Future<Either<Failure, void>> addNotificationPreset(
-    NotificationPresetModel model,
-  ) async {
+  Future<Either<Failure, void>> addNotificationPreset(NotificationPresetModel model) async {
     try {
       final presets = await getNotificationPresets();
-      return await presets.fold((failure) => Left(UnknownFailure()), (
-        existingPresets,
-      ) async {
+      return await presets.fold((failure) => Left(UnknownFailure()), (existingPresets) async {
         final updatedPresets = [...existingPresets, model];
         await prefs.setString(
           SP.notificationPresets,
@@ -518,13 +464,14 @@ class NotificationSettingsDataSourceImpl
   }
 
   @override
-  Future<Either<Failure, List<NotificationPresetModel>>>
-  getNotificationPresets() async {
+  Future<Either<Failure, List<NotificationPresetModel>>> getNotificationPresets() async {
     final raw = prefs.getString(SP.notificationPresets);
     if (raw != null) {
-      List<dynamic> list = jsonDecode(raw);
+      final list = jsonDecode(raw) as List<dynamic>;
       List<NotificationPresetModel> result =
-          list.map((json) => NotificationPresetModel.fromJson(json)).toList();
+          list
+              .map((json) => NotificationPresetModel.fromJson(json as Map<String, dynamic>))
+              .toList();
       return Right(result);
     } else {
       await _initializeNotificationPresetsInSP();
@@ -533,9 +480,11 @@ class NotificationSettingsDataSourceImpl
         debugPrint('it should not be null');
         return Left(UnknownFailure());
       }
-      List<dynamic> list = jsonDecode(raw2);
+      final list = jsonDecode(raw2) as List<dynamic>;
       List<NotificationPresetModel> result =
-          list.map((json) => NotificationPresetModel.fromJson(json)).toList();
+          list
+              .map((json) => NotificationPresetModel.fromJson(json as Map<String, dynamic>))
+              .toList();
       return Right(result);
     }
   }
@@ -544,8 +493,7 @@ class NotificationSettingsDataSourceImpl
   Future<Either<Failure, void>> initializeNotificationsPresets() async {
     List<NotificationPresetModel>? presets = _getNotificationPresets();
     final scheduledNotifications =
-        (await flutterLocalNotificationsPlugin.pendingNotificationRequests())
-            .length;
+        (await flutterLocalNotificationsPlugin.pendingNotificationRequests()).length;
     if (presets == null && scheduledNotifications == 0) {
       final result = await getNotificationPresets();
       await result.fold((left) {}, (right) async {
@@ -563,11 +511,7 @@ class NotificationSettingsDataSourceImpl
     debugPrint('Initializing notification presets');
     await prefs.setString(
       SP.notificationPresets,
-      jsonEncode(
-        SurelineNotificationPresets.values
-            .map((model) => model.toJson())
-            .toList(),
-      ),
+      jsonEncode(SurelineNotificationPresets.values.map((model) => model.toJson()).toList()),
     );
   }
 }

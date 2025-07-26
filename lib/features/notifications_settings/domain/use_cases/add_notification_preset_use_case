@@ -3,11 +3,21 @@ import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/features/notifications_settings/domain/entity/notification_preset_entity.dart';
 import 'package:sureline/features/notifications_settings/domain/repository/notification_setting_repository.dart';
 
+/// Use case for adding a new notification preset to the system.
+/// This use case encapsulates the business logic for creating and storing
+/// new notification configurations that users can select and customize.
+///
+/// The use case ensures that new presets are properly validated and
+/// stored in the repository for later retrieval and management.
 class AddNotificationPresetUseCase {
   final NotificationSettingRepository repository;
 
   AddNotificationPresetUseCase(this.repository);
 
+  /// Executes the add notification preset operation.
+  ///
+  /// [entity] - The notification preset entity to add to the system
+  /// Returns a failure if the preset cannot be added or validation fails
   Future<Either<Failure, void>> execute(NotificationPresetEntity entity) async {
     return await repository.addNotificationPreset(entity);
   }

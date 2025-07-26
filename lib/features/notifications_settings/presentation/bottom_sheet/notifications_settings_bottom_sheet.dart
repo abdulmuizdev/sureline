@@ -12,16 +12,21 @@ import 'package:sureline/features/notifications_settings/presentation/bloc/notif
 import 'package:sureline/features/notifications_settings/presentation/bottom_sheet/notification_detail_bottom_sheet/notification_detail_bottom_sheet.dart';
 import 'package:sureline/features/notifications_settings/presentation/bottom_sheet/widgets/reminder_container.dart';
 
+/// Main bottom sheet component for managing notification settings.
+/// This widget provides the primary interface for users to view, select,
+/// and manage their notification presets for quote delivery.
+///
+/// The component displays a list of available notification configurations
+/// with their timing, frequency, and selection status, allowing users
+/// to enable/disable presets and add new configurations.
 class NotificationsSettingsBottomSheet extends StatefulWidget {
   const NotificationsSettingsBottomSheet({super.key});
 
   @override
-  State<NotificationsSettingsBottomSheet> createState() =>
-      _NotificationsSettingsBottomSheetState();
+  State<NotificationsSettingsBottomSheet> createState() => _NotificationsSettingsBottomSheetState();
 }
 
-class _NotificationsSettingsBottomSheetState
-    extends State<NotificationsSettingsBottomSheet> {
+class _NotificationsSettingsBottomSheetState extends State<NotificationsSettingsBottomSheet> {
   List<NotificationPresetEntity> _presets = [];
 
   @override
@@ -29,10 +34,7 @@ class _NotificationsSettingsBottomSheetState
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create:
-              (_) =>
-                  locator<NotificationSettingBloc>()
-                    ..add(GetNotificationPresets()),
+          create: (_) => locator<NotificationSettingBloc>()..add(GetNotificationPresets()),
         ),
       ],
       child: BlocListener<NotificationSettingBloc, NotificationSettingState>(
@@ -43,15 +45,11 @@ class _NotificationsSettingsBottomSheetState
           if (state is RefreshedNotificationPresets) {
             _presets = state.result;
             if (state.editAfterwards) {
-              final index = _presets.indexWhere(
-                (entity) => entity.id == state.id,
-              );
+              final index = _presets.indexWhere((entity) => entity.id == state.id);
               if (index >= 0) {
                 await _showNotificationDetails(_presets[index]);
                 if (!context.mounted) return;
-                context.read<NotificationSettingBloc>().add(
-                  RefreshNotificationPresets(),
-                );
+                context.read<NotificationSettingBloc>().add(RefreshNotificationPresets());
               } else {
                 debugPrint('index cannot be less than 0');
               }
@@ -98,11 +96,8 @@ class _NotificationsSettingsBottomSheetState
                           subTitle:
                               '${_presets[index].qtyPerDay}x ${Utils.getNotificationPresetSubtitle(_presets[index].days)}',
                           timeString:
-                              (_presets[index].startTime ==
-                                      _presets[index].endTime)
-                                  ? Utils.formatTimeOfDay(
-                                    _presets[index].startTime,
-                                  )
+                              (_presets[index].startTime == _presets[index].endTime)
+                                  ? Utils.formatTimeOfDay(_presets[index].startTime)
                                   : '${Utils.formatTimeOfDay(_presets[index].startTime)} - ${Utils.formatTimeOfDay(_presets[index].endTime)}',
                           isSelected: _presets[index].isSelected,
                           onPressed: () async {
@@ -126,9 +121,7 @@ class _NotificationsSettingsBottomSheetState
                   SurelineButton(
                     text: 'Add reminder',
                     onPressed: () {
-                      context.read<NotificationSettingBloc>().add(
-                        AddNotificationPreset(),
-                      );
+                      context.read<NotificationSettingBloc>().add(AddNotificationPreset());
                     },
                     disableVerticalPadding: true,
                   ),
@@ -143,6 +136,11 @@ class _NotificationsSettingsBottomSheetState
     );
   }
 
+  /// Shows the notification detail bottom sheet for editing a preset.
+  /// This method opens a modal bottom sheet that allows users to modify
+  /// the configuration of a specific notification preset.
+  ///
+  /// [entity] - The notification preset entity to edit
   Future<void> _showNotificationDetails(NotificationPresetEntity entity) async {
     await showModalBottomSheet(
       isScrollControlled: true,

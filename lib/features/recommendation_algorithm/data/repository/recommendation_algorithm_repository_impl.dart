@@ -3,26 +3,26 @@ import 'package:sureline/core/error/failures.dart';
 import 'package:sureline/features/preferenecs/general_settings/author_preferences/data/model/author_pref_model.dart';
 import 'package:sureline/features/preferenecs/general_settings/muted_content/domain/entity/muted_content_entity.dart';
 import 'package:sureline/features/recommendation_algorithm/data/data_source/recommendation_algorithm_data_source.dart';
-import 'package:sureline/features/recommendation_algorithm/domain/entity/quote_entity.dart';
+import 'package:sureline/common/domain/entities/recommendation_algorithm/quote_entity.dart';
 import 'package:sureline/features/recommendation_algorithm/domain/repository/recommendation_algorithm_repository.dart';
 
-class RecommendationAlgorithmRepositoryImpl
-    extends RecommendationAlgorithmRepository {
+class RecommendationAlgorithmRepositoryImpl extends RecommendationAlgorithmRepository {
   final RecommendationAlgorithmDataSource dataSource;
 
   RecommendationAlgorithmRepositoryImpl(this.dataSource);
 
   @override
-  Future<Either<Failure, void>> initialize() async {
-    return dataSource.initialize();
+  Future<Either<Failure, void>> initialize({required bool isPremium}) async {
+    return dataSource.initialize(isPremium: isPremium);
   }
 
   @override
   Future<Either<Failure, List<QuoteEntity>>> getQuotes({
     int? page,
     int? limit,
+    required bool isPremium,
   }) async {
-    return dataSource.getQuotes(page: page, limit: limit);
+    return dataSource.getQuotes(page: page, limit: limit, isPremium: isPremium);
   }
 
   @override
@@ -31,15 +31,16 @@ class RecommendationAlgorithmRepositoryImpl
   }
 
   @override
-  Future<Either<Failure, List<QuoteEntity>>> getShownQuotes() async {
-    return dataSource.getShownQuotes();
+  Future<Either<Failure, List<QuoteEntity>>> getShownQuotes({required bool isPremium}) async {
+    return dataSource.getShownQuotes(isPremium: isPremium);
   }
 
   @override
   Future<Either<Failure, void>> updateAuthorPreference(
-    AuthorPrefModel authorPrefModel,
-  ) async {
-    return dataSource.updateAuthorPreference(authorPrefModel);
+    AuthorPrefModel authorPrefModel, {
+    required bool isPremium,
+  }) async {
+    return dataSource.updateAuthorPreference(authorPrefModel, isPremium: isPremium);
   }
 
   @override
@@ -51,10 +52,12 @@ class RecommendationAlgorithmRepositoryImpl
   Future<Either<Failure, void>> updateMutedContent({
     required bool withAuthor,
     required bool withoutAuthor,
+    required bool isPremium,
   }) {
     return dataSource.updateMutedContent(
       withAuthor: withAuthor,
       withoutAuthor: withoutAuthor,
+      isPremium: isPremium,
     );
   }
 

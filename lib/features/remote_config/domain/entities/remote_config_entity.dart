@@ -10,6 +10,7 @@ class RemoteConfigEntity {
   final List<QuestionEntity> survey6;
   final List<ReviewEntity> reviews;
   final List<String> benefits;
+  final List<String> benefitsImages;
 
   const RemoteConfigEntity  ({
     required this.survey1,
@@ -20,5 +21,6 @@ class RemoteConfigEntity {
     required this.survey6,
     required this.reviews,
     required this.benefits,
+    required this.benefitsImages,
   });
-} 
+}

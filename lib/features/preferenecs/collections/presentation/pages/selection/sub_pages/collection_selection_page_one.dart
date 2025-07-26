@@ -1,26 +1,24 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/core/theme/app_colors.dart';
-import 'package:sureline/features/preferenecs/collections/domain/entity/collection_entity.dart';
+import 'package:sureline/common/domain/entities/collections/collection_entity.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_event.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_state.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/widgets/collection_selection_list_item.dart';
-import 'package:sureline/features/preferenecs/favourites/domain/entity/favourite_entity.dart';
-import 'package:sureline/features/preferenecs/history/domain/entity/history_entity.dart';
-import 'package:sureline/features/home/domain/entity/quote_entity.dart';
-import 'package:sureline/features/preferenecs/own_quotes/domain/entity/own_quote_entity.dart';
-import 'package:sureline/features/preferenecs/search/domain/entity/search_entity.dart';
+import 'package:sureline/common/domain/entities/collections/favourite_entity.dart';
+import 'package:sureline/common/domain/entities/collections/history_entity.dart';
+import 'package:sureline/common/domain/entities/recommendation_algorithm/quote_entity.dart';
+import 'package:sureline/common/domain/entities/collections/own_quote_entity.dart';
+import 'package:sureline/common/domain/entities/collections/search_entity.dart';
 
 class CollectionSelectionPageOne extends StatefulWidget {
   final int? favouriteId;
   final int? ownQuoteId;
   final int? quoteId;
   final int? searchId;
-  final Function(List<FavouriteEntity>, List<CollectionEntity>)?
-  onFavouritesUpdated;
-  final Function(List<OwnQuoteEntity>, List<CollectionEntity>)?
-  onOwnQuotesUpdated;
+  final Function(List<FavouriteEntity>, List<CollectionEntity>)? onFavouritesUpdated;
+  final Function(List<OwnQuoteEntity>, List<CollectionEntity>)? onOwnQuotesUpdated;
   final Function(List<HistoryEntity>, List<CollectionEntity>)? onHistoryUpdated;
   final Function(List<SearchEntity>, List<CollectionEntity>)? onSearchUpdated;
   final bool shouldReloadCollections;
@@ -38,12 +36,10 @@ class CollectionSelectionPageOne extends StatefulWidget {
   });
 
   @override
-  State<CollectionSelectionPageOne> createState() =>
-      _CollectionSelectionPageOneState();
+  State<CollectionSelectionPageOne> createState() => _CollectionSelectionPageOneState();
 }
 
-class _CollectionSelectionPageOneState
-    extends State<CollectionSelectionPageOne> {
+class _CollectionSelectionPageOneState extends State<CollectionSelectionPageOne> {
   List<CollectionEntity> _collections = [];
   List<CollectionEntity> _selectedCollections = [];
 
@@ -54,24 +50,16 @@ class _CollectionSelectionPageOneState
       if (mounted) {
         context.read<CollectionsBloc>().add(GetCollections());
         if (widget.favouriteId != null) {
-          context.read<CollectionsBloc>().add(
-            GetCollectionsOfFavourite(widget.favouriteId!),
-          );
+          context.read<CollectionsBloc>().add(GetCollectionsOfFavourite(widget.favouriteId!));
         }
         if (widget.ownQuoteId != null) {
-          context.read<CollectionsBloc>().add(
-            GetCollectionsOfOwnQuote(widget.ownQuoteId!),
-          );
+          context.read<CollectionsBloc>().add(GetCollectionsOfOwnQuote(widget.ownQuoteId!));
         }
         if (widget.quoteId != null) {
-          context.read<CollectionsBloc>().add(
-            GetCollectionsOfHistory(widget.quoteId!),
-          );
+          context.read<CollectionsBloc>().add(GetCollectionsOfHistory(widget.quoteId!));
         }
         if (widget.searchId != null) {
-          context.read<CollectionsBloc>().add(
-            GetCollectionsOfSearch(widget.searchId!),
-          );
+          context.read<CollectionsBloc>().add(GetCollectionsOfSearch(widget.searchId!));
         }
       }
     });
@@ -95,9 +83,7 @@ class _CollectionSelectionPageOneState
         if (state is SavedCollection) {
           // Refresh collections when a new collection is saved
           _collections = state.collections;
-          print(
-            'Collection saved, updated selection list with ${_collections.length} collections',
-          );
+          print('Collection saved, updated selection list with ${_collections.length} collections');
         }
         if (state is GotCollectionsOfFavourite) {
           _selectedCollections = state.collections ?? [];
@@ -136,10 +122,7 @@ class _CollectionSelectionPageOneState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Saved',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                ),
+                const Text('Saved', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 24),
                 Expanded(
                   child: ListView.builder(

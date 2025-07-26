@@ -11,17 +11,14 @@ class ReportedSnackbar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 15),
       height: 52,
 
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(17),
-      ),
+      decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(17)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.flag_outlined, size: 20, color: AppColors.primaryColor),
-          SizedBox(width: 10),
-          Text(
+          const SizedBox(width: 10),
+          const Text(
             'Reported, thank you!',
             style: TextStyle(
               fontSize: 16,

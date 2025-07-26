@@ -22,15 +22,8 @@ class BottomSheetAppBar extends StatelessWidget {
       child: Row(
         children: [
           if (showIcon)
-            Icon(
-              Icons.keyboard_arrow_left_rounded,
-              color: AppColors.primaryColor,
-            ),
-          if (showText)
-            Text(
-              title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
-            ),
+            const Icon(Icons.keyboard_arrow_left_rounded, color: AppColors.primaryColor),
+          if (showText) Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal)),
         ],
       ),
     );

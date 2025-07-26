@@ -14,6 +14,12 @@ import 'package:sureline/features/onboarding/theme_selection/presentation/bloc/t
 
 import '../widgets/theme_grid_item.dart';
 
+/// Screen for selecting the initial theme during the onboarding process.
+/// This screen allows users to choose their preferred visual theme
+/// from a grid of available options before proceeding to the next onboarding step.
+///
+/// The screen includes a grid layout of theme options with visual previews,
+/// state management for theme selection, and integration with the onboarding flow.
 class ThemeSelectionScreen extends StatefulWidget {
   const ThemeSelectionScreen({super.key});
 
@@ -22,22 +28,21 @@ class ThemeSelectionScreen extends StatefulWidget {
 }
 
 class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
+  /// List of available themes retrieved from the bloc.
+  /// Populated when the GotThemes state is received.
   List<ThemeEntity> _themes = [];
+
+  /// Index of the currently selected theme in the grid.
+  /// -1 indicates no selection, valid indices correspond to theme array positions.
   int _selectedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => locator<ThemeBloc>()..add(GetThemes())),
-      ],
+      providers: [BlocProvider(create: (_) => locator<ThemeBloc>()..add(GetThemes()))],
       child: BlocListener<ThemeBloc, ThemeState>(
         listener: (context, state) {
-          if (state is GotThemes) {
-            _themes = state.themes;
-            _selectedIndex = state.activeIndex;
-            print('selected index is $_selectedIndex');
-          }
+          _handleStateChanges(state);
         },
         child: BlocBuilder<ThemeBloc, ThemeState>(
           builder: (context, state) {
@@ -54,50 +59,13 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
                               'Choose from a larger selection of theme or create your own later',
                           reduceMargins: true,
                         ),
-
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(15),
-                            child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    childAspectRatio: (110 / 162),
-                                    crossAxisSpacing: 4,
-                                    mainAxisSpacing: 4,
-                                  ),
-                              itemCount: _themes.length,
-                              // (_themes.length > 6) ? 6 : _themes.length,
-                              itemBuilder: (context, index) {
-                                return ThemeGridItem(
-                                  entity: _themes[index],
-                                  isSelected: _selectedIndex == index,
-                                  onPressed: () {
-                                    context.read<ThemeBloc>().add(
-                                      ChangeTheme(_themes[index]),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
+                            child: _buildThemeGrid(context),
                           ),
                         ),
-
-                        SurelineButton(
-                          text: 'Continue',
-                          disableVerticalPadding: true,
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => SurveyScreen(
-                                      entities: App.remoteConfigEntity.survey4,
-                                      navigateTo: GoalsScreen(),
-                                    ),
-                              ),
-                            );
-                          },
-                        ),
+                        _buildContinueButton(),
                       ],
                     ),
                   ),
@@ -106,6 +74,79 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  /// Handles state changes from the ThemeBloc.
+  /// Updates local state when themes are loaded and selection changes.
+  ///
+  /// [state] - The current state from the bloc
+  void _handleStateChanges(ThemeState state) {
+    if (state is GotThemes) {
+      setState(() {
+        _themes = state.themes;
+        _selectedIndex = state.activeIndex;
+      });
+      print('Selected index is $_selectedIndex');
+    }
+  }
+
+  /// Builds the theme grid with available theme options.
+  /// Creates a responsive grid layout with theme preview items.
+  ///
+  /// Returns a GridView.builder widget with theme items
+  Widget _buildThemeGrid(BuildContext ctx) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: (110 / 162),
+        crossAxisSpacing: 4,
+        mainAxisSpacing: 4,
+      ),
+      itemCount: _themes.length,
+      itemBuilder: (context, index) {
+        return ThemeGridItem(
+          entity: _themes[index],
+          isSelected: _selectedIndex == index,
+          onPressed: () {
+            _handleThemeSelection(ctx, index);
+          },
+        );
+      },
+    );
+  }
+
+  /// Handles theme selection from the grid.
+  /// Dispatches the ChangeTheme event to the bloc with the selected theme.
+  ///
+  /// [index] - The index of the selected theme in the grid
+  void _handleThemeSelection(BuildContext ctx, int index) {
+    ctx.read<ThemeBloc>().add(ChangeTheme(_themes[index]));
+  }
+
+  /// Builds the continue button for proceeding to the next onboarding step.
+  /// Navigates to the survey screen with specific survey configuration.
+  ///
+  /// Returns a SurelineButton widget
+  Widget _buildContinueButton() {
+    return SurelineButton(
+      text: 'Continue',
+      disableVerticalPadding: true,
+      onPressed: () {
+        _navigateToSurvey();
+      },
+    );
+  }
+
+  /// Navigates to the survey screen as the next onboarding step.
+  /// Uses remote configuration for survey content and sets goals screen as destination.
+  void _navigateToSurvey() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder:
+            (context) =>
+                SurveyScreen(entities: App.remoteConfigEntity.survey4, navigateTo: GoalsScreen()),
       ),
     );
   }
