@@ -20,7 +20,7 @@ class HistoryDataSourceImpl implements HistoryDataSource {
     final List<HistoryModel> historyList = [];
 
     for (final quote in quotes) {
-      final isFavourite = await quotesDao.isQuoteFavourite(quote.id);
+      final isFavourite = await quotesDao.isHistoryFavourite(quote.id);
       final collections = await collectionsQuotesTableDao.getCollectionsOfHistory(quote.id);
       print('collections: ${collections.length}');
       final collectionModels = collections.map((c) => CollectionModel.fromCollection(c)).toList();

@@ -150,6 +150,6 @@ class _IconSelectionScreenState extends State<IconSelectionScreen> {
   /// This method handles the transition to the theme selection step,
   /// maintaining the onboarding flow sequence.
   void _navigateToNextScreen() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ThemeSelectionScreen()));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ThemeSelectionScreen()));
   }
 }

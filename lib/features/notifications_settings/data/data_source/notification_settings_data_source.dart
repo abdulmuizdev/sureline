@@ -289,15 +289,6 @@ class NotificationSettingsDataSourceImpl extends NotificationSettingsDataSource 
     }
   }
 
-  List<NotificationPresetModel>? _getNotificationPresets() {
-    final raw = prefs.getString(SP.notificationPresets);
-    if (raw == null) return null;
-    final list = jsonDecode(raw) as List<dynamic>;
-    final presets =
-        list.map((json) => NotificationPresetModel.fromJson(json as Map<String, dynamic>)).toList();
-    return presets;
-  }
-
   Future<void> scheduleNotifications({
     required int baseId,
     required int qtyPerDay,
@@ -324,58 +315,60 @@ class NotificationSettingsDataSourceImpl extends NotificationSettingsDataSource 
     // final interval = (totalSeconds / (notificationsPerDay - 1));
     final interval = (totalSeconds / (notificationsPerDay));
     int currentQty = 0;
-    if (startTime == endTime && qtyPerDay == 1 && weekdays.length == 7) {
-      final when = _nextInstanceOfWeekdayTime(startTime.hour, startTime.minute);
-      debugPrint('when is this $when');
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        int.parse('$baseId$currentQty'),
-        'Sureline',
-        _getNotificationString(
-          '',
-          isWritingReminder: isWritingReminder,
-          isStreakReminder: isStreakReminder,
-          isPracticeReminder: isPracticeReminder,
-        ),
-        when,
-        const NotificationDetails(iOS: DarwinNotificationDetails()),
-        matchDateTimeComponents: DateTimeComponents.time,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime,
-        androidScheduleMode: AndroidScheduleMode.exact,
-      );
-    } else {
-      outerLoop:
-      for (final weekday in weekdays) {
-        for (int i = 0; i < notificationsPerDay; i++) {
-          final scheduledTime = start.add(Duration(seconds: interval.round() * i));
-          final when = _nextInstanceOfWeekdayTime(
-            scheduledTime.hour,
-            scheduledTime.minute,
-            weekday: weekday,
-          );
-          debugPrint('when is this 2 $when');
-          if (currentQty >= limit) {
-            if (currentQty != 0) {
-              await prefs.setString(SP.lastNotificationScheduledAt, when.toIso8601String());
-            }
-            break outerLoop;
+    // if (startTime == endTime && qtyPerDay == 1 && weekdays.length == 7) {
+    //   final when = _nextInstanceOfWeekdayTime(startTime.hour, startTime.minute);
+    //   debugPrint('when is this $when');
+    //   await flutterLocalNotificationsPlugin.zonedSchedule(
+    //     int.parse('$baseId$currentQty'),
+    //     'Sureline',
+    //     _getNotificationString(
+    //       '',
+    //       isWritingReminder: isWritingReminder,
+    //       isStreakReminder: isStreakReminder,
+    //       isPracticeReminder: isPracticeReminder,
+    //     ),
+    //     when,
+    //     const NotificationDetails(iOS: DarwinNotificationDetails()),
+    //     matchDateTimeComponents: DateTimeComponents.time,
+    //     uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime,
+    //     androidScheduleMode: AndroidScheduleMode.exact,
+    //   );
+    // } else {
+
+    // }
+
+    outerLoop:
+    for (final weekday in weekdays) {
+      for (int i = 0; i < notificationsPerDay; i++) {
+        final scheduledTime = start.add(Duration(seconds: interval.round() * i));
+        final when = _nextInstanceOfWeekdayTime(
+          scheduledTime.hour,
+          scheduledTime.minute,
+          weekday: weekday,
+        );
+        debugPrint('when is this 2 $when');
+        if (currentQty >= limit) {
+          if (currentQty != 0) {
+            await prefs.setString(SP.lastNotificationScheduledAt, when.toIso8601String());
           }
-          await flutterLocalNotificationsPlugin.zonedSchedule(
-            int.parse('$baseId$currentQty'),
-            'Sureline',
-            _getNotificationString(
-              quotes[i],
-              isWritingReminder: isWritingReminder,
-              isStreakReminder: isStreakReminder,
-              isPracticeReminder: isPracticeReminder,
-            ),
-            when,
-            const NotificationDetails(iOS: DarwinNotificationDetails()),
-            uiLocalNotificationDateInterpretation:
-                UILocalNotificationDateInterpretation.wallClockTime,
-            androidScheduleMode: AndroidScheduleMode.exact,
-          );
-          currentQty++;
+          break outerLoop;
         }
+        await flutterLocalNotificationsPlugin.zonedSchedule(
+          int.parse('$baseId$currentQty'),
+          'Sureline',
+          _getNotificationString(
+            quotes[i],
+            isWritingReminder: isWritingReminder,
+            isStreakReminder: isStreakReminder,
+            isPracticeReminder: isPracticeReminder,
+          ),
+          when,
+          const NotificationDetails(iOS: DarwinNotificationDetails()),
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.wallClockTime,
+          androidScheduleMode: AndroidScheduleMode.exact,
+        );
+        currentQty++;
       }
     }
   }
@@ -505,6 +498,15 @@ class NotificationSettingsDataSourceImpl extends NotificationSettingsDataSource 
       });
     }
     return Right(unit);
+  }
+
+  List<NotificationPresetModel>? _getNotificationPresets() {
+    final raw = prefs.getString(SP.notificationPresets);
+    if (raw == null) return null;
+    final list = jsonDecode(raw) as List<dynamic>;
+    final presets =
+        list.map((json) => NotificationPresetModel.fromJson(json as Map<String, dynamic>)).toList();
+    return presets;
   }
 
   Future<void> _initializeNotificationPresetsInSP() async {

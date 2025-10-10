@@ -104,7 +104,7 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
         crossAxisSpacing: 4,
         mainAxisSpacing: 4,
       ),
-      itemCount: _themes.length,
+      itemCount: (_themes.length > 6) ? 6 : _themes.length,
       itemBuilder: (context, index) {
         return ThemeGridItem(
           entity: _themes[index],

@@ -75,143 +75,161 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
       child: BlocBuilder<CollectionsBloc, CollectionsState>(
         builder: (context, state) {
           return Portal(
-            child: Container(
-              color: AppColors.white,
-              padding: const EdgeInsets.only(left: 18, right: 18, bottom: 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.name,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryColor,
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  if (favourites.isEmpty &&
-                      ownQuotes.isEmpty &&
-                      histories.isEmpty &&
-                      searchQuotes.isEmpty) ...[
-                    Expanded(
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              height: 100,
-                              width: 100,
-                              child: Image.asset('assets/images/collection.png'),
-                            ),
-                            SizedBox(height: 20),
-                            OnboardingHeading(
-                              title: 'You haven\'t added anything to this collection yet',
-
-                              disableMargins: true,
-                            ),
-                          ],
-                        ),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _deleteOverlayVisibleIndex = -1;
+                });
+              },
+              behavior: HitTestBehavior.translucent,
+              child: Container(
+                color: AppColors.white,
+                padding: const EdgeInsets.only(left: 18, right: 18, bottom: 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.name,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryColor,
                       ),
                     ),
-                  ] else ...[
-                    SurelineSearchBar(controller: SearchController()),
-                    // SizedBox(height: 27),
-                    // SurelineButton(
-                    //   isOutlined: true,
-                    //   text: 'Show all in feed',
-                    //   onPressed: () {},
-                    //   disableVerticalPadding: true,
-                    // ),
-                    // SizedBox(height: 27),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount:
-                            favourites.length +
-                            ownQuotes.length +
-                            histories.length +
-                            searchQuotes.length,
-                        itemBuilder: (context, index) {
-                          // Calculate which list the index belongs to
-                          final favouriteIndex = index;
-                          final ownQuoteIndex = index - favourites.length;
-                          final historyIndex = index - favourites.length - ownQuotes.length;
-                          final searchIndex =
-                              index - favourites.length - ownQuotes.length - histories.length;
+                    SizedBox(height: 24),
+                    if (favourites.isEmpty &&
+                        ownQuotes.isEmpty &&
+                        histories.isEmpty &&
+                        searchQuotes.isEmpty) ...[
+                      Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 100,
+                                width: 100,
+                                child: Image.asset('assets/images/collection.png'),
+                              ),
+                              SizedBox(height: 20),
+                              OnboardingHeading(
+                                title: 'You haven\'t added anything to this collection yet',
 
-                          // Determine which entity to pass based on index
-                          FavouriteEntity? favouriteEntity;
-                          OwnQuoteEntity? ownQuoteEntity;
-                          HistoryEntity? historyEntity;
-                          SearchEntity? searchEntity;
+                                disableMargins: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      SurelineSearchBar(controller: SearchController()),
+                      SizedBox(height: 27),
+                      // SurelineButton(
+                      //   isOutlined: true,
+                      //   text: 'Show all in feed',
+                      //   onPressed: () {},
+                      //   disableVerticalPadding: true,
+                      // ),
+                      // SizedBox(height: 27),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount:
+                              favourites.length +
+                              ownQuotes.length +
+                              histories.length +
+                              searchQuotes.length,
+                          itemBuilder: (context, index) {
+                            // Calculate which list the index belongs to
+                            final favouriteIndex = index;
+                            final ownQuoteIndex = index - favourites.length;
+                            final historyIndex = index - favourites.length - ownQuotes.length;
+                            final searchIndex =
+                                index - favourites.length - ownQuotes.length - histories.length;
 
-                          if (index < favourites.length) {
-                            favouriteEntity = favourites[favouriteIndex];
-                          } else if (index < favourites.length + ownQuotes.length) {
-                            ownQuoteEntity = ownQuotes[ownQuoteIndex];
-                          } else if (index <
-                              favourites.length + ownQuotes.length + histories.length) {
-                            historyEntity = histories[historyIndex];
-                          } else {
-                            searchEntity = searchQuotes[searchIndex];
-                          }
+                            // Determine which entity to pass based on index
+                            FavouriteEntity? favouriteEntity;
+                            OwnQuoteEntity? ownQuoteEntity;
+                            HistoryEntity? historyEntity;
+                            SearchEntity? searchEntity;
 
-                          return FavouriteListItem(
-                            favouriteEntity: favouriteEntity,
-                            ownQuoteEntity: ownQuoteEntity,
-                            historyEntity: historyEntity,
-                            searchEntity: searchEntity,
-                            onDeletePressed: () {
-                              context.read<CollectionsBloc>().add(
-                                OnDeleteQuotePressed(favourites[index].id, widget.collectionId),
-                              );
-                            },
-                            onAddToCollectionPressed: () async {
-                              await showModalBottomSheet(
-                                context: Navigator.of(context, rootNavigator: true).context,
-                                builder:
-                                    (ctx) => BlocProvider(
-                                      create: (_) => locator<CollectionsBloc>(),
-                                      child: CollectionSelectionBottomSheet(
-                                        favouriteId: favouriteEntity?.id,
-                                        ownQuoteId: ownQuoteEntity?.id,
-                                        quoteId: historyEntity?.id,
-                                        onFavouritesUpdated: (favourites, collections) {},
-                                      ),
-                                    ),
-                                isScrollControlled: true,
-                                useSafeArea: true,
-                              );
-                              if (mounted && context.mounted) {
-                                context.read<CollectionsBloc>().add(
-                                  GetFavouritesOfCollection(widget.collectionId),
-                                );
-                                context.read<CollectionsBloc>().add(
-                                  GetOwnQuotesOfCollection(widget.collectionId),
-                                );
-                                context.read<CollectionsBloc>().add(
-                                  GetHistoryOfCollection(widget.collectionId),
-                                );
-                              }
-                            },
-                            onOverlayToggled: (value) {
-                              if (value) {
-                                setState(() {
-                                  _deleteOverlayVisibleIndex = index;
-                                });
-                              } else {
+                            if (index < favourites.length) {
+                              favouriteEntity = favourites[favouriteIndex];
+                            } else if (index < favourites.length + ownQuotes.length) {
+                              ownQuoteEntity = ownQuotes[ownQuoteIndex];
+                            } else if (index <
+                                favourites.length + ownQuotes.length + histories.length) {
+                              historyEntity = histories[historyIndex];
+                            } else {
+                              searchEntity = searchQuotes[searchIndex];
+                            }
+
+                            return FavouriteListItem(
+                              favouriteEntity: favouriteEntity,
+                              ownQuoteEntity: ownQuoteEntity,
+                              historyEntity: historyEntity,
+                              searchEntity: searchEntity,
+                              onDeletePressed: () {
                                 setState(() {
                                   _deleteOverlayVisibleIndex = -1;
                                 });
-                              }
-                            },
-                            isOverlayVisible: _deleteOverlayVisibleIndex == index,
-                          );
-                        },
+                                context.read<CollectionsBloc>().add(
+                                  OnDeleteQuotePressed(
+                                    favouriteId: favouriteEntity?.id,
+                                    ownQuoteId: ownQuoteEntity?.id,
+                                    quoteId: historyEntity?.id,
+                                    searchId: searchEntity?.id,
+                                    collectionId: widget.collectionId,
+                                  ),
+                                );
+                              },
+                              onAddToCollectionPressed: () async {
+                                await showModalBottomSheet(
+                                  context: Navigator.of(context, rootNavigator: true).context,
+                                  builder:
+                                      (ctx) => CollectionSelectionBottomSheet(
+                                        favouriteId: favouriteEntity?.id,
+                                        ownQuoteId: ownQuoteEntity?.id,
+                                        historyId: historyEntity?.id,
+                                        searchId: searchEntity?.id,
+                                        onFavouritesUpdated: (favourites, collections) {},
+                                      ),
+                                  isScrollControlled: true,
+                                  useSafeArea: true,
+                                );
+                                if (mounted && context.mounted) {
+                                  context.read<CollectionsBloc>().add(
+                                    GetFavouritesOfCollection(widget.collectionId),
+                                  );
+                                  context.read<CollectionsBloc>().add(
+                                    GetOwnQuotesOfCollection(widget.collectionId),
+                                  );
+                                  context.read<CollectionsBloc>().add(
+                                    GetHistoryOfCollection(widget.collectionId),
+                                  );
+                                  context.read<CollectionsBloc>().add(
+                                    GetSearchOfCollection(widget.collectionId),
+                                  );
+                                }
+                              },
+                              onOverlayToggled: (value) {
+                                if (value) {
+                                  setState(() {
+                                    _deleteOverlayVisibleIndex = index;
+                                  });
+                                } else {
+                                  setState(() {
+                                    _deleteOverlayVisibleIndex = -1;
+                                  });
+                                }
+                              },
+                              isOverlayVisible: _deleteOverlayVisibleIndex == index,
+                            );
+                          },
+                        ),
                       ),
-                    ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           );

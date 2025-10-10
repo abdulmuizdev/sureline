@@ -45,6 +45,7 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
         _navigateToHomeScreen();
       });
     }
@@ -70,28 +71,39 @@ class _HomeScreenWidgetScreenState extends State<HomeScreenWidgetScreen>
                   child: Image.asset('assets/images/home_screen.png'),
                 ),
                 Spacer(),
-                SurelineButton(
-                  disableVerticalPadding: true,
-                  text: 'Install widget',
-                  onPressed: () async {
-                    _showInstallationDialog(context);
-                  },
-                ),
-                SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    _navigateToHomeScreen();
-                  },
-                  child: Text(
-                    'Remind me later',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryColor,
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 30),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SurelineButton(
+                    disableVerticalPadding: true,
+                    text: 'Install widget',
+                    onPressed: () async {
+                      _showInstallationDialog(context);
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      _navigateToHomeScreen();
+                    },
+                    child: Text(
+                      'Remind me later',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryColor,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

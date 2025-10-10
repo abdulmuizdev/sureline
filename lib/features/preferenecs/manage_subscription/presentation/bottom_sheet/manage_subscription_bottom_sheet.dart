@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/utils/utils.dart';
@@ -44,6 +45,7 @@ class _ManageSubscriptionBottomSheetState extends State<ManageSubscriptionBottom
           // Update local state when subscription records are loaded
           if (state is SubscriptionRecordLoaded) {
             _subscriptionRecords = state.subscriptionRecords;
+            _presentPaywallIfNeeded(context);
           }
         },
         child: BlocBuilder<SubscriptionRecordBloc, SubscriptionRecordState>(
@@ -126,5 +128,13 @@ class _ManageSubscriptionBottomSheetState extends State<ManageSubscriptionBottom
         ),
       ),
     );
+  }
+}
+
+void _presentPaywallIfNeeded(BuildContext context) async {
+  final paywallResult = await RevenueCatUI.presentPaywallIfNeeded("premium");
+  print('Paywall result: $paywallResult');
+  if (paywallResult == PaywallResult.purchased || paywallResult == PaywallResult.restored) {
+    context.read<SubscriptionRecordBloc>().add(const GetSubscriptionRecordsEvent());
   }
 }

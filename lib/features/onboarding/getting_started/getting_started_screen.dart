@@ -91,7 +91,7 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
                   child: Image.asset('assets/images/excited_man.png'),
                 ),
                 Spacer(),
-                Image.asset('assets/images/achievement.png', width: 260),
+                Image.asset('assets/images/achievement_without_num.png', width: 260),
                 Spacer(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 66),

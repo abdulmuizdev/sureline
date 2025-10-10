@@ -24,6 +24,7 @@ import 'package:sureline/common/data/model/collections/search_model.dart';
 import 'package:sureline/features/preferenecs/collections/data/database/dao/collections_dao.dart';
 import 'package:sureline/features/preferenecs/favourites/data/database/dao/favourites_dao.dart';
 import 'package:sureline/features/preferenecs/own_quotes/data/database/dao/own_quotes_dao.dart';
+import 'package:sureline/core/app/app.dart';
 
 /// Abstract data source for collections database operations.
 ///
@@ -150,7 +151,11 @@ class CollectionsDataSourceImpl extends CollectionsDataSource {
         final favourites = await _getFavouritesData(collection.id);
         final ownQuotes = await _getOwnQuotesData(collection.id);
         final history = await _getHistoryData(collection.id);
-        final search = await _getSearchData(collection.id, isPremium: false);
+        final search = await _getSearchData(collection.id, isPremium: App.isPremium);
+        // print('favourites: ${favourites.length}');
+        // print('ownQuotes: ${ownQuotes.length}');
+        // print('history: ${history.length}');
+        // print('search: ${search.length}');
         collectionModels.add(
           CollectionModel(
             id: collection.id,
@@ -239,7 +244,7 @@ class CollectionsDataSourceImpl extends CollectionsDataSource {
   /// Returns: List of history models with populated data
   Future<List<HistoryModel>> _getHistoryData(int collectionId) async {
     final histories = await collectionsHistoryDao.getHistoryOfCollection(collectionId);
-    print('histories raw size from db: ${histories.length}');
+    // print('histories raw size from db: ${histories.length}');
     final historyModels = <HistoryModel>[];
 
     for (final history in histories) {
@@ -273,7 +278,7 @@ class CollectionsDataSourceImpl extends CollectionsDataSource {
       collectionId,
       isPremium: isPremium,
     );
-    print('searches raw size from db: ${searches.length}');
+
     final searchModels = <SearchModel>[];
 
     for (final search in searches) {
@@ -517,7 +522,6 @@ class CollectionsDataSourceImpl extends CollectionsDataSource {
   Future<Either<Failure, List<HistoryModel>>> getHistoryOfCollection(int collectionId) async {
     try {
       final histories = await collectionsHistoryDao.getHistoryOfCollection(collectionId);
-      print('history raw size from db: ${histories.length}');
       final historyModels = <HistoryModel>[];
 
       for (final history in histories) {

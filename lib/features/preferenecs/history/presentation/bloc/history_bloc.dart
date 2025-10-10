@@ -5,6 +5,7 @@ import 'package:sureline/common/domain/use_cases/favourites/remove_favourite_use
 import 'package:sureline/features/preferenecs/history/domain/use_cases/get_history_use_case.dart';
 import 'package:sureline/features/preferenecs/history/presentation/bloc/history_event.dart';
 import 'package:sureline/features/preferenecs/history/presentation/bloc/history_state.dart';
+import 'package:sureline/core/app/app.dart';
 
 /// Bloc for managing history-related state and business logic.
 ///
@@ -44,7 +45,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
   ///
   /// [emit] - The emitter for state changes
   Future<void> _getHistory(Emitter<HistoryState> emit) async {
-    final result = await getHistoryUseCase.call(isPremium: false);
+    final result = await getHistoryUseCase.call(isPremium: App.isPremium);
     result.fold((l) => emit(HistoryError(l.message)), (r) => emit(HistoryLoaded(r)));
   }
 

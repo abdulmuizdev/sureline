@@ -66,5 +66,9 @@ class QuotesDataFiles {
     'assets/data/napoleon_hill.json',
     'assets/data/peter_drucker.json',
   ];
-  static const List<String> premiumFiles = ['assets/data/james_clear.json'];
+  static const List<String> premiumFiles = [
+    'assets/data/james_clear.json',
+    'assets/data/paulo_coelho.json',
+    'assets/data/eckhart_tolle.json',
+  ];
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sureline/common/domain/use_cases/get_voice_use_case.dart';
 import 'package:sureline/common/domain/use_cases/is_onboarding_completed_use_case.dart';
 import 'package:sureline/common/domain/use_cases/schedule_up_to_sixty_notifications_use_case.dart';
@@ -17,6 +18,7 @@ import 'package:sureline/features/recommendation_algorithm/domain/use_cases/init
 import 'package:sureline/features/remote_config/domain/use_cases/prepare_remote_config_use_case.dart';
 import 'package:sureline/features/theme_selection/domain/use_case/set_theme_use_case.dart';
 import 'package:sureline/core/utils/utils.dart';
+import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +27,8 @@ void main() async {
   await initializeRevenueCat();
 
   // Check premium status before initializing recommendation algorithm
-  final isPremium = await Utils.checkPremiumStatus();
-  await locator<InitializeRecommendationAlgorithm>().call(isPremium: isPremium);
+  App.isPremium = await Utils.checkPremiumStatus();
+  await locator<InitializeRecommendationAlgorithm>().call(isPremium: App.isPremium);
   await locator<PrepareRemoteConfigUseCase>().execute();
   final result = await locator<GetVolumeUseCase>().execute();
   result.fold((left) {}, (right) {
@@ -176,14 +178,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
-        useMaterial3: true,
-        // fontFamily: Constants.defaultFontFamily,
+    return MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => locator<CollectionsBloc>())],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
+          useMaterial3: true,
+          // fontFamily: Constants.defaultFontFamily,
+        ),
+        home: isOnboarded ? const HomeScreen() : const GettingStartedScreen(),
+        // home: GettingStartedScreen(),
       ),
-      home: (isOnboarded) ? HomeScreen() : HomeScreen(),
     );
   }
 }

@@ -79,7 +79,6 @@ class _CollectionListPageState extends State<CollectionListPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('shouldRefreshCollections: ${widget.shouldRefreshCollections}');
     return BlocListener<CollectionsBloc, CollectionsState>(
       listener: (context, state) {
         if (state is GotCollections) {
@@ -178,6 +177,7 @@ class _CollectionListPageState extends State<CollectionListPage> {
                                 child: CollectionListItem(
                                   entity: collections[index],
                                   onDeletePressed: () {
+                                    print('calling on delete pressed');
                                     setState(() {
                                       _overlayVisibleIndex = -1;
                                     });

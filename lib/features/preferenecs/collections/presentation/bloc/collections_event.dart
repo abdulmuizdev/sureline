@@ -103,9 +103,18 @@ class SaveCollection extends CollectionsEvent {
 /// [favouriteId]: The ID of the favourite quote to remove
 /// [collectionId]: The ID of the collection to remove from
 class OnDeleteQuotePressed extends CollectionsEvent {
-  final int favouriteId;
+  final int? favouriteId;
+  final int? ownQuoteId;
+  final int? quoteId;
+  final int? searchId;
   final int collectionId;
-  const OnDeleteQuotePressed(this.favouriteId, this.collectionId);
+  const OnDeleteQuotePressed({
+    required this.favouriteId,
+    required this.ownQuoteId,
+    required this.quoteId,
+    required this.searchId,
+    required this.collectionId,
+  });
 }
 
 /// Gets collections containing a specific favourite.
@@ -140,8 +149,8 @@ class GetCollectionsOfOwnQuote extends CollectionsEvent {
 ///
 /// [quoteId]: The ID of the history quote to query
 class GetCollectionsOfHistory extends CollectionsEvent {
-  final int quoteId;
-  const GetCollectionsOfHistory(this.quoteId);
+  final int historyId;
+  const GetCollectionsOfHistory(this.historyId);
 }
 
 /// Gets collections containing a specific search quote.
@@ -173,6 +182,7 @@ class OnAddToCollectionPressed extends CollectionsEvent {
   final int collectionId;
   final int? favouriteId;
   final int? ownQuoteId;
+  final int? historyId;
   final int? quoteId;
   final int? searchId;
   final bool isSelected;
@@ -182,6 +192,7 @@ class OnAddToCollectionPressed extends CollectionsEvent {
     required this.isSelected,
     this.favouriteId,
     this.ownQuoteId,
+    this.historyId,
     this.quoteId,
     this.searchId,
   });

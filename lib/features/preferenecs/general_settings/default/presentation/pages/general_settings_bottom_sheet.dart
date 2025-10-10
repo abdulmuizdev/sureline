@@ -147,7 +147,7 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                   SettingsListItem(
                     useDarkHover: true,
                     title: 'Streak',
-                    icon: Icons.add,
+                    icon: Icons.local_fire_department_outlined,
                     isLast: true,
                     onPressed: () {
                       context.push('/general-settings/streak');
@@ -237,7 +237,9 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                     icon: CupertinoIcons.lock,
                     hideArrow: true,
                     onPressed: () async {
-                      final Uri url = Uri.parse('https://sureline.app/privacy');
+                      final Uri url = Uri.parse(
+                        'https://www.notion.so/Privacy-Policy-for-Sureline-23c641d7e14e80ad9225fcf1a6ea46bd?source=copy_linkhttps://sureline.app/privacy',
+                      );
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url);
                       }
@@ -245,12 +247,14 @@ class GeneralSettingsBottomSheet extends StatelessWidget {
                   ),
                   SettingsListItem(
                     useDarkHover: true,
-                    title: 'Terms of Service',
+                    title: 'Terms and Conditions',
                     icon: CupertinoIcons.doc_text,
                     isLast: true,
                     hideArrow: true,
                     onPressed: () async {
-                      final Uri url = Uri.parse('https://sureline.app/terms');
+                      final Uri url = Uri.parse(
+                        'https://www.notion.so/Terms-and-Conditions-for-Sureline-23c641d7e14e8005ba7efd7db93f0517?source=copy_link',
+                      );
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url);
                       }

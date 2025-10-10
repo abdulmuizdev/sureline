@@ -173,16 +173,7 @@ class _OwnQuotesListPageState extends State<OwnQuotesListPage> {
                                     ),
                                   );
                                 },
-                                // Handle delete action
-                                onDeletePressed: () {
-                                  setState(() {
-                                    _deleteOverlayVisibleIndex = -1;
-                                  });
-                                  context.read<OwnQuotesBloc>().add(
-                                    OnDeletePressed(_ownQuotes[index]),
-                                  );
-                                  context.read<OwnQuotesBloc>().add(GetOwnQuotes());
-                                },
+
                                 // Handle adding to collection
                                 onAddToCollectionPressed: () {
                                   showModalBottomSheet(
@@ -204,6 +195,16 @@ class _OwnQuotesListPageState extends State<OwnQuotesListPage> {
                                     isScrollControlled: true,
                                     useSafeArea: true,
                                   );
+                                },
+                                // Handle delete action
+                                onDeletePressed: () {
+                                  setState(() {
+                                    _deleteOverlayVisibleIndex = -1;
+                                  });
+                                  context.read<OwnQuotesBloc>().add(
+                                    OnDeletePressed(_ownQuotes[index]),
+                                  );
+                                  context.read<OwnQuotesBloc>().add(GetOwnQuotes());
                                 },
                                 // Handle overlay visibility for delete confirmation
                                 onOverlayToggled: (value) {

@@ -61,22 +61,24 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
   ) : super(const Initial()) {
     // Instagram sharing with video/image support
     on<OpenInstagram>((event, emit) async {
-      _renderPost(event, (url) {
+      debugPrint('ig post is rendering');
+      await _renderPost(event, emit, (url) {
         print('ig post is rendered');
         DirectSocialShare.shareOnInstagram(url, !event.entity.renderEntity.isLiveBackground);
       });
+      debugPrint('finished');
     });
 
     // Facebook sharing with video support
     on<OpenFacebook>((event, emit) async {
-      _renderPost(event, (url) {
+      await _renderPost(event, emit, (url) {
         DirectSocialShare.shareOnFacebook(videoPath: url);
       });
     });
 
     // TikTok sharing with video/image support
     on<OpenTikTok>((event, emit) async {
-      _renderPost(event, (url) async {
+      await _renderPost(event, emit, (url) async {
         DirectSocialShare.shareOnTikTok(
           path: url,
           isImage: !event.entity.renderEntity.isLiveBackground,
@@ -85,8 +87,8 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
     });
 
     // Generic social media sharing
-    on<ShareOnSocial>((event, emit) {
-      _renderPost(event, (url) async {
+    on<ShareOnSocial>((event, emit) async {
+      await _renderPost(event, emit, (url) async {
         await _shareOnSocialUseCase.execute(
           // Create share entity with rendered content
           ShareEntity(
@@ -109,8 +111,8 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
     });
 
     // Messages sharing integration
-    on<OpenMessages>((event, emit) {
-      _renderPost(event, (url) async {
+    on<OpenMessages>((event, emit) async {
+      await _renderPost(event, emit, (url) async {
         await _shareOnMessageUseCase.execute(
           // Create share entity for messages
           ShareEntity(
@@ -123,8 +125,8 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
     });
 
     // Default share sheet integration
-    on<OpenDefaultShare>((event, emit) {
-      _renderPost(event, (url) async {
+    on<OpenDefaultShare>((event, emit) async {
+      await _renderPost(event, emit, (url) async {
         debugPrint('callback is executing');
         await _shareOnDefaultUseCase.execute(
           ShareEntity(
@@ -137,14 +139,14 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
     });
 
     // Save rendered content to device
-    on<SavePost>((event, emit) {
-      _renderPost(event, (url) async {
+    on<SavePost>((event, emit) async {
+      await _renderPost(event, emit, (url) async {
         await _savePostUseCase.execute(url);
       });
     });
 
     // Handle rendering in progress state
-    on<RenderingInProgress>((event, emit) {
+    on<RenderingInProgress>((event, emit) async {
       emit(Rendering(null));
     });
   }
@@ -177,7 +179,11 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
   /// Parameters:
   /// - [event] The share event containing render entity and schema
   /// - [onComplete] Callback function to execute when rendering is complete
-  void _renderPost(ShareEvent event, void Function(String) onComplete) async {
+  Future<void> _renderPost(
+    ShareEvent event,
+    Emitter<ShareState> emit,
+    void Function(String) onComplete,
+  ) async {
     // Ensure event.entity is a ShareEntity
     if (!((event as dynamic).entity is ShareEntity)) {
       throw ArgumentError('event.entity must be a ShareEntity');
@@ -214,12 +220,10 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
         },
         (right) {
           debugPrint(right);
-          add(
-            RenderCompleted(
-              proceed: () {
-                onComplete(right);
-              },
-            ),
+          emit(
+            Rendered(() {
+              onComplete(right);
+            }),
           );
         },
       );

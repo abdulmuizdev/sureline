@@ -7,51 +7,29 @@ import 'package:sureline/core/theme/app_colors.dart';
 ///
 /// The widget includes visual feedback for button states and enforces
 /// minimum and maximum limits for notification frequency.
-class NotificationSelector extends StatefulWidget {
+class NotificationSelector extends StatelessWidget {
   /// Callback function triggered when the notification count changes.
   /// Provides the new count value to the parent component.
   final Function(int value) onValueChanged;
 
-  const NotificationSelector({super.key, required this.onValueChanged});
+  final int count;
 
-  @override
-  State<NotificationSelector> createState() => _NotificationSelectorState();
-}
-
-class _NotificationSelectorState extends State<NotificationSelector> {
-  /// Current notification count selected by the user.
-  /// Ranges from 0 to 20 with a default of 10.
-  int _count = 10;
-
-  /// Whether the minus button is enabled.
-  /// Disabled when count reaches the minimum (0).
-  bool _isMinusEnabled = true;
-
-  /// Whether the plus button is enabled.
-  /// Disabled when count reaches the maximum (20).
-  bool _isPlusEnabled = true;
+  const NotificationSelector({super.key, required this.onValueChanged, this.count = 10});
 
   /// Handles increment and decrement logic for the notification count.
   /// Updates button states and notifies the parent of changes.
   ///
   /// [isIncrement] - Whether to increment (true) or decrement (false) the count
   void _adjustCount(bool isIncrement) {
-    setState(() {
-      if (isIncrement) {
-        if (_count < 20) {
-          _count++;
-        }
-      } else {
-        if (_count > 0) {
-          _count--;
-        }
+    if (isIncrement) {
+      if (count < 20) {
+        onValueChanged(count + 1);
       }
-
-      // Update button states based on the current count
-      _isPlusEnabled = _count < 20;
-      _isMinusEnabled = _count > 0;
-    });
-    widget.onValueChanged(_count);
+    } else {
+      if (count > 0) {
+        onValueChanged(count - 1);
+      }
+    }
   }
 
   @override
@@ -76,15 +54,15 @@ class _NotificationSelectorState extends State<NotificationSelector> {
             Row(
               children: [
                 _buildAdjustmentButton(
-                  _isMinusEnabled,
-                  Icons.remove_rounded,
-                  () => _adjustCount(false),
+                  isEnabled: count > 0,
+                  icon: Icons.remove_rounded,
+                  onPressed: () => _adjustCount(false),
                 ),
                 const SizedBox(width: 30),
                 SizedBox(
                   width: 35,
                   child: Text(
-                    '${_count}x',
+                    '${count}x',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
@@ -93,7 +71,11 @@ class _NotificationSelectorState extends State<NotificationSelector> {
                   ),
                 ),
                 const SizedBox(width: 30),
-                _buildAdjustmentButton(_isPlusEnabled, Icons.add_rounded, () => _adjustCount(true)),
+                _buildAdjustmentButton(
+                  isEnabled: count < 20,
+                  icon: Icons.add_rounded,
+                  onPressed: () => _adjustCount(true),
+                ),
               ],
             ),
           ],
@@ -107,7 +89,11 @@ class _NotificationSelectorState extends State<NotificationSelector> {
   /// [isEnabled] - Whether the button should be interactive
   /// [icon] - The icon to display on the button
   /// [onPressed] - Callback function when the button is pressed
-  Widget _buildAdjustmentButton(bool isEnabled, IconData icon, VoidCallback onPressed) {
+  Widget _buildAdjustmentButton({
+    required bool isEnabled,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
     return GestureDetector(
       onTap: isEnabled ? onPressed : null,
       child: Container(

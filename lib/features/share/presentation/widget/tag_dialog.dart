@@ -9,7 +9,8 @@ class TagDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Dialog(
+      insetPadding: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Column(
@@ -19,19 +20,11 @@ class TagDialog extends StatelessWidget {
               alignment: Alignment.topLeft,
               child: IconButton(
                 onPressed: onDonePressed,
-                icon: Icon(
-                  Icons.close_rounded,
-                  size: 20,
-                  color: AppColors.primaryColor,
-                ),
+                icon: Icon(Icons.close_rounded, size: 20, color: AppColors.primaryColor),
               ),
             ),
             SizedBox(height: 20),
-            SizedBox(
-              width: 100,
-              height: 100,
-              child: Image.asset('assets/images/instagram.png'),
-            ),
+            SizedBox(width: 100, height: 100, child: Image.asset('assets/images/instagram.png')),
             SizedBox(height: 40),
             Text(
               '@sure.line96',

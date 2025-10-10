@@ -63,4 +63,7 @@ class App {
 
   /// Solid background color for the application.
   static Color? bgSolidColor;
+
+  /// Premium status for the application.
+  static bool isPremium = false;
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sureline/common/domain/entities/create_theme_entity.dart';
 import 'package:sureline/common/presentation/widgets/background.dart';
 import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
 import 'package:sureline/core/app/app.dart';
@@ -63,7 +64,7 @@ class ShareStreakRenderWidget extends StatelessWidget {
         child: Stack(
           children: [
             // Full-screen background for visual appeal
-            Positioned.fill(child: Background(width: width, height: height)),
+            Positioned.fill(child: Background(width: width, height: height, isStatic: true)),
             // Centered content with scaling for optimal display
             Transform.scale(
               scale: 1,
@@ -72,10 +73,9 @@ class ShareStreakRenderWidget extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Streak count display with placeholder for icon
-                    Container(
+                    SizedBox(
                       width: 150,
                       height: 130,
-                      decoration: BoxDecoration(),
                       child: Stack(
                         alignment: Alignment.bottomCenter,
                         children: [
@@ -85,15 +85,15 @@ class ShareStreakRenderWidget extends StatelessWidget {
                             height: 80,
                             child: Image.asset(
                               'assets/images/sparkle.png',
-                              color: App.themeEntity.textDecorEntity.textColor,
+                              color: AppColors.primaryColor,
                             ),
                           ),
                           // Large, prominent streak number
                           Text(
                             streakScore,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 40,
-                              color: App.themeEntity.textDecorEntity.textColor,
+                              color: AppColors.primaryColor,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -102,17 +102,17 @@ class ShareStreakRenderWidget extends StatelessWidget {
                     ),
 
                     // Motivational messaging with app branding
-                    OnboardingHeading(
+                    const OnboardingHeading(
                       title: 'day streak',
                       subTitle: 'practicing positive energy quotes',
                       disableTopMargin: true,
                       reduceMargins: true,
-                      textColor: App.themeEntity.textDecorEntity.textColor,
+                      textColor: AppColors.primaryColor,
                     ),
 
                     SizedBox(height: 30),
                     // App watermark for brand recognition
-                    Watermark(),
+                    Watermark(overrideColor: AppColors.primaryColor),
                   ],
                 ),
               ),

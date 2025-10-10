@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sureline/common/presentation/widgets/onboarding_heading.dart';
+import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/common/domain/entities/collections/collection_entity.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_bloc.dart';
@@ -15,6 +17,7 @@ import 'package:sureline/common/domain/entities/collections/search_entity.dart';
 class CollectionSelectionPageOne extends StatefulWidget {
   final int? favouriteId;
   final int? ownQuoteId;
+  final int? historyId;
   final int? quoteId;
   final int? searchId;
   final Function(List<FavouriteEntity>, List<CollectionEntity>)? onFavouritesUpdated;
@@ -26,6 +29,7 @@ class CollectionSelectionPageOne extends StatefulWidget {
     super.key,
     this.favouriteId,
     this.ownQuoteId,
+    this.historyId,
     this.quoteId,
     this.searchId,
     this.onFavouritesUpdated,
@@ -47,13 +51,16 @@ class _CollectionSelectionPageOneState extends State<CollectionSelectionPageOne>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
+      if (mounted && context.mounted) {
         context.read<CollectionsBloc>().add(GetCollections());
         if (widget.favouriteId != null) {
           context.read<CollectionsBloc>().add(GetCollectionsOfFavourite(widget.favouriteId!));
         }
         if (widget.ownQuoteId != null) {
           context.read<CollectionsBloc>().add(GetCollectionsOfOwnQuote(widget.ownQuoteId!));
+        }
+        if (widget.historyId != null) {
+          context.read<CollectionsBloc>().add(GetCollectionsOfHistory(widget.historyId!));
         }
         if (widget.quoteId != null) {
           context.read<CollectionsBloc>().add(GetCollectionsOfHistory(widget.quoteId!));
@@ -107,6 +114,7 @@ class _CollectionSelectionPageOneState extends State<CollectionSelectionPageOne>
         }
         if (state is GotHistoryOfCollectionAndCollectionsOfHistory) {
           _selectedCollections = state.collections;
+          print('calling history updated');
           widget.onHistoryUpdated?.call(state.history, state.collections);
         }
         if (state is GotSearchOfCollectionAndCollectionsOfSearch) {
@@ -116,47 +124,81 @@ class _CollectionSelectionPageOneState extends State<CollectionSelectionPageOne>
       },
       child: BlocBuilder<CollectionsBloc, CollectionsState>(
         builder: (context, state) {
-          return Container(
-            padding: const EdgeInsets.all(18),
-            color: AppColors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Saved', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 24),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _collections.length,
-                    itemBuilder: (context, index) {
-                      final collection = _collections[index];
-                      final isSelected = _selectedCollections.any(
-                        (element) => element.name == collection.name,
-                      );
-
-                      return CollectionSelectionListItem(
-                        isFirst: index == 0,
-                        isLast: index == _collections.length - 1,
-                        entity: collection,
-                        isSelected: isSelected,
-                        onSelected: () {
-                          context.read<CollectionsBloc>().add(
-                            OnAddToCollectionPressed(
-                              collectionId: collection.id,
-                              isSelected: !isSelected,
-                              favouriteId: widget.favouriteId,
-                              ownQuoteId: widget.ownQuoteId,
-                              quoteId: widget.quoteId,
-                              searchId: widget.searchId,
-                            ),
-                          );
-                        },
-                      );
-                    },
+          if (_collections.isEmpty) {
+            return Container(
+              color: AppColors.white,
+              padding: const EdgeInsets.only(left: 18, right: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Saved', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                  SizedBox(height: 24),
+                  Spacer(),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: Image.asset('assets/images/collection.png'),
+                      ),
+                      OnboardingHeading(
+                        title: 'You don\'t have any collections yet',
+                        subTitle:
+                            'Create collections to group quotes you want to save together, like \'Morning motivations\' or \'Beat my fear\'',
+                        disableMargins: true,
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          );
+                  Spacer(),
+                  Spacer(),
+                ],
+              ),
+            );
+          } else {
+            return Container(
+              padding: const EdgeInsets.all(18),
+              color: AppColors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Saved', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _collections.length,
+                      itemBuilder: (context, index) {
+                        final collection = _collections[index];
+                        final isSelected = _selectedCollections.any(
+                          (element) => element.name == collection.name,
+                        );
+
+                        return CollectionSelectionListItem(
+                          isFirst: index == 0,
+                          isLast: index == _collections.length - 1,
+                          entity: collection,
+                          isSelected: isSelected,
+                          onSelected: () {
+                            context.read<CollectionsBloc>().add(
+                              OnAddToCollectionPressed(
+                                collectionId: collection.id,
+                                isSelected: !isSelected,
+                                // favouriteId: widget.favouriteId,
+                                historyId: widget.historyId,
+                                ownQuoteId: widget.ownQuoteId,
+                                quoteId: widget.quoteId,
+                                searchId: widget.searchId,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
         },
       ),
     );

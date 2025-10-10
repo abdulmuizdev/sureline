@@ -129,7 +129,7 @@ class _HistoryBottomSheetState extends State<HistoryBottomSheet> {
                                     context: Navigator.of(context, rootNavigator: true).context,
                                     builder:
                                         (ctx) => CollectionSelectionBottomSheet(
-                                          quoteId: _quotes[index].id,
+                                          historyId: _quotes[index].id,
                                           onHistoryUpdated: (_, collectionsOfHistory) {
                                             print(
                                               'collectionsOfHistory: ${collectionsOfHistory.length}',

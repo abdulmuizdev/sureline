@@ -170,6 +170,7 @@ class _FavouriteListItemState extends State<FavouriteListItem> {
                             widget.favouriteEntity?.quote ??
                             widget.ownQuoteEntity?.quoteText ??
                             widget.searchEntity?.quoteText ??
+                            widget.historyEntity?.quoteText ??
                             '';
                         if (quoteText.isNotEmpty) {
                           SharePlus.instance.share(ShareParams(text: '"$quoteText"'));

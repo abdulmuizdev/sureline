@@ -7,6 +7,7 @@ class NotificationDetailNormalSelector extends StatelessWidget {
   final bool? isLast;
   final String title;
   final String actionTitle;
+  final bool showArrow;
 
   const NotificationDetailNormalSelector({
     super.key,
@@ -15,6 +16,7 @@ class NotificationDetailNormalSelector extends StatelessWidget {
     this.isLast,
     required this.title,
     required this.actionTitle,
+    this.showArrow = true,
   });
 
   @override
@@ -25,20 +27,13 @@ class NotificationDetailNormalSelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white2,
         borderRadius: BorderRadius.only(
-          topLeft:
-              (isFirst ?? false) ? Radius.circular(10) : Radius.zero,
-          topRight:
-              (isFirst ?? false) ? Radius.circular(10) : Radius.zero,
-          bottomLeft:
-          (isLast ?? false) ? Radius.circular(10) : Radius.zero,
-          bottomRight:
-          (isLast ?? false) ? Radius.circular(10) : Radius.zero,
+          topLeft: (isFirst ?? false) ? Radius.circular(10) : Radius.zero,
+          topRight: (isFirst ?? false) ? Radius.circular(10) : Radius.zero,
+          bottomLeft: (isLast ?? false) ? Radius.circular(10) : Radius.zero,
+          bottomRight: (isLast ?? false) ? Radius.circular(10) : Radius.zero,
         ),
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.primaryColor.withValues(alpha: 0.1),
-            width: 0.3,
-          ),
+          bottom: BorderSide(color: AppColors.primaryColor.withValues(alpha: 0.1), width: 0.3),
         ),
       ),
       child: Row(
@@ -62,12 +57,10 @@ class NotificationDetailNormalSelector extends StatelessWidget {
                   color: AppColors.primaryColor,
                 ),
               ),
-              const SizedBox(width: 18),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                color: AppColors.primaryColor,
-                size: 12,
-              ),
+              if (showArrow) ...[
+                const SizedBox(width: 18),
+                Icon(Icons.arrow_forward_ios_rounded, color: AppColors.primaryColor, size: 12),
+              ],
             ],
           ),
         ],
@@ -75,21 +68,14 @@ class NotificationDetailNormalSelector extends StatelessWidget {
     );
   }
 
-  Widget adjustmentButton(
-    bool isEnabled,
-    IconData icon,
-    VoidCallback onPressed,
-  ) {
+  Widget adjustmentButton(bool isEnabled, IconData icon, VoidCallback onPressed) {
     return GestureDetector(
       onTap: isEnabled ? onPressed : null,
       child: Container(
         width: 31,
         height: 31,
         decoration: BoxDecoration(
-          color:
-              isEnabled
-                  ? AppColors.primaryColor
-                  : AppColors.primaryColor.withValues(alpha: 0.3),
+          color: isEnabled ? AppColors.primaryColor : AppColors.primaryColor.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(5),
         ),
         child: Icon(icon, color: AppColors.pureWhite),

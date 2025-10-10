@@ -4,6 +4,7 @@ import FacebookShare
 import AVFoundation
 import UniformTypeIdentifiers
 import PhotosUI
+import Photos
 import AVKit
 import MessageUI
 import TikTokOpenSDKCore

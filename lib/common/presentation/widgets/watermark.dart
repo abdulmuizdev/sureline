@@ -4,14 +4,15 @@ import 'package:sureline/core/theme/app_colors.dart';
 
 class Watermark extends StatelessWidget {
   final double? height;
-  const Watermark({super.key, this.height});
+  final Color? overrideColor;
+  const Watermark({super.key, this.height, this.overrideColor});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 130,
       height: height ?? 25,
-      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      width: 100,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
         color: AppColors.pureWhite.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
@@ -23,7 +24,7 @@ class Watermark extends StatelessWidget {
       ),
       child: Center(
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
@@ -32,11 +33,11 @@ class Watermark extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              'Sureline.app',
+              'Sureline',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
-                color: App.themeEntity.textDecorEntity.textColor,
+                color: overrideColor ?? App.themeEntity.textDecorEntity.textColor,
               ),
             ),
           ],

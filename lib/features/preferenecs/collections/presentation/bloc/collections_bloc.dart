@@ -33,6 +33,7 @@ import 'package:sureline/features/preferenecs/collections/domain/use_cases/remov
 import 'package:sureline/features/preferenecs/collections/domain/use_cases/save_collection_use_case.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_event.dart';
 import 'package:sureline/features/preferenecs/collections/presentation/bloc/collections_state.dart';
+import 'package:sureline/core/app/app.dart';
 
 /// Bloc for managing collections and their relationships.
 ///
@@ -163,13 +164,43 @@ class CollectionsBloc extends Bloc<CollectionsEvent, CollectionsState> {
     });
 
     on<OnDeleteQuotePressed>((event, emit) async {
-      final result = await _removeFavouriteFromCollectionUseCase.execute(
-        event.collectionId,
-        event.favouriteId,
-      );
-      await result.fold((left) {}, (right) async {
-        await _getFavouritesOfCollection(emit, event.collectionId);
-      });
+      if (event.favouriteId != null) {
+        final result = await _removeFavouriteFromCollectionUseCase.execute(
+          event.collectionId,
+          event.favouriteId!,
+        );
+
+        await result.fold((left) {}, (right) async {
+          await _getFavouritesOfCollection(emit, event.collectionId);
+        });
+      } else if (event.ownQuoteId != null) {
+        final result = await _removeOwnQuoteFromCollectionUseCase.execute(
+          event.collectionId,
+          event.ownQuoteId!,
+        );
+
+        await result.fold((left) {}, (right) async {
+          await _getOwnQuotesOfCollection(emit, event.collectionId);
+        });
+      } else if (event.quoteId != null) {
+        final result = await _removeHistoryFromCollectionUseCase.execute(
+          event.collectionId,
+          event.quoteId!,
+        );
+
+        await result.fold((left) {}, (right) async {
+          await _getHistoryOfCollection(emit, event.collectionId);
+        });
+      } else if (event.searchId != null) {
+        final result = await _removeSearchFromCollectionUseCase.execute(
+          event.collectionId,
+          event.searchId!,
+        );
+
+        await result.fold((left) {}, (right) async {
+          await _getSearchOfCollection(emit, event.collectionId);
+        });
+      }
     });
 
     on<OnAddToCollectionPressed>((event, emit) async {
@@ -177,6 +208,7 @@ class CollectionsBloc extends Bloc<CollectionsEvent, CollectionsState> {
       print('event.ownQuoteId: ${event.ownQuoteId}');
       print('event.quoteId: ${event.quoteId}');
       print('event.searchId: ${event.searchId}');
+      print('event.historyId: ${event.historyId}');
 
       if (event.favouriteId != null && event.ownQuoteId == null && event.quoteId == null) {
         print('Condition 1: Adding favourite to collection');
@@ -187,7 +219,7 @@ class CollectionsBloc extends Bloc<CollectionsEvent, CollectionsState> {
       } else if (event.favouriteId != null && event.ownQuoteId != null && event.quoteId == null) {
         print('Condition 3: Adding own quote to collection (favourite and own quote both present)');
         await _addOwnQuoteToCollection(emit, event);
-      } else if (event.quoteId != null &&
+      } else if (event.historyId != null &&
           // event.favouriteId == null &&
           event.ownQuoteId == null) {
         print('Condition 4: Adding history to collection');
@@ -226,7 +258,7 @@ class CollectionsBloc extends Bloc<CollectionsEvent, CollectionsState> {
     });
 
     on<GetCollectionsOfHistory>((event, emit) async {
-      await _getCollectionsOfHistory(emit, event.quoteId);
+      await _getCollectionsOfHistory(emit, event.historyId);
     });
 
     on<GetCollectionsOfSearch>((event, emit) async {
@@ -324,24 +356,24 @@ class CollectionsBloc extends Bloc<CollectionsEvent, CollectionsState> {
     if (!event.isSelected) {
       final result = await _removeHistoryFromCollectionUseCase.execute(
         event.collectionId,
-        event.quoteId!,
+        event.historyId!,
       );
       await result.fold((left) {}, (right) async {
         await _getHistoryOfCollectionAndCollectionsOfHistory(
           emit,
-          event.quoteId!,
+          event.historyId!,
           event.collectionId,
         );
       });
     } else {
       final result = await _addHistoryToCollectionUseCase.execute(
         event.collectionId,
-        event.quoteId!,
+        event.historyId!,
       );
       await result.fold((left) {}, (right) async {
         await _getHistoryOfCollectionAndCollectionsOfHistory(
           emit,
-          event.quoteId!,
+          event.historyId!,
           event.collectionId,
         );
       });
@@ -464,7 +496,10 @@ class CollectionsBloc extends Bloc<CollectionsEvent, CollectionsState> {
   /// [emit]: The state emitter
   /// [collectionId]: The ID of the collection to query
   Future<void> _getSearchOfCollection(Emitter<CollectionsState> emit, int collectionId) async {
-    final result = await _getSearchOfCollectionUseCase.execute(collectionId, isPremium: false);
+    final result = await _getSearchOfCollectionUseCase.execute(
+      collectionId,
+      isPremium: App.isPremium,
+    );
     result.fold(
       (left) {
         // Handle error state
@@ -661,7 +696,7 @@ class CollectionsBloc extends Bloc<CollectionsEvent, CollectionsState> {
   ) async {
     final searchResult = await _getSearchOfCollectionUseCase.execute(
       collectionId,
-      isPremium: false,
+      isPremium: App.isPremium,
     );
     final collectionsResult = await _getCollectionsOfSearchUseCase(searchId);
 

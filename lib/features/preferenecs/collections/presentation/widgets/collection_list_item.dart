@@ -117,7 +117,11 @@ class _CollectionListItemState extends State<CollectionListItem> {
                   animateUpwards: true,
                   child: IconButton(
                     onPressed: () => widget.onOverlayToggled(!widget.isOverlayVisible),
-                    icon: const Icon(Icons.more_vert_rounded, size: 20, color: AppColors.primaryColor),
+                    icon: const Icon(
+                      Icons.more_vert_rounded,
+                      size: 20,
+                      color: AppColors.primaryColor,
+                    ),
                   ),
                 ),
               ],
@@ -136,7 +140,45 @@ class _CollectionListItemState extends State<CollectionListItem> {
                 ),
                 IconButton(
                   onPressed: () {
-                    SharePlus.instance.share(ShareParams(text: '"${widget.entity.name}"'));
+                    // Create formatted string with collection name as heading and all quotes
+                    final shareText =
+                        StringBuffer()
+                          // Add collection name as heading
+                          ..writeln('${widget.entity.name}:')
+                          ..writeln(); // Empty line after heading
+
+                    // Add all favourite quotes
+                    for (final favourite in widget.entity.favouriteQuotes) {
+                      shareText
+                        ..writeln(favourite.quote)
+                        ..writeln(); // Empty line after heading
+                    }
+
+                    // Add all own quotes
+                    for (final ownQuote in widget.entity.ownQuotes) {
+                      shareText
+                        ..writeln(ownQuote.quoteText)
+                        ..writeln(); // Empty line after heading
+                    }
+
+                    // Add all history quotes
+                    for (final history in widget.entity.historyQuotes) {
+                      shareText
+                        ..writeln(history.quoteText)
+                        ..writeln(); // Empty line after heading
+                    }
+
+                    // Add all search quotes
+                    for (final search in widget.entity.searchQuotes) {
+                      shareText
+                        ..writeln(search.quoteText)
+                        ..writeln(); // Empty line after heading
+                    }
+
+                    // Add footer
+                    shareText.writeln('From Sureline app.');
+
+                    SharePlus.instance.share(ShareParams(text: shareText.toString()));
                   },
                   icon: const Icon(Icons.ios_share_rounded, color: AppColors.primaryColor),
                 ),

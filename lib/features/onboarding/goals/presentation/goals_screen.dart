@@ -50,31 +50,39 @@ class _GoalsScreenState extends State<GoalsScreen> {
           SafeArea(
             child: Column(
               children: [
-                SkipButton(
-                  onTap: () {
-                    _goToNextPage();
-                  },
-                ),
-                OnboardingHeading(
-                  title: 'What are your goals right now?',
-                  subTitle: 'The more you share, the more personalized your quotes will be',
-                  reduceMargins: true,
-                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SkipButton(
+                          onTap: () {
+                            _goToNextPage();
+                          },
+                        ),
+                        OnboardingHeading(
+                          title: 'What are your goals right now?',
+                          subTitle: 'The more you share, the more personalized your quotes will be',
+                          reduceMargins: true,
+                        ),
 
-                Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: SurelineTextField(
-                    controller: _goalsController,
-                    hint: 'I want to...',
-                    disableCenterAlignment: true,
-                    isTextArea: true,
-                    showCharLimit: true,
+                        Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: SurelineTextField(
+                            controller: _goalsController,
+                            hint: 'I want to...',
+                            disableCenterAlignment: true,
+                            isTextArea: true,
+                            showCharLimit: true,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                Spacer(),
                 SurelineButton(
                   text: 'Save goals',
                   isDisabled: _isSaveGoalsButtonDisabled,
+
                   onPressed: () {
                     _goToNextPage();
                   },

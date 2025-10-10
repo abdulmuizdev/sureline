@@ -162,13 +162,13 @@ class Constants {
       ),
       const QuestionModel(
         title: "What's making you feel that way?",
-        subTitle: 'You can select more than one option',
+        subTitle: 'Choose the best option',
         isStay: true,
         choices: ['Health', 'Family', 'Work', 'Friends', 'Love', 'Other'],
       ),
       const QuestionModel(
         title: 'What do you want to improve?',
-        subTitle: 'Choose at least one to tailor your content so it resonates with you',
+        subTitle: 'Choose the best option',
         isStay: true,
         choices: [
           'Loving myself',
@@ -183,7 +183,7 @@ class Constants {
     survey5: [
       const QuestionModel(
         title: 'How can Sureline help you with?',
-        subTitle: 'Choose at least one to see quotes based on your goals',
+        subTitle: 'Choose the best option to see quotes based on your goals',
         choices: [
           'Improve my mental health',
           'Develop a positive mindset',
@@ -208,7 +208,7 @@ class Constants {
     survey6: [
       const QuestionModel(
         title: 'What do you want to achieve with Sureline?',
-        subTitle: 'Choose at least one to see quotes based on your goals',
+        subTitle: 'Choose the best option to see quotes based on your goals',
         choices: [
           'Be more present and enjoy life',
           'Improve my mental health',

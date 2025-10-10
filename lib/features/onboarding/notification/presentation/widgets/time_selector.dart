@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:sureline/common/presentation/widgets/sureline_overlay.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:throttling/throttling.dart';
@@ -18,7 +18,7 @@ class TimeSelector extends StatefulWidget {
 
   /// The currently selected time in string format.
   /// Displayed in the time button.
-  final String time;
+  final TimeOfDay time;
 
   /// Whether the time picker overlay is currently visible.
   /// Controls the display of the CupertinoDatePicker.
@@ -30,7 +30,11 @@ class TimeSelector extends StatefulWidget {
 
   /// Callback function triggered when the time selection changes.
   /// Provides the new time string to the parent component.
-  final Function(String) onTimeChange;
+  final Function(TimeOfDay) onTimeChange;
+
+  final String label;
+
+  final bool isFirst;
 
   const TimeSelector({
     super.key,
@@ -39,6 +43,8 @@ class TimeSelector extends StatefulWidget {
     required this.isOverlayVisible,
     required this.onOverlayToggled,
     required this.onTimeChange,
+    required this.label,
+    required this.isFirst,
   });
 
   @override
@@ -48,7 +54,7 @@ class TimeSelector extends StatefulWidget {
 class _TimeSelectorState extends State<TimeSelector> {
   /// The most recent time value selected by the user.
   /// Used to track changes and provide to the parent component.
-  late String _latestTime;
+  late TimeOfDay _latestTime;
 
   /// Throttling instance to limit sound effect frequency.
   /// Prevents excessive sound playback during rapid scrolling.
@@ -91,7 +97,7 @@ class _TimeSelectorState extends State<TimeSelector> {
   /// [newTime] - The new DateTime selected by the user
   void _onTimeChanged(DateTime newTime) async {
     setState(() {
-      _latestTime = DateFormat('h:mm a').format(newTime);
+      _latestTime = TimeOfDay.fromDateTime(newTime);
     });
     _playTickSound();
   }
@@ -105,8 +111,8 @@ class _TimeSelectorState extends State<TimeSelector> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'How many',
+          Text(
+            widget.label,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.normal,
@@ -128,9 +134,23 @@ class _TimeSelectorState extends State<TimeSelector> {
   ///
   /// Returns a BorderRadius object for proper styling.
   BorderRadius _getBorderRadius() {
-    return (widget.isLast ?? false)
-        ? const BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10))
-        : const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10));
+    if (widget.isFirst && (widget.isLast ?? false)) {
+      return const BorderRadius.all(Radius.circular(10));
+    } else if (widget.isFirst) {
+      return const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10));
+    } else if (widget.isLast ?? false) {
+      return const BorderRadius.only(
+        bottomLeft: Radius.circular(10),
+        bottomRight: Radius.circular(10),
+      );
+    } else {
+      return const BorderRadius.only(
+        topLeft: Radius.circular(10),
+        topRight: Radius.circular(10),
+        bottomLeft: Radius.circular(10),
+        bottomRight: Radius.circular(10),
+      );
+    }
   }
 
   /// Builds the time picker overlay with CupertinoDatePicker.
@@ -193,7 +213,7 @@ class _TimeSelectorState extends State<TimeSelector> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 11),
           child: Text(
-            widget.time,
+            widget.time.format(context),
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,

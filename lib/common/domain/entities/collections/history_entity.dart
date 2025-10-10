@@ -24,6 +24,7 @@
 
 import 'package:sureline/common/data/model/collections/history_model.dart';
 import 'package:sureline/common/domain/entities/collections/collection_entity.dart';
+import 'package:sureline/common/domain/entities/recommendation_algorithm/quote_entity.dart';
 
 /// Entity representing a quote from browsing history.
 ///
@@ -113,6 +114,25 @@ class HistoryEntity {
       quoteText: model.quoteText,
       isFavourite: model.isFavourite,
       collections: model.collections.map((e) => CollectionEntity.fromModel(e)).toList(),
+    );
+  }
+
+  /// [FOR HOME BLOC ONLY]
+  /// Creates a [HistoryEntity] from a [QuoteEntity].
+  ///
+  /// This factory method is intended for use exclusively within the HomeBloc.
+  /// It converts a quote entity to a history entity, maintaining the separation
+  /// between data and domain layers. It also converts all nested collection models to entities.
+  ///
+  /// [quote]: The quote entity to convert from
+  /// Returns: A new [HistoryEntity] instance
+  factory HistoryEntity.fromQuoteEntity(QuoteEntity quote) {
+    return HistoryEntity(
+      id: quote.id,
+      quoteText: quote.quoteText,
+      // Irrelevant fields
+      isFavourite: false,
+      collections: [],
     );
   }
 }

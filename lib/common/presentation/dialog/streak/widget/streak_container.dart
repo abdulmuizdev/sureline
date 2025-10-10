@@ -142,12 +142,16 @@ class _StreakContainerState extends State<StreakContainer> {
   ///
   /// Returns an IconButton widget
   Widget _buildShareButton() {
-    return IconButton(
-      onPressed: (widget.isShareEnabled ?? false) ? widget.onSharePressed : null,
-      icon: Icon(
-        Icons.ios_share_rounded,
-        size: 20,
-        color: AppColors.primaryColor.withValues(alpha: 0.5),
+    return AnimatedOpacity(
+      opacity: (widget.isShareEnabled ?? false) ? 1 : 0,
+      duration: const Duration(milliseconds: 300),
+      child: IconButton(
+        onPressed: (widget.isShareEnabled ?? false) ? widget.onSharePressed : null,
+        icon: Icon(
+          Icons.ios_share_rounded,
+          size: 20,
+          color: AppColors.primaryColor.withValues(alpha: 0.5),
+        ),
       ),
     );
   }

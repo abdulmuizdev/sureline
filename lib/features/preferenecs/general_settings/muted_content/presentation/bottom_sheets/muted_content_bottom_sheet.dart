@@ -101,20 +101,14 @@ class _MutedContentBottomSheetState extends State<MutedContentBottomSheet> {
                                 mainAxisSpacing: 18,
                                 crossAxisSpacing: 18,
                               ),
-                              itemCount: 2,
+                              itemCount: 1,
                               itemBuilder: (context, index) {
                                 return MutedContentGridItem(
-                                  title: index == 0 ? 'With Author' : 'Without Author',
-                                  isSelected:
-                                      index == 0
-                                          ? _mutedContent.isWithAuthorMuted
-                                          : _mutedContent.isWithoutAuthorMuted,
+                                  title: 'Without Author',
+                                  isSelected: _mutedContent.isWithoutAuthorMuted,
                                   onPressed: () {
                                     final newOptions = _mutedContent.copyWith(
-                                      isWithAuthorMuted:
-                                          index == 0 ? !_mutedContent.isWithAuthorMuted : false,
-                                      isWithoutAuthorMuted:
-                                          index == 1 ? !_mutedContent.isWithoutAuthorMuted : false,
+                                      isWithoutAuthorMuted: !_mutedContent.isWithoutAuthorMuted,
                                     );
 
                                     context.read<MutedContentBloc>().add(

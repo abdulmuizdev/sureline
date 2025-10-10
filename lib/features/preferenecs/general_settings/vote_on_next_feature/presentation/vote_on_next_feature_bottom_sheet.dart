@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:sureline/common/presentation/dialog/streak/widget/sureline_back_button.dart';
 import 'package:sureline/core/theme/app_colors.dart';
 import 'package:sureline/core/constants/secrets.dart';
+import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/utils/utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VoteOnNextFeatureBottomSheet extends StatefulWidget {
   const VoteOnNextFeatureBottomSheet({super.key});
@@ -21,6 +24,11 @@ class _VoteOnNextFeatureBottomSheetState extends State<VoteOnNextFeatureBottomSh
   @override
   void initState() {
     super.initState();
+    _initializeWebView();
+  }
+
+  Future<void> _initializeWebView() async {
+    final cannyToken = await _generateCannyToken();
 
     _controller =
         WebViewController()
@@ -37,18 +45,40 @@ class _VoteOnNextFeatureBottomSheetState extends State<VoteOnNextFeatureBottomSh
           )
           ..loadRequest(
             Uri.parse(
-              'https://webview.canny.io?boardToken=${Secrets.cannyBoardToken}&ssoToken=${_generateCannyToken()}',
+              'https://webview.canny.io?boardToken=${Secrets.cannyBoardToken}&ssoToken=$cannyToken',
             ),
           );
   }
 
-  String _generateCannyToken() {
+  Future<String> _generateCannyToken() async {
+    // Get device identifier using device_info_plus
+    final deviceInfo = DeviceInfoPlugin();
+    String deviceId;
+
+    try {
+      if (Theme.of(context).platform == TargetPlatform.iOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        deviceId = iosInfo.identifierForVendor ?? 'unknown-device';
+      } else {
+        final androidInfo = await deviceInfo.androidInfo;
+        deviceId = androidInfo.id;
+      }
+    } catch (e) {
+      debugPrint('Error getting device info: $e');
+      deviceId = 'unknown-device';
+    }
+
+    // Get user name from shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    final userName = prefs.getString(SP.name);
+    final displayName = (userName != null && userName.isNotEmpty) ? userName : 'Sureline User';
+
     // User data for Canny token generation
     final Map<String, dynamic> userData = {
       'avatarURL': null, // optional, but preferred
-      'email': Secrets.defaultUserEmail,
-      'id': '1',
-      'name': 'Abdul Muiz',
+      'email': '$deviceId@abdulmuiz.dev', // Use device ID as email
+      'id': deviceId, // Use device ID as user ID
+      'name': displayName, // Use name from shared preferences or default
     };
 
     // Private key for JWT signing

@@ -24,6 +24,7 @@ import 'package:sureline/common/domain/entities/collections/search_entity.dart';
 class CollectionSelectionBottomSheet extends StatefulWidget {
   final int? favouriteId;
   final int? ownQuoteId;
+  final int? historyId;
   final int? quoteId;
   final int? searchId;
   final Function(List<FavouriteEntity>, List<CollectionEntity>)? onFavouritesUpdated;
@@ -35,6 +36,7 @@ class CollectionSelectionBottomSheet extends StatefulWidget {
     super.key,
     this.favouriteId,
     this.ownQuoteId,
+    this.historyId,
     this.quoteId,
     this.searchId,
     this.onFavouritesUpdated,
@@ -148,10 +150,11 @@ class _CollectionSelectionBottomSheetState extends State<CollectionSelectionBott
                         builder:
                             (context) => CollectionSelectionPageOne(
                               shouldReloadCollections: _shouldReloadCollections,
-                              favouriteId: widget.favouriteId,
+                              // favouriteId: widget.favouriteId,
                               ownQuoteId: widget.ownQuoteId,
                               quoteId: widget.quoteId,
                               searchId: widget.searchId,
+                              historyId: widget.historyId,
                               onFavouritesUpdated: (favourites, collections) {
                                 widget.onFavouritesUpdated?.call(favourites, collections);
                               },

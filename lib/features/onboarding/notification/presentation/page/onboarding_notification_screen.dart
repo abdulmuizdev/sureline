@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,8 +13,12 @@ import 'package:sureline/core/constants/constants.dart';
 import 'package:sureline/core/constants/sp.dart';
 import 'package:sureline/core/di/injection.dart';
 import 'package:sureline/core/theme/app_colors.dart';
+import 'package:sureline/features/notifications_settings/domain/entity/notification_preset_entity.dart';
 import 'package:sureline/features/notifications_settings/domain/use_cases/initialize_notifications_presets_use_case.dart';
 import 'package:sureline/features/onboarding/icon_selection/presentation/pages/icon_selection_screen.dart';
+import 'package:sureline/features/onboarding/notification/presentation/bloc/notification_bloc.dart';
+import 'package:sureline/features/onboarding/notification/presentation/bloc/notification_event.dart';
+import 'package:sureline/features/onboarding/notification/presentation/bloc/notification_state.dart';
 import 'package:sureline/features/onboarding/notification/presentation/widgets/notification_selector.dart';
 import 'package:sureline/features/onboarding/notification/presentation/widgets/time_selector.dart';
 
@@ -50,11 +55,11 @@ class _OnboardingNotificationScreenState extends State<OnboardingNotificationScr
 
   /// The first notification time in string format.
   /// Defaults to '9:00 AM'.
-  String _firstTime = '9:00 AM';
+  TimeOfDay _firstTime = TimeOfDay(hour: 9, minute: 0);
 
   /// The second notification time in string format.
   /// Defaults to '10:00 AM'.
-  String _secondTime = '10:00 AM';
+  TimeOfDay _secondTime = TimeOfDay(hour: 10, minute: 0);
 
   /// Animation controller for the main notification animation.
   late AnimationController _controller;
@@ -74,14 +79,23 @@ class _OnboardingNotificationScreenState extends State<OnboardingNotificationScr
   /// Width animation for the notification container.
   late Animation<double> _widthAnimation;
 
+  late NotificationPresetEntity _preset;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _controller2.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
 
     _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 1000));
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.linear);
-
     _controller2 = AnimationController(vsync: this, duration: Duration(milliseconds: 1000));
+
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.linear);
     _positionAnimation = Tween<Offset>(
       begin: Offset(0, 0),
       end: Offset(0, -(10 / 80)),
@@ -110,111 +124,139 @@ class _OnboardingNotificationScreenState extends State<OnboardingNotificationScr
 
   @override
   Widget build(BuildContext context) {
-    return Portal(
-      child: Scaffold(
-        body: GestureDetector(
-          onTap: () {
-            _hideOverlays();
-          },
-          child: Stack(
-            children: [
-              Background(isStatic: true),
-              SafeArea(
-                child: Column(
-                  children: [
-                    OnboardingHeading(
-                      title: 'Get quotes throughout the day',
-                      subTitle: 'Reading quotes regularly will help you reach your goals',
-                      reduceMargins: true,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 26),
-                      child: FadeTransition(
-                        opacity: _animation,
-                        child: ScaleTransition(
-                          scale: _animation,
-                          child: Stack(
-                            children: [
-                              FadeTransition(
+    return BlocProvider(
+      create:
+          (context) => locator<OnboardingNotificationBloc>()..add(GetGeneralNotificationPreset()),
+      child: BlocListener<OnboardingNotificationBloc, OnboardingNotificationState>(
+        listener: (context, state) {
+          if (state is GeneralNotificationPresetFailure) {}
+          if (state is GotGeneralNotificationPreset) {
+            _notificationCount = state.preset.qtyPerDay;
+            _firstTime = state.preset.startTime;
+            _secondTime = state.preset.endTime;
+            _preset = state.preset;
+          }
+          if (state is EditedGeneralNotificationPreset) {
+            _navigateToIconSelection();
+          }
+        },
+        child: BlocBuilder<OnboardingNotificationBloc, OnboardingNotificationState>(
+          builder: (context, state) {
+            return Portal(
+              child: Scaffold(
+                body: GestureDetector(
+                  onTap: () {
+                    _hideOverlays();
+                  },
+                  child: Stack(
+                    children: [
+                      Background(isStatic: true),
+                      SafeArea(
+                        child: Column(
+                          children: [
+                            OnboardingHeading(
+                              title: 'Get quotes throughout the day',
+                              subTitle: 'Reading quotes regularly will help you reach your goals',
+                              reduceMargins: true,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 26),
+                              child: FadeTransition(
                                 opacity: _animation,
-                                child: Center(
-                                  child: AnimatedBuilder(
-                                    animation: _controller2,
-                                    builder: (context, child) {
-                                      return Container(
-                                        width: _widthAnimation.value,
-                                        height: 80,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.pureWhite.withValues(alpha: 0.4),
-                                          borderRadius: BorderRadius.circular(13),
+                                child: ScaleTransition(
+                                  scale: _animation,
+                                  child: Stack(
+                                    children: [
+                                      FadeTransition(
+                                        opacity: _animation,
+                                        child: Center(
+                                          child: AnimatedBuilder(
+                                            animation: _controller2,
+                                            builder: (context, child) {
+                                              return Container(
+                                                width: _widthAnimation.value,
+                                                height: 88,
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.pureWhite.withValues(alpha: 0.4),
+                                                  borderRadius: BorderRadius.circular(13),
+                                                ),
+                                              );
+                                            },
+                                          ),
                                         ),
-                                      );
-                                    },
+                                      ),
+                                      SlideTransition(
+                                        position: _positionAnimation,
+                                        child: Image.asset('assets/images/notification.png'),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              SlideTransition(
-                                position: _positionAnimation,
-                                child: Image.asset('assets/images/notification.png'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 40),
-                    NotificationSelector(
-                      onValueChanged: (value) async {
-                        _handleNotificationCountChange(value);
-                      },
-                    ),
-                    SizedBox(height: 10),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (_notificationCount > 0)
-                              TimeSelector(
-                                time: _firstTime,
-                                isOverlayVisible: _isFirstOverlayVisible,
-                                onOverlayToggled: (isVisible) {
-                                  _handleFirstTimeOverlayToggle(isVisible);
-                                },
-                                onTimeChange: (newTime) {
-                                  _handleFirstTimeChange(newTime);
-                                },
-                              ),
-                            SizedBox(height: 1),
-                            if (_notificationCount > 1)
-                              TimeSelector(
-                                isLast: true,
-                                time: _secondTime,
-                                isOverlayVisible: _isSecondOverlayVisible,
-                                onOverlayToggled: (isVisible) {
-                                  _handleSecondTimeOverlayToggle(isVisible);
-                                },
-                                onTimeChange: (newTime) {
-                                  _handleSecondTimeChange(newTime);
-                                },
-                              ),
-                            Spacer(),
-                            SurelineButton(
-                              text: 'Allow and Save',
-                              onPressed: () async {
-                                await _handleSaveAndContinue();
+                            ),
+                            SizedBox(height: 40),
+                            NotificationSelector(
+                              count: _notificationCount,
+                              onValueChanged: (value) async {
+                                _handleNotificationCountChange(value);
                               },
+                            ),
+                            SizedBox(height: 10),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 15),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (_notificationCount > 0)
+                                      TimeSelector(
+                                        label: 'Start',
+                                        time: _firstTime,
+                                        isFirst: _notificationCount > 0,
+                                        isLast: _notificationCount == 1,
+                                        isOverlayVisible: _isFirstOverlayVisible,
+                                        onOverlayToggled: (isVisible) {
+                                          _handleFirstTimeOverlayToggle(isVisible);
+                                        },
+                                        onTimeChange: (newTime) {
+                                          _handleFirstTimeChange(newTime);
+                                        },
+                                      ),
+                                    SizedBox(height: 1),
+                                    if (_notificationCount > 1)
+                                      TimeSelector(
+                                        label: 'End',
+                                        isFirst: false,
+                                        isLast: true,
+                                        time: _secondTime,
+                                        isOverlayVisible: _isSecondOverlayVisible,
+                                        onOverlayToggled: (isVisible) {
+                                          _handleSecondTimeOverlayToggle(isVisible);
+                                        },
+                                        onTimeChange: (newTime) {
+                                          _handleSecondTimeChange(newTime);
+                                        },
+                                      ),
+                                    Spacer(),
+                                    SurelineButton(
+                                      text: 'Allow and Save',
+                                      onPressed: () async {
+                                        await _handleSaveAndContinue(context);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -228,30 +270,6 @@ class _OnboardingNotificationScreenState extends State<OnboardingNotificationScr
         _isFirstOverlayVisible = false;
         _isSecondOverlayVisible = false;
       });
-    }
-  }
-
-  /// Handles changes to the notification count from the selector.
-  /// Shows a dialog when the limit is reached and manages the dialog state.
-  ///
-  /// [value] - The new notification count selected by the user
-  void _handleNotificationCountChange(int value) async {
-    setState(() {
-      _notificationCount = value;
-    });
-
-    if (value == Constants.headsUpNotificationLimit) {
-      final prefs = await SharedPreferences.getInstance();
-      final hasShownDialog = prefs.getBool(SP.hasShownNotificationLimitDialog) ?? false;
-
-      if (hasShownDialog) {
-        return;
-      }
-
-      if (mounted && context.mounted) {
-        _showNotificationLimitDialog();
-        await prefs.setBool(SP.hasShownNotificationLimitDialog, true);
-      }
     }
   }
 
@@ -307,10 +325,34 @@ class _OnboardingNotificationScreenState extends State<OnboardingNotificationScr
     });
   }
 
+  /// Handles changes to the notification count from the selector.
+  /// Shows a dialog when the limit is reached and manages the dialog state.
+  ///
+  /// [value] - The new notification count selected by the user
+  void _handleNotificationCountChange(int value) async {
+    setState(() {
+      _notificationCount = value;
+    });
+
+    if (value == Constants.headsUpNotificationLimit) {
+      final prefs = await SharedPreferences.getInstance();
+      final hasShownDialog = prefs.getBool(SP.hasShownNotificationLimitDialog) ?? false;
+
+      if (hasShownDialog) {
+        return;
+      }
+
+      if (mounted && context.mounted) {
+        _showNotificationLimitDialog();
+        await prefs.setBool(SP.hasShownNotificationLimitDialog, true);
+      }
+    }
+  }
+
   /// Updates the first notification time.
   ///
   /// [newTime] - The new time string to set
-  void _handleFirstTimeChange(String newTime) {
+  void _handleFirstTimeChange(TimeOfDay newTime) {
     setState(() {
       _firstTime = newTime;
     });
@@ -319,7 +361,7 @@ class _OnboardingNotificationScreenState extends State<OnboardingNotificationScr
   /// Updates the second notification time.
   ///
   /// [newTime] - The new time string to set
-  void _handleSecondTimeChange(String newTime) {
+  void _handleSecondTimeChange(TimeOfDay newTime) {
     setState(() {
       _secondTime = newTime;
     });
@@ -328,21 +370,25 @@ class _OnboardingNotificationScreenState extends State<OnboardingNotificationScr
   /// Handles the save and continue process.
   /// Initializes notification presets, schedules notifications,
   /// and navigates to the next onboarding step.
-  Future<void> _handleSaveAndContinue() async {
-    await locator<InitializeNotificationsPresetsUseCase>().execute();
-    await locator<ScheduleUpToSixtyNotificationsUseCase>().execute();
-
-    await Future.delayed(Duration(seconds: 1));
-    await HapticFeedback.lightImpact();
-
-    if (mounted && context.mounted) {
-      _navigateToIconSelection();
-    }
+  Future<void> _handleSaveAndContinue(BuildContext ctx) async {
+    final entity = _preset.copyWith(
+      qtyPerDay: _notificationCount,
+      startTime: _firstTime,
+      endTime: (_notificationCount == 1) ? _firstTime : _secondTime,
+    );
+    ctx.read<OnboardingNotificationBloc>().add(EditGeneralNotificationPreset(entity: entity));
   }
 
   /// Navigates to the icon selection screen.
   /// This method handles the transition to the next onboarding step.
-  void _navigateToIconSelection() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => IconSelectionScreen()));
+  void _navigateToIconSelection() async {
+    await Future.delayed(Duration(seconds: 1));
+    await HapticFeedback.lightImpact();
+
+    if (mounted && context.mounted) {
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (context) => IconSelectionScreen()));
+    }
   }
 }

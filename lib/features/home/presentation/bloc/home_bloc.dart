@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sureline/common/domain/entities/collections/history_entity.dart';
 import 'package:sureline/common/domain/entities/streak_entity.dart';
 import 'package:sureline/common/domain/use_cases/streak/clear_streak_data_use_case.dart';
 import 'package:sureline/common/domain/use_cases/streak/get_all_streak_data_use_case.dart';
@@ -162,10 +163,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       HapticFeedback.lightImpact();
       Either<Failure, int> result;
       if (event.isLiked) {
-        await _addFavouriteUseCase.call(quote: event.entity);
+        await _addFavouriteUseCase.call(history: HistoryEntity.fromQuoteEntity(event.entity));
         result = await _getFavouritesCountUseCase.call();
       } else {
-        await _removeFavouriteUseCase.call(quoteId: event.entity.id);
+        await _removeFavouriteUseCase.call(historyId: event.entity.id);
         result = await _getFavouritesCountUseCase.call();
       }
       result.fold((left) {}, (right) {

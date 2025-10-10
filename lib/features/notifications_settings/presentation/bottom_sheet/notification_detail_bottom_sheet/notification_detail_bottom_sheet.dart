@@ -20,12 +20,10 @@ class NotificationDetailBottomSheet extends StatefulWidget {
   const NotificationDetailBottomSheet({super.key, required this.presetEntity});
 
   @override
-  State<NotificationDetailBottomSheet> createState() =>
-      _NotificationDetailBottomSheetState();
+  State<NotificationDetailBottomSheet> createState() => _NotificationDetailBottomSheetState();
 }
 
-class _NotificationDetailBottomSheetState
-    extends State<NotificationDetailBottomSheet> {
+class _NotificationDetailBottomSheetState extends State<NotificationDetailBottomSheet> {
   late List<DayEntity> _days;
   final _now = DateTime.now();
   late DateTime _startTime;
@@ -57,10 +55,16 @@ class _NotificationDetailBottomSheetState
     );
     _qtyPerDay = widget.presetEntity.qtyPerDay;
     _isOneTime = _startTime == _endTime;
+
+    print(widget.presetEntity.isQuoteReminder);
+    print(widget.presetEntity.isPracticeReminder);
+    print(widget.presetEntity.isStreakReminder);
+    print(widget.presetEntity.isWritingReminder);
+
     _showCountSelector =
-        (widget.presetEntity.isPracticeReminder == false &&
-            widget.presetEntity.isStreakReminder == false &&
-            widget.presetEntity.isWritingReminder == false);
+        ((widget.presetEntity.isPracticeReminder ?? false) == false &&
+            (widget.presetEntity.isStreakReminder ?? false) == false &&
+            (widget.presetEntity.isWritingReminder ?? false) == false);
   }
 
   void _checkDifference(BuildContext context) {
@@ -73,7 +77,8 @@ class _NotificationDetailBottomSheetState
     final newEntity = widget.presetEntity.copyWith(
       qtyPerDay: _qtyPerDay,
       startTime: TimeOfDay.fromDateTime(_startTime),
-      endTime: TimeOfDay.fromDateTime(_endTime),
+      endTime:
+          (_qtyPerDay == 1) ? TimeOfDay.fromDateTime(_startTime) : TimeOfDay.fromDateTime(_endTime),
       days: _days,
     );
 
@@ -89,9 +94,7 @@ class _NotificationDetailBottomSheetState
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => locator<NotificationSettingBloc>()),
-      ],
+      providers: [BlocProvider(create: (_) => locator<NotificationSettingBloc>())],
       child: BlocListener<NotificationSettingBloc, NotificationSettingState>(
         listener: (context, state) {},
         child: BlocBuilder<NotificationSettingBloc, NotificationSettingState>(
@@ -109,8 +112,7 @@ class _NotificationDetailBottomSheetState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SurelineBackButton(title: 'Done'),
-                    SizedBox(height: 27),
+                    // SizedBox(height: 27),
                     Text(
                       widget.presetEntity.title,
                       style: TextStyle(
@@ -126,6 +128,7 @@ class _NotificationDetailBottomSheetState
                         onPressed: () {},
                         actionTitle: 'General',
                         isFirst: true,
+                        showArrow: false,
                       ),
                     ],
                     if (_showCountSelector) ...[
@@ -140,20 +143,24 @@ class _NotificationDetailBottomSheetState
                         },
                       ),
                     ],
-                    TimeSelector(
-                      title: (_isOneTime) ? 'Time' : 'Start at',
-                      time: _startTime,
-                      onValueChanged: (time) {
-                        setState(() {
-                          _startTime = time;
-                          if (_isOneTime) {
-                            _endTime = _startTime;
-                          }
-                        });
-                        _checkDifference(context);
-                      },
-                    ),
-                    if (!_isOneTime) ...[
+                    if (_qtyPerDay > 0) ...[
+                      TimeSelector(
+                        title: (_isOneTime) ? 'Time' : 'Start at',
+                        time: _startTime,
+                        isFirst: (_isOneTime) ? true : false,
+                        isLast: (_isOneTime) ? true : false,
+                        onValueChanged: (time) {
+                          setState(() {
+                            _startTime = time;
+                            if (_isOneTime) {
+                              _endTime = _startTime;
+                            }
+                          });
+                          _checkDifference(context);
+                        },
+                      ),
+                    ],
+                    if (!_isOneTime && _qtyPerDay > 1) ...[
                       TimeSelector(
                         title: 'End at',
                         time: _endTime,
@@ -168,6 +175,7 @@ class _NotificationDetailBottomSheetState
                     if (!_isOneTime) ...[
                       RepeatSelector(
                         days: _days,
+
                         onSelectionChange: (updatedDays) {
                           setState(() {
                             _days = updatedDays;
@@ -177,12 +185,12 @@ class _NotificationDetailBottomSheetState
                         },
                       ),
                     ],
-                    NotificationDetailNormalSelector(
-                      title: 'Sound',
-                      onPressed: () {},
-                      actionTitle: 'Positive',
-                      isLast: true,
-                    ),
+                    // NotificationDetailNormalSelector(
+                    //   title: 'Sound',
+                    //   onPressed: () {},
+                    //   actionTitle: 'Positive',
+                    //   isLast: true,
+                    // ),
                   ],
                 ),
               ),

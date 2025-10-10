@@ -6,8 +6,7 @@ import 'package:sureline/features/home/data/data_source/quote_data_source.dart';
 part 'favourites_dao.g.dart';
 
 @DriftAccessor(tables: [Favourites])
-class FavouritesDao extends DatabaseAccessor<AppDatabase>
-    with _$FavouritesDaoMixin {
+class FavouritesDao extends DatabaseAccessor<AppDatabase> with _$FavouritesDaoMixin {
   FavouritesDao(AppDatabase db) : super(db);
 
   Future<List<Favourite>> getAllFavourites() {
@@ -19,17 +18,11 @@ class FavouritesDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<bool> isFavourite(int quoteId) {
-    return (select(favourites)..where(
-      (tbl) => tbl.quoteId.equals(quoteId),
-    )).get().then((value) => value.isNotEmpty);
+    return (select(favourites)
+      ..where((tbl) => tbl.quoteId.equals(quoteId))).get().then((value) => value.isNotEmpty);
   }
 
-  Future<int> removeFavourite({
-    int? quoteId,
-    int? ownQuoteId,
-    int? historyId,
-    int? searchId,
-  }) {
+  Future<int> removeFavourite({int? quoteId, int? ownQuoteId, int? historyId, int? searchId}) {
     final query = delete(favourites);
 
     if (quoteId != null) {
@@ -50,8 +43,7 @@ class FavouritesDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<int> getFavouritesCount() {
-    return (select(favourites)..orderBy([
-      (t) => OrderingTerm.desc(t.id),
-    ])).get().then((value) => value.length);
+    return (select(favourites)
+      ..orderBy([(t) => OrderingTerm.desc(t.id)])).get().then((value) => value.length);
   }
 }

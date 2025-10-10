@@ -65,6 +65,7 @@ import 'package:sureline/features/notifications_settings/domain/use_cases/initia
 import 'package:sureline/features/notifications_settings/presentation/bloc/notification_setting_bloc.dart';
 import 'package:sureline/features/onboarding/interested_catag/presentation/bloc/category_bloc.dart';
 import 'package:sureline/features/onboarding/name/presentation/bloc/onboarding_name_bloc.dart';
+import 'package:sureline/features/onboarding/notification/presentation/bloc/notification_bloc.dart';
 import 'package:sureline/features/onboarding/theme_selection/presentation/bloc/theme_bloc.dart';
 import 'package:sureline/features/preferenecs/collections/data/data_sources/collections_data_source.dart';
 import 'package:sureline/features/preferenecs/collections/data/database/dao/collections_dao.dart';
@@ -259,6 +260,7 @@ Future<void> setupLocator() async {
         locator(),
       ),
     )
+    ..registerFactory(() => OnboardingNotificationBloc(locator(), locator()))
     ..registerFactory(() => QuotesDao(locator()))
     ..registerFactory(() => AuthorPrefsTableDao(locator()))
     ..registerFactory(() => MutedContentTableDao(locator()))

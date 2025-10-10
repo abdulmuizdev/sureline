@@ -30,14 +30,17 @@ class LockScreenWidgetScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
                   child: Image.asset('assets/images/lock_screen.png'),
                 ),
-                SurelineButton(
-                  disableVerticalPadding: true,
-                  text: 'Got it!',
-                  onPressed: () {
-                    _navigateToHomeScreenWidget(context);
-                  },
-                ),
               ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SurelineButton(
+              disableVerticalPadding: false,
+              text: 'Got it!',
+              onPressed: () {
+                _navigateToHomeScreenWidget(context);
+              },
             ),
           ),
         ],

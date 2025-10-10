@@ -127,17 +127,23 @@ class HomeWidgetBottomSheet extends StatelessWidget {
     showCupertinoDialog(
       context: context,
       builder:
-          (_) => CupertinoAlertDialog(
+          (dialogContext) => CupertinoAlertDialog(
             title: const Text("'Sureline' would like to open your Home Screen"),
             content: const Text("The app will close and your phone's Home Screen will open."),
             actions: [
               CupertinoDialogAction(
+                child: const Text('Cancel', style: TextStyle(color: Color(0xFF007AFF))),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                },
+              ),
+              CupertinoDialogAction(
                 child: const Text(
                   'Open',
-                  style: TextStyle(color: Color(0xFF007AFF), fontWeight: FontWeight.normal),
+                  style: TextStyle(color: Color(0xFF007AFF), fontWeight: FontWeight.bold),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(dialogContext).pop();
                   _minimizeApp();
                 },
               ),

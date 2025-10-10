@@ -2,21 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "sureline",
+            "name": "Flutter",
+            "type": "dart",
             "request": "launch",
-            "type": "dart"
+            "program": "lib/main.dart",
+            "flutterMode": "debug"
         },
         {
-            "name": "sureline (profile mode)",
-            "request": "launch",
+            "name": "Flutter (My iPhone 15)",
             "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "sureline (release mode)",
             "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
+            "program": "lib/main.dart",
+            "deviceId": "7A60BDB0-DC04-4CC1-B387-BB668862A512",
+            "flutterMode": "debug"
         }
     ]
 }

@@ -54,10 +54,10 @@ class FavouritesDataSourceImpl extends FavouritesDataSource {
       for (final favourite in favourites) {
         List<CollectionModel> collectionModels = [];
 
-        print('favourite.quoteId: ${favourite.quoteId}');
-        print('favourite.ownQuoteId: ${favourite.ownQuoteId}');
-        print('favourite.historyId: ${favourite.historyId}');
-        print('favourite.searchId: ${favourite.searchId}');
+        // print('favourite.quoteId: ${favourite.quoteId}');
+        // print('favourite.ownQuoteId: ${favourite.ownQuoteId}');
+        // print('favourite.historyId: ${favourite.historyId}');
+        // print('favourite.searchId: ${favourite.searchId}');
 
         if (favourite.quoteId != null &&
             favourite.ownQuoteId == null &&
@@ -77,6 +77,7 @@ class FavouritesDataSourceImpl extends FavouritesDataSource {
             // favourite.quoteId == null &&
             favourite.ownQuoteId == null &&
             favourite.searchId == null) {
+          print('this is logic check');
           collectionModels = await _getCollectionsOfHistory(favourite.historyId!);
         } else if (favourite.searchId != null &&
             favourite.quoteId == null &&

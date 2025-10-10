@@ -51,35 +51,42 @@ class _InterestedCategoriesScreenState extends State<InterestedCategoriesScreen>
 
                   SafeArea(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SkipButton(
-                          onTap: () {
-                            _goToNextPage();
-                          },
-                        ),
-                        OnboardingHeading(
-                          title: 'Which categories are you interested in?',
-                          subTitle: 'This will be used to personalize your feed',
-                          reduceMargins: true,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Wrap(
-                            spacing: 15,
-                            runSpacing: 15,
-                            children: List.generate(_categories.length, (index) {
-                              return CategoryItem(
-                                entity: _categories[index],
-                                onPressed: () {
-                                  _toggleCategorySelection(index);
-                                },
-                                isSelected: _categories[index].isSelected,
-                              );
-                            }),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SkipButton(
+                                  onTap: () {
+                                    _goToNextPage();
+                                  },
+                                ),
+                                OnboardingHeading(
+                                  title: 'Which categories are you interested in?',
+                                  subTitle: 'This will be used to personalize your feed',
+                                  reduceMargins: true,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                                  child: Wrap(
+                                    spacing: 15,
+                                    runSpacing: 15,
+                                    children: List.generate(_categories.length, (index) {
+                                      return CategoryItem(
+                                        entity: _categories[index],
+                                        onPressed: () {
+                                          _toggleCategorySelection(index);
+                                        },
+                                        isSelected: _categories[index].isSelected,
+                                      );
+                                    }),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Spacer(),
                         SurelineButton(
                           text: 'Continue',
                           onPressed: () {

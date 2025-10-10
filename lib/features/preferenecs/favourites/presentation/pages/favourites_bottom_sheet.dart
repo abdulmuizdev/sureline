@@ -105,26 +105,48 @@ class _FavouritesBottomSheetState extends State<FavouritesBottomSheet> {
                                 ownQuoteEntity: null,
                                 // Handle adding to collection
                                 onAddToCollectionPressed: () {
+                                  print('onAddToCollectionPressed');
+                                  print('historyId: ${_quotes[index].historyId}');
+                                  print('ownQuoteId: ${_quotes[index].ownQuoteId}');
+                                  print('searchId: ${_quotes[index].searchId}');
+                                  print('quoteId: ${_quotes[index].quoteId}');
                                   showModalBottomSheet(
                                     context: context,
                                     builder:
                                         (ctx) => CollectionSelectionBottomSheet(
-                                          favouriteId: _quotes[index].id,
+                                          // favouriteId: _quotes[index].id,
+                                          historyId: _quotes[index].historyId,
                                           ownQuoteId: _quotes[index].ownQuoteId,
+                                          searchId: _quotes[index].searchId,
                                           quoteId: _quotes[index].quoteId,
-                                          onFavouritesUpdated: (_, collectionsOfFavourite) {
-                                            print(
-                                              'collectionsOfFavourite: ${collectionsOfFavourite.length}',
+                                          onFavouritesUpdated: (_, _) {
+                                            print('got callback');
+                                            context.read<FavouritesBloc>().add(
+                                              GetFavouriteQuotes(),
                                             );
-                                            setState(() {
-                                              _quotes[index] = _quotes[index].copyWith(
-                                                collections: collectionsOfFavourite,
-                                              );
-                                            });
+                                          },
+                                          onHistoryUpdated: (_, _) {
+                                            print('got callback');
+                                            context.read<FavouritesBloc>().add(
+                                              GetFavouriteQuotes(),
+                                            );
+                                          },
+                                          onSearchUpdated: (_, _) {
+                                            print('got callback');
+                                            context.read<FavouritesBloc>().add(
+                                              GetFavouriteQuotes(),
+                                            );
+                                          },
+                                          onOwnQuotesUpdated: (_, _) {
+                                            print('got callback');
+                                            context.read<FavouritesBloc>().add(
+                                              GetFavouriteQuotes(),
+                                            );
                                           },
                                         ),
                                     isScrollControlled: true,
                                     useSafeArea: true,
+                                    useRootNavigator: true,
                                   );
                                 },
                                 // Handle delete action

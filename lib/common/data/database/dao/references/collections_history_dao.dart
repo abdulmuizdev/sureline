@@ -16,7 +16,6 @@ class CollectionsHistoryDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<List<CollectionsTableData>> getCollectionsOfHistory(int quoteId) {
-    print('getting collections of history $quoteId');
     return (select(collectionsTable)..where(
       (tbl) => tbl.id.isInQuery(
         selectOnly(collectionsHistoryQuotes)

@@ -31,6 +31,12 @@ import 'package:sureline/features/preferenecs/history/presentation/pages/history
 import 'package:sureline/features/home_widget/presentation/bottom_sheet/home_widget_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/manage_subscription/presentation/bottom_sheet/manage_subscription_bottom_sheet.dart';
 import 'package:sureline/features/notifications_settings/presentation/bottom_sheet/notifications_settings_bottom_sheet.dart';
+import 'package:sureline/features/notifications_settings/presentation/bottom_sheet/notification_detail_bottom_sheet/notification_detail_bottom_sheet.dart';
+import 'package:sureline/features/notifications_settings/domain/entity/notification_preset_entity.dart';
+import 'package:sureline/features/notifications_settings/presentation/bloc/notification_setting_bloc.dart';
+import 'package:sureline/features/notifications_settings/presentation/bloc/notification_setting_event.dart';
+import 'package:sureline/features/notifications_settings/presentation/bloc/notification_setting_state.dart';
+import 'package:sureline/core/constants/sureline_default_notification_days.dart';
 import 'package:sureline/features/preferenecs/own_quotes/presentation/bloc/own_quotes_bloc.dart';
 import 'package:sureline/features/preferenecs/own_quotes/presentation/pages/own_quotes_bottom_sheet.dart';
 import 'package:sureline/features/preferenecs/own_quotes/presentation/pages/sub_pages/create_own_quote_page.dart';
@@ -178,6 +184,37 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
         path: '/notifications',
         builder: (context, state) => const NotificationsSettingsBottomSheet(),
       ),
+      RouteConfig(
+        path: '/notifications/detail/:presetId',
+        builder: (context, state) {
+          final presetId = int.tryParse(state.pathParameters['presetId'] ?? '0') ?? 0;
+          // Get the actual NotificationPresetEntity from the bloc
+          return BlocProvider(
+            create: (context) => locator<NotificationSettingBloc>()..add(GetNotificationPresets()),
+            child: BlocBuilder<NotificationSettingBloc, NotificationSettingState>(
+              builder: (context, state) {
+                if (state is GotNotificationPresets) {
+                  try {
+                    final presetEntity = state.result.firstWhere((preset) => preset.id == presetId);
+                    return NotificationDetailBottomSheet(presetEntity: presetEntity);
+                  } catch (e) {
+                    // Preset not found, go back
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    });
+                    return const SizedBox.shrink();
+                  }
+                }
+                // Show loading or fallback
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+          );
+        },
+        customAppBar: _buildNotificationDetailAppBar,
+      ),
       RouteConfig(path: '/home-widget', builder: (context, state) => const HomeWidgetBottomSheet()),
       RouteConfig(
         path: '/own-quotes',
@@ -233,7 +270,6 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
             // if (isCollectionsRoute) {
             content = MultiBlocProvider(
               providers: [
-                BlocProvider<CollectionsBloc>(create: (context) => locator<CollectionsBloc>()),
                 BlocProvider<OwnQuotesBloc>(create: (context) => locator<OwnQuotesBloc>()),
               ],
               child: content,
@@ -478,6 +514,25 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
     );
   }
 
+  Widget _buildNotificationDetailAppBar(BuildContext context, GoRouterState state) {
+    return GestureDetector(
+      onTap: _handleBack,
+      child: Row(
+        children: [
+          const Icon(Icons.keyboard_arrow_left_rounded, color: AppColors.primaryColor, size: 20),
+          const Text(
+            'Done',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   RouteConfig? _getRouteConfig(String path) {
     // First try exact match
     final exact = _routeConfigs.firstWhereOrNull((config) => config.path == path);
@@ -537,6 +592,8 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
         return 'Sureline';
       case '/notifications':
         return 'Sureline';
+      case '/notifications/detail':
+        return 'Done';
       case '/home-widget':
         return 'Sureline';
       case '/own-quotes':

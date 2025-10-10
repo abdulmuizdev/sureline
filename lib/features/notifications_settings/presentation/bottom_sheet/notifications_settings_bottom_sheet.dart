@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sureline/common/presentation/dialog/streak/widget/sureline_back_button.dart';
 import 'package:sureline/common/presentation/widgets/sureline_button.dart';
 import 'package:sureline/core/di/injection.dart';
@@ -137,16 +138,10 @@ class _NotificationsSettingsBottomSheetState extends State<NotificationsSettings
   }
 
   /// Shows the notification detail bottom sheet for editing a preset.
-  /// This method opens a modal bottom sheet that allows users to modify
-  /// the configuration of a specific notification preset.
+  /// This method navigates to the notification detail route using the router.
   ///
   /// [entity] - The notification preset entity to edit
   Future<void> _showNotificationDetails(NotificationPresetEntity entity) async {
-    await showModalBottomSheet(
-      isScrollControlled: true,
-      useSafeArea: true,
-      context: context,
-      builder: (context) => NotificationDetailBottomSheet(presetEntity: entity),
-    );
+    await context.push('/notifications/detail/${entity.id}');
   }
 }

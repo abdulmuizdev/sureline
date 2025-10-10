@@ -33,7 +33,7 @@ class MoreAppsBottomSheet extends StatelessWidget {
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: 60),
+          SizedBox(height: 10),
           AppListItem(
             isFirst: true,
             isLast: false,

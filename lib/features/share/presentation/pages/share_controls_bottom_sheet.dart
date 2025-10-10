@@ -451,17 +451,11 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                         margin: const EdgeInsets.symmetric(horizontal: 20),
                         child: CupertinoActionSheet(
                           actions: [
-                            CupertinoActionSheetAction(
-                              onPressed: () {
+                            TagDialog(
+                              onDonePressed: () {
                                 Navigator.of(context).pop();
                                 state.proceed();
                               },
-                              child: TagDialog(
-                                onDonePressed: () {
-                                  Navigator.of(context).pop();
-                                  state.proceed();
-                                },
-                              ),
                             ),
                           ],
                         ),
@@ -565,16 +559,13 @@ class _ShareControlsBottomSheetState extends State<ShareControlsBottomSheet> {
                                     showModalBottomSheet(
                                       context: Navigator.of(context, rootNavigator: true).context,
                                       builder:
-                                          (ctx) => BlocProvider(
-                                            create: (_) => locator<CollectionsBloc>(),
-                                            child: CollectionSelectionBottomSheet(
-                                              quoteId: widget.quoteId,
+                                          (ctx) => CollectionSelectionBottomSheet(
+                                            quoteId: widget.quoteId,
 
-                                              onHistoryUpdated: (_, collectionsOfHistory) {
-                                                Navigator.of(ctx).pop();
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
+                                            onHistoryUpdated: (_, collectionsOfHistory) {
+                                              Navigator.of(ctx).pop();
+                                              Navigator.of(context).pop();
+                                            },
                                           ),
                                       isScrollControlled: true,
                                       useSafeArea: true,

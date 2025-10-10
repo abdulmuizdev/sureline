@@ -181,6 +181,7 @@ class _PreferencesMainPageState extends State<PreferencesMainPage> {
                     SettingsListItem(
                       title: 'Home Screen widgets',
                       icon: CupertinoIcons.heart,
+                      isLast: true,
                       onPressed: () {
                         context.push('/home-widget');
                       },

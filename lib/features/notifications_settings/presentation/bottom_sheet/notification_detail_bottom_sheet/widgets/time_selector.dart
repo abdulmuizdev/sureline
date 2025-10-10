@@ -5,6 +5,7 @@ import 'package:sureline/core/theme/app_colors.dart';
 class TimeSelector extends StatefulWidget {
   final Function(DateTime time) onValueChanged;
   final bool? isFirst;
+  final bool? isLast;
   final String title;
   final DateTime time;
 
@@ -12,6 +13,7 @@ class TimeSelector extends StatefulWidget {
     super.key,
     required this.onValueChanged,
     this.isFirst,
+    this.isLast,
     required this.title,
     required this.time,
   });
@@ -32,16 +34,13 @@ class _TimeSelectorState extends State<TimeSelector> {
       decoration: BoxDecoration(
         color: AppColors.pureWhite,
         borderRadius: BorderRadius.only(
-          topLeft:
-              (widget.isFirst ?? false) ? Radius.circular(10) : Radius.zero,
-          topRight:
-              (widget.isFirst ?? false) ? Radius.circular(10) : Radius.zero,
+          topLeft: (widget.isFirst ?? false) ? Radius.circular(10) : Radius.zero,
+          topRight: (widget.isFirst ?? false) ? Radius.circular(10) : Radius.zero,
+          bottomLeft: (widget.isLast ?? false) ? Radius.circular(10) : Radius.zero,
+          bottomRight: (widget.isLast ?? false) ? Radius.circular(10) : Radius.zero,
         ),
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.primaryColor.withValues(alpha: 0.1),
-            width: 0.3,
-          ),
+          bottom: BorderSide(color: AppColors.primaryColor.withValues(alpha: 0.1), width: 0.3),
         ),
       ),
       child: Row(
@@ -88,21 +87,14 @@ class _TimeSelectorState extends State<TimeSelector> {
     );
   }
 
-  Widget adjustmentButton(
-    bool isEnabled,
-    IconData icon,
-    VoidCallback onPressed,
-  ) {
+  Widget adjustmentButton(bool isEnabled, IconData icon, VoidCallback onPressed) {
     return GestureDetector(
       onTap: isEnabled ? onPressed : null,
       child: Container(
         width: 31,
         height: 31,
         decoration: BoxDecoration(
-          color:
-              isEnabled
-                  ? AppColors.primaryColor
-                  : AppColors.primaryColor.withValues(alpha: 0.3),
+          color: isEnabled ? AppColors.primaryColor : AppColors.primaryColor.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(5),
         ),
         child: Icon(icon, color: AppColors.pureWhite),

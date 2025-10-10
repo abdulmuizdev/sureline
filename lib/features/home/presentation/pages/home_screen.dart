@@ -2,9 +2,11 @@
 ///
 /// Features quote browsing, like functionality, sharing, and user guides.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:sureline/common/domain/entities/streak_display_entity.dart';
 import 'package:sureline/common/presentation/dialog/streak/page/streak_bottom_sheet.dart';
@@ -25,11 +27,14 @@ import 'package:sureline/features/home/presentation/snackbars/feed_setup_snack_b
 import 'package:sureline/features/home/presentation/widgets/home_list_item.dart';
 import 'package:sureline/common/presentation/widgets/watermark.dart';
 import 'package:sureline/features/preferenecs/default/presentation/bottom_sheet/preferences_bottom_sheet.dart';
+import 'package:sureline/features/share/presentation/bloc/share_bloc.dart';
+import 'package:sureline/features/share/presentation/bloc/share_state.dart';
 import 'package:sureline/features/share/presentation/pages/share_controls_bottom_sheet.dart';
 import 'package:sureline/features/home/presentation/widgets/home_button.dart';
 import 'package:sureline/features/home/presentation/widgets/like_progress.dart';
 import 'package:sureline/features/share/presentation/snackbars/theme_changed_snack_bar/theme_changed_snack_bar.dart';
 import 'package:sureline/common/domain/entities/streak_entity.dart';
+import 'package:sureline/features/share/presentation/widget/tag_dialog.dart';
 import 'package:sureline/features/theme_selection/presentation/main/bottom_sheet/theme_selection_bottom_sheet.dart';
 
 /// Main home screen for quote browsing and interaction.
@@ -60,14 +65,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   bool _showWaterMark = true;
   int _likeCount = 0;
   int _currentIndex = 0;
-  bool _isPremium = false;
+  bool _screenshotCallbackEnabled = true;
+  bool _isInstagramShare = false;
+  final ShareBloc _shareBloc = locator<ShareBloc>();
 
   final ScreenshotCallback screenshotCallback = ScreenshotCallback();
 
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(vsync: this, duration: Duration(seconds: 1));
     _controlsFadeAnimation = Tween<double>(
       begin: 0,
@@ -75,27 +81,22 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _isPremium = await Utils.checkPremiumStatus();
-      if (mounted && context.mounted) {
-        context.read<HomeBloc>().add(GetQuotes(_page, _isPremium));
-      }
       screenshotCallback.addListener(() {
-        _showShareBottomSheet(_currentIndex);
+        if (_screenshotCallbackEnabled) {
+          _showShareBottomSheet(_currentIndex);
+        }
       });
-      await Future.delayed(Duration(seconds: 1));
 
-      if ((widget.isThemeChanged ?? false) && context.mounted) {
+      await Future<void>.delayed(const Duration(milliseconds: 1000));
+      if ((widget.isThemeChanged ?? false) && mounted && context.mounted) {
         final entity = _quotes[_pageController.position.pixels.round()];
         Utils.showCustomSnackBar(
           context,
           ThemeChangedSnackBar(
-            onRenderComplete: () {
+            shareBloc: _shareBloc,
+            onShareItemPressed: (isInstagram) {
               setState(() {
-                _showExtraWidgets = true;
-              });
-            },
-            onShareItemPressed: () {
-              setState(() {
+                _isInstagramShare = isInstagram;
                 _showExtraWidgets = false;
               });
             },
@@ -125,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           create:
               (_) =>
                   locator<HomeBloc>()
-                    // ..add(GetQuotes(_page))
+                    ..add(GetQuotes(_page, App.isPremium))
                     ..add(OnboardingComplete())
                     ..add(IsSwipeComplete())
                     ..add(IsFeedSetupShown())
@@ -135,274 +136,369 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     ..add(UpdateStreak()),
           // ..add(GetLastSevenDaysStreakData())
         ),
+        BlocProvider(create: (_) => _shareBloc),
       ],
-      child: BlocListener<HomeBloc, HomeState>(
-        listener: (context, state) {
-          if (state is StreakIsBroken) {
-            debugPrint('streak is broken');
-          }
-          if (state is GotLastSevenDaysStreakData) {
-            showModalBottomSheet(
-              useSafeArea: true,
-              isScrollControlled: true,
-              context: context,
-              builder: (context) => StreakBottomSheet(entities: state.streakData),
-            );
-          }
-          if (state is ShowStreakBottomSheet) {
-            Future.delayed(Duration(milliseconds: 1000), () {
-              if (mounted && context.mounted) {
-                HapticFeedback.lightImpact();
-                showModalBottomSheet(
-                  useSafeArea: true,
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) => StreakBottomSheet(entities: state.streakData),
-                );
-              }
-            });
-          }
-          if (state is GotQuotes) {
-            _quotes.addAll(state.result);
-          }
-          if (state is GotSwipeCompleteState) {
-            _isSwipeCompleted = state.isCompleted;
-          }
-          if (state is GotShareGuideState) {
-            _isShareGuideShown = state.isShown;
-          }
-          if (state is GotFeedSetupState) {
-            _isFeedSetupShown = state.isShown;
-          }
-          if (state is GotLikeGuideState) {
-            _isLikeGuideShown = state.isShown;
-          }
-          if (state is GotLikeCount) {
-            _likeCount = state.likeCount;
-            if (_likeCount == 3 && !_isShareGuideShown) {
-              if (!_isShareGuideShown) {
-                Future.delayed(Duration(milliseconds: 500), () {
-                  if (context.mounted) {
-                    HapticFeedback.lightImpact();
-                    _showLikeProgress = true;
-                    _openShareDialog();
-                  }
-                });
-              } else {
-                _showLikeProgress = true;
-              }
-
-              context.read<HomeBloc>().add(OnShareGuideShown());
-            }
-
-            if (_likeCount >= Constants.minimumLikeGoal && !_isFeedSetupShown) {
-              debugPrint('showing feed setup');
-              Utils.showCustomSnackBar(context, FeedSetupSnackBar());
-              context.read<HomeBloc>().add(OnFeedSetupShown());
+      child: BlocListener<ShareBloc, ShareState>(
+        listener: (context, state) async {
+          // Listening only for theme changed snack bar
+          if (state is Rendering) {}
+          if (state is Rendered) {
+            debugPrint('rendered is received');
+            _showExtraWidgets = true;
+            if (_isInstagramShare) {
+              await showGeneralDialog(
+                context: context,
+                barrierDismissible: true,
+                barrierLabel: '',
+                transitionDuration: const Duration(milliseconds: 500),
+                pageBuilder:
+                    (context, animation, secondaryAnimation) => Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        child: TagDialog(
+                          onDonePressed: () {
+                            Navigator.of(context).pop();
+                            state.proceed();
+                          },
+                        ),
+                      ),
+                    ),
+                transitionBuilder: Utils.dialogTransitionBuilder,
+              );
+            } else {
+              state.proceed();
             }
           }
         },
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state) {
-            return RepaintBoundary(
-              key: _exportKey,
-              child: Scaffold(
-                body: Stack(
-                  children: [
-                    Positioned.fill(child: Background()),
-                    Stack(
-                      children: [
-                        MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          child: PageView(
-                            controller: _pageController,
-                            scrollDirection: Axis.vertical,
-                            onPageChanged: (int pageIndex) {
-                              // Update current index
-                              setState(() {
-                                _currentIndex = pageIndex;
-                              });
+        child: BlocListener<HomeBloc, HomeState>(
+          listener: (context, state) {
+            if (state is StreakIsBroken) {
+              debugPrint('streak is broken');
+            }
+            if (state is GotLastSevenDaysStreakData) {
+              showModalBottomSheet(
+                useSafeArea: true,
+                isScrollControlled: true,
+                context: context,
+                builder: (context) => StreakBottomSheet(entities: state.streakData),
+              );
+            }
+            if (state is ShowStreakBottomSheet) {
+              Future.delayed(Duration(milliseconds: 2000), () {
+                if (mounted && context.mounted) {
+                  HapticFeedback.lightImpact();
+                  showModalBottomSheet(
+                    useSafeArea: true,
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (context) => StreakBottomSheet(entities: state.streakData),
+                  );
+                }
+              });
+            }
+            if (state is GotQuotes) {
+              print('got quotes ${state.result.length}');
+              _quotes.addAll(state.result);
+            }
+            if (state is GotSwipeCompleteState) {
+              _isSwipeCompleted = state.isCompleted;
+            }
+            if (state is GotShareGuideState) {
+              _isShareGuideShown = state.isShown;
+            }
+            if (state is GotFeedSetupState) {
+              _isFeedSetupShown = state.isShown;
+            }
+            if (state is GotLikeGuideState) {
+              _isLikeGuideShown = state.isShown;
+            }
+            if (state is GotLikeCount) {
+              _likeCount = state.likeCount;
+              if (_likeCount == 3 && !_isShareGuideShown) {
+                if (!_isShareGuideShown) {
+                  Future.delayed(Duration(milliseconds: 2000), () {
+                    if (mounted && context.mounted) {
+                      HapticFeedback.lightImpact();
+                      _showLikeProgress = true;
+                      _openShareDialog();
+                    }
+                  });
+                } else {
+                  _showLikeProgress = true;
+                }
 
-                              if (_quotes.isNotEmpty) {
-                                context.read<HomeBloc>().add(
-                                  MarkQuoteAsShown(_quotes[pageIndex].id),
-                                );
-                              }
-                              // Handle swipe completion
-                              if (pageIndex >= 1 && _controlsFadeAnimation.value == 0) {
-                                context.read<HomeBloc>().add(OnSwipeComplete());
-                                _controller.forward();
-                              }
+                context.read<HomeBloc>().add(const OnShareGuideShown());
+              }
 
-                              // Handle like guide at index 2
-                              if (pageIndex == 2) {
-                                debugPrint('like guide is this $_isLikeGuideShown');
-                                if (_likeCount < Constants.minimumLikeGoal) {
-                                  if (!_isLikeGuideShown) {
-                                    showModalBottomSheet(
-                                      isScrollControlled: true,
-                                      context: context,
-                                      builder: (context) => LikeDetailBottomSheet(),
-                                    );
+              if (_likeCount >= Constants.minimumLikeGoal && !_isFeedSetupShown) {
+                debugPrint('showing feed setup');
+                Future.delayed(const Duration(milliseconds: 1000), () {
+                  if (mounted && context.mounted) {
+                    Utils.showCustomSnackBar(context, const FeedSetupSnackBar());
+                    context.read<HomeBloc>().add(const OnFeedSetupShown());
+                  }
+                });
+              }
+            }
+          },
+          child: BlocBuilder<ShareBloc, ShareState>(
+            builder: (context, shareState) {
+              return BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  return RepaintBoundary(
+                    key: _exportKey,
+                    child: Scaffold(
+                      body: Stack(
+                        children: [
+                          Positioned.fill(child: Background()),
+                          Stack(
+                            children: [
+                              MediaQuery.removePadding(
+                                context: context,
+                                removeTop: true,
+                                child: PageView(
+                                  controller: _pageController,
+                                  scrollDirection: Axis.vertical,
+                                  onPageChanged: (int pageIndex) {
+                                    // Update current index
                                     setState(() {
-                                      _isLikeGuideShown = true;
+                                      _currentIndex = pageIndex;
                                     });
-                                    context.read<HomeBloc>().add(OnLikeGuideShown());
-                                  } else {
-                                    setState(() {
-                                      _showLikeProgress = true;
-                                    });
-                                  }
-                                }
-                              }
 
-                              // Load more quotes when near the end
-                              if (pageIndex >= _quotes.length - 3) {
-                                _page++;
-                                print('getting more quotes $_page');
-                                context.read<HomeBloc>().add(GetQuotes(_page, _isPremium));
-                              }
-                            },
-                            children: List.generate(
-                              _quotes.length,
-                              (index) => HomeListItem(
-                                quoteKey: _quotes[index].quoteKey,
-                                isWelcome: (_isSwipeCompleted) ? false : index == 0,
-                                showSwipeUp: (_isSwipeCompleted) ? false : index >= 1,
-                                showSwipeGuide: (_isSwipeCompleted) ? false : index == 1,
-                                quote: _quotes[index].quoteText,
-                                isLiked: _quotes[index].isLiked,
-                                showExtras: _showExtraWidgets,
-                                showWaterMark: _showWaterMark,
-                                onTap: () {
-                                  Future.delayed(Duration(milliseconds: 500), () {
-                                    HapticFeedback.lightImpact();
-                                    if (context.mounted) {
-                                      _pageController.animateToPage(
-                                        index + 1,
-                                        duration: Duration(milliseconds: 250),
-                                        curve: Curves.linear,
+                                    if (_quotes.isNotEmpty) {
+                                      context.read<HomeBloc>().add(
+                                        MarkQuoteAsShown(_quotes[pageIndex].id),
                                       );
                                     }
-                                  });
-                                },
-                                onLikePressed: (isLiked) {
-                                  context.read<HomeBloc>().add(
-                                    OnLikePressed(isLiked, _quotes[index]),
-                                  );
-                                  final current = _quotes[index];
-                                  setState(() {
-                                    _quotes[index] = (current).copyWith(isLiked: !current.isLiked);
-                                  });
-                                },
-                                onSharePressed: () {
-                                  HapticFeedback.lightImpact();
-                                  _showShareBottomSheet(index);
-                                },
+                                    // Handle swipe completion
+                                    if (pageIndex >= 1 && _controlsFadeAnimation.value == 0) {
+                                      context.read<HomeBloc>().add(OnSwipeComplete());
+                                      _controller.forward();
+                                    }
+
+                                    // Handle like guide at index 2
+                                    if (pageIndex == 2) {
+                                      debugPrint('like guide is this $_isLikeGuideShown');
+                                      if (_likeCount < Constants.minimumLikeGoal) {
+                                        if (!_isLikeGuideShown) {
+                                          showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            context: context,
+                                            builder: (context) => LikeDetailBottomSheet(),
+                                          );
+                                          setState(() {
+                                            _isLikeGuideShown = true;
+                                          });
+                                          context.read<HomeBloc>().add(OnLikeGuideShown());
+                                        } else {
+                                          setState(() {
+                                            _showLikeProgress = true;
+                                          });
+                                        }
+                                      }
+                                    }
+
+                                    // Load more quotes when near the end
+                                    if (pageIndex >= _quotes.length - 3) {
+                                      _page++;
+                                      print('getting more quotes $_page');
+                                      context.read<HomeBloc>().add(GetQuotes(_page, App.isPremium));
+                                    }
+                                  },
+                                  children: List.generate(
+                                    _quotes.length,
+                                    (index) => HomeListItem(
+                                      quoteKey: _quotes[index].quoteKey,
+                                      isWelcome: (_isSwipeCompleted) ? false : index == 0,
+                                      showSwipeUp: (_isSwipeCompleted) ? false : index >= 1,
+                                      showSwipeGuide: (_isSwipeCompleted) ? false : index == 1,
+                                      quote: _quotes[index].quoteText,
+                                      isLiked: _quotes[index].isLiked,
+                                      showExtras: _showExtraWidgets,
+                                      showWaterMark: _showWaterMark,
+                                      onTap: () {
+                                        Future.delayed(Duration(milliseconds: 500), () {
+                                          HapticFeedback.lightImpact();
+                                          if (context.mounted) {
+                                            _pageController.animateToPage(
+                                              index + 1,
+                                              duration: Duration(milliseconds: 250),
+                                              curve: Curves.linear,
+                                            );
+                                          }
+                                        });
+                                      },
+                                      onLikePressed: (isLiked) {
+                                        context.read<HomeBloc>().add(
+                                          OnLikePressed(isLiked, _quotes[index]),
+                                        );
+                                        final current = _quotes[index];
+                                        setState(() {
+                                          _quotes[index] = (current).copyWith(
+                                            isLiked: !current.isLiked,
+                                          );
+                                        });
+                                      },
+                                      onSharePressed: () {
+                                        HapticFeedback.lightImpact();
+                                        _showShareBottomSheet(index);
+                                      },
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: AnimatedOpacity(
+                                  duration: Duration(milliseconds: 500),
+                                  opacity:
+                                      _showExtraWidgets
+                                          ? (_isSwipeCompleted)
+                                              ? 1
+                                              : 0
+                                          : 0,
+                                  child: FadeTransition(
+                                    opacity:
+                                        (_isSwipeCompleted)
+                                            ? Tween<double>(begin: 1, end: 1).animate(
+                                              CurvedAnimation(
+                                                parent: _controller,
+                                                curve: Curves.linear,
+                                              ),
+                                            )
+                                            : _controlsFadeAnimation,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 30),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              GestureDetector(
+                                                child: HomeButton(
+                                                  icon: Icons.imagesearch_roller_outlined,
+                                                ),
+                                                onTap: () async {
+                                                  await HapticFeedback.lightImpact();
+                                                  if (mounted && context.mounted) {
+                                                    setState(() {
+                                                      _screenshotCallbackEnabled = false;
+                                                    });
+                                                    await showModalBottomSheet(
+                                                      useSafeArea: true,
+                                                      isScrollControlled: true,
+                                                      context: context,
+                                                      builder:
+                                                          (context) => ThemeSelectionBottomSheet(
+                                                            quote:
+                                                                _quotes[(_pageController.page ?? 1)
+                                                                        .round()]
+                                                                    .quoteText,
+                                                          ),
+                                                    );
+                                                    if (mounted && context.mounted) {
+                                                      setState(() {
+                                                        _screenshotCallbackEnabled = true;
+                                                      });
+                                                    }
+                                                  }
+                                                },
+                                              ),
+                                              GestureDetector(
+                                                child: HomeButton(icon: Icons.person_3_outlined),
+                                                onTap: () {
+                                                  HapticFeedback.lightImpact();
+                                                  showModalBottomSheet(
+                                                    isScrollControlled: true,
+                                                    useSafeArea: true,
+                                                    context: context,
+                                                    builder: (context) => PreferencesBottomSheet(),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: AnimatedOpacity(
+                          AnimatedOpacity(
                             duration: Duration(milliseconds: 500),
                             opacity:
-                                _showExtraWidgets
-                                    ? (_isSwipeCompleted)
-                                        ? 1
+                                (_showExtraWidgets)
+                                    ? (_showLikeProgress)
+                                        ? ((_likeCount < Constants.minimumLikeGoal) ? 1 : 0)
                                         : 0
                                     : 0,
-                            child: FadeTransition(
-                              opacity:
-                                  (_isSwipeCompleted)
-                                      ? Tween<double>(begin: 1, end: 1).animate(
-                                        CurvedAnimation(parent: _controller, curve: Curves.linear),
-                                      )
-                                      : _controlsFadeAnimation,
+                            child: Align(
+                              alignment: Alignment.topCenter,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 30),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        GestureDetector(
-                                          child: HomeButton(
-                                            icon: Icons.imagesearch_roller_outlined,
-                                          ),
-                                          onTap: () {
-                                            HapticFeedback.lightImpact();
-                                            showModalBottomSheet(
-                                              useSafeArea: true,
-                                              isScrollControlled: true,
-                                              context: context,
-                                              builder:
-                                                  (context) => ThemeSelectionBottomSheet(
-                                                    quote:
-                                                        _quotes[(_pageController.page ?? 1).round()]
-                                                            .quoteText,
-                                                  ),
-                                            );
-                                          },
-                                        ),
-                                        GestureDetector(
-                                          child: HomeButton(icon: Icons.person_3_outlined),
-                                          onTap: () {
-                                            HapticFeedback.lightImpact();
+                                padding: const EdgeInsets.only(top: 66),
+                                child: LikeProgress(
+                                  likeCount: _likeCount,
+                                  likeGoal: Constants.minimumLikeGoal,
+                                  onPressed:
+                                      _showLikeProgress
+                                          ? () {
                                             showModalBottomSheet(
                                               isScrollControlled: true,
                                               useSafeArea: true,
                                               context: context,
-                                              builder: (context) => PreferencesBottomSheet(),
+                                              builder: (context) => LikeDetailBottomSheet(),
                                             );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                          }
+                                          : null,
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    AnimatedOpacity(
-                      duration: Duration(milliseconds: 500),
-                      opacity:
-                          (_showExtraWidgets)
-                              ? (_showLikeProgress)
-                                  ? ((_likeCount < Constants.minimumLikeGoal) ? 1 : 0)
-                                  : 0
-                              : 0,
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 66),
-                          child: LikeProgress(
-                            likeCount: _likeCount,
-                            likeGoal: Constants.minimumLikeGoal,
-                            onPressed: () {
-                              showModalBottomSheet(
-                                isScrollControlled: true,
-                                useSafeArea: true,
-                                context: context,
-                                builder: (context) => LikeDetailBottomSheet(),
-                              );
-                            },
-                          ),
-                        ),
+                          if (shareState is Rendering) ...[
+                            Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.height,
+                                color: Colors.white.withValues(alpha: 0.1),
+                                child: Center(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.surface,
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 23,
+                                        vertical: 17,
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const CupertinoActivityIndicator(radius: 20),
+                                          if (shareState.progress != null) ...[
+                                            const SizedBox(height: 18),
+                                            const Text('Rendering...'),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );

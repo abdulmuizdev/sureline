@@ -43,12 +43,16 @@ class FavouritesRepositoryImpl extends FavouritesRepository {
   }) async {
     // Convert domain entities to data models and delegate to data source
     if (quote != null) {
+      print('checkk 1');
       return dataSource.addFavourite(quote: QuoteModel.fromEntity(quote));
     } else if (ownQuote != null) {
+      print('checkk 2');
       return dataSource.addFavourite(ownQuote: OwnQuoteModel.fromEntity(ownQuote));
     } else if (search != null) {
+      print('checkk 3');
       return dataSource.addFavourite(search: SearchModel.fromEntity(search));
     } else if (history != null) {
+      print('checkk 4');
       return dataSource.addFavourite(history: HistoryModel.fromEntity(history));
     } else {
       // Return failure if no valid entity is provided

@@ -228,6 +228,12 @@ class QuotesDao extends DatabaseAccessor<AppDatabase> with _$QuotesDaoMixin {
     )).getSingleOrNull().then((favourite) => favourite != null);
   }
 
+  Future<bool> isHistoryFavourite(int historyId) {
+    return (select(favourites)..where(
+      (tbl) => tbl.historyId.equals(historyId),
+    )).getSingleOrNull().then((favourite) => favourite != null);
+  }
+
   /// Checks if a search result is marked as favorite by the user.
   ///
   /// This method supports search functionality by tracking favorite

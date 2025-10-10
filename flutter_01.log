@@ -1,0 +1,69 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter run --machine --start-paused -d 00008120-000E0D2A1E98C01E --devtools-server-address http://127.0.0.1:9100/ --target /Users/abdulmuiz/Projects/SaaS/SureLine/Client/sureline/lib/main.dart
+
+## exception
+
+RPCError: streamListen: (-32000) Bad state: The client closed with pending request "_setStreamIncludePrivateMembers".
+
+```
+#0      new _OutstandingRequest (package:vm_service/src/vm_service.dart:265:34)
+#1      VmService._call.<anonymous closure> (package:vm_service/src/vm_service.dart:1921:25)
+#2      VmService._call (package:vm_service/src/vm_service.dart:1933:8)
+#3      VmService.streamListen (package:vm_service/src/vm_service.dart:1849:7)
+#4      IOSDeviceLogReader._listenToUnifiedLoggingEvents (package:flutter_tools/src/ios/devices.dart:1379:44)
+#5      IOSDeviceLogReader.provideVmService (package:flutter_tools/src/ios/devices.dart:1287:11)
+#6      FlutterDevice.connect.<anonymous closure> (package:flutter_tools/src/resident_runner.dart:363:58)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel stable, 3.29.0, on macOS 14.6 23G80 darwin-arm64, locale en-PK) [1,509ms]
+    • Flutter version 3.29.0 on channel stable at /Users/abdulmuiz/development/flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision 35c388afb5 (6 months ago), 2025-02-10 12:48:41 -0800
+    • Engine revision f73bfc4522
+    • Dart version 3.7.0
+    • DevTools version 2.42.2
+
+[✓] Android toolchain - develop for Android devices (Android SDK version 35.0.1) [5.0s]
+    • Android SDK at /Users/abdulmuiz/Library/Android/sdk
+    • Platform android-35, build-tools 35.0.1
+    • Java binary at: /Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java
+      This is the JDK bundled with the latest Android Studio installation on this machine.
+      To manually set the JDK path, use: `flutter config --jdk-dir="path/to/jdk"`.
+    • Java version OpenJDK Runtime Environment (build 21.0.6+-13368085-b895.109)
+    • All Android licenses accepted.
+
+[✓] Xcode - develop for iOS and macOS (Xcode 16.2) [1,233ms]
+    • Xcode at /Applications/Xcode.app/Contents/Developer
+    • Build 16C5032a
+    • CocoaPods version 1.16.2
+
+[✓] Chrome - develop for the web [2ms]
+    • Chrome at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+
+[✓] Android Studio (version 2024.3) [2ms]
+    • Android Studio at /Applications/Android Studio.app/Contents
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    • Java version OpenJDK Runtime Environment (build 21.0.6+-13368085-b895.109)
+
+[✓] Connected device (4 available) [5.8s]
+    • Abdul Muiz’s iPhone (wireless) (mobile) • 00008120-000E0D2A1E98C01E • ios            • iOS 18.5 22F76
+    • macOS (desktop)                         • macos                     • darwin-arm64   • macOS 14.6 23G80 darwin-arm64
+    • Mac Designed for iPad (desktop)         • mac-designed-for-ipad     • darwin         • macOS 14.6 23G80 darwin-arm64
+    • Chrome (web)                            • chrome                    • web-javascript • Google Chrome 138.0.7204.101
+
+[✓] Network resources [1,054ms]
+    • All expected network resources are available.
+
+• No issues found!
+```

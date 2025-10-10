@@ -166,7 +166,7 @@ struct SurelineQuoteWidget: Widget {
             SurelineQuoteWidgetEntryView(entry: entry)
 //                .containerBackground(.fill.tertiary, for: .widget)
         }
-        .supportedFamilies([.systemMedium, .systemLarge, .systemSmall, .systemExtraLarge])
+        .supportedFamilies([.systemMedium])
 
         .configurationDisplayName("Hourly quotes")
         .description("Make it yours by editing this widget from app's widget setting")

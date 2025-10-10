@@ -59,11 +59,7 @@ class StreakBottomSheet extends StatelessWidget {
   ///
   /// Returns a SizedBox widget with placeholder content
   Widget _buildVisualElement() {
-    return SizedBox(
-      height: 235,
-      width: 235,
-      child: Image.asset('assets/images/sparkle.png'),
-    );
+    return SizedBox(height: 235, width: 235, child: Image.asset('assets/images/sparkle.png'));
   }
 
   /// Builds the motivational content with heading and description.
@@ -83,7 +79,7 @@ class StreakBottomSheet extends StatelessWidget {
   ///
   /// Returns a StreakContainer widget
   Widget _buildStreakContainer() {
-    return StreakContainer(entities: entities);
+    return StreakContainer(entities: entities, showShare: false);
   }
 
   /// Builds the commitment button for user interaction.
